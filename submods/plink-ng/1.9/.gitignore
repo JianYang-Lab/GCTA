@@ -1,0 +1,11 @@
+.DS_Store
+plink
+bb
+bazel-1.9
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+*~
+*.tmp
+*.o
