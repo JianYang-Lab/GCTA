@@ -235,7 +235,7 @@ void read_weight(string phen_file, vector<string> &phen_ID, vector<double> &weig
 }
 
 
-void gcta::fit_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string qGE_file, string GE_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, bool no_constrain, bool mlmassoc, bool within_family, bool reml_bending, bool reml_diag_one, string weight_file) {
+void gcta::fit_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string qGE_file, string GE_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, bool no_constrain, bool mlmassoc, bool within_family, bool reml_bending, bool reml_diag_one, string weight_file) {
     _within_family = within_family;
     _reml_mtd = reml_mtd;
     _reml_max_iter = MaxIter;
@@ -516,7 +516,7 @@ void gcta::fit_reml(string grm_file, string phen_file, string qcovar_file, strin
     //LOGGER << "Prepare time: " << LOGGER.tp("main") << std::endl;
 
     // run REML algorithm
-    reml(pred_rand_eff, est_fix_eff, reml_priors, reml_priors_var, prevalence, -2.0, no_constrain, no_lrt, mlmassoc);
+    reml(pred_rand_eff, est_fix_eff, est_fix_eff_var, reml_priors, reml_priors_var, prevalence, -2.0, no_constrain, no_lrt, mlmassoc);
 }
 
 void gcta::drop_comp(vector<int> &drop) {
@@ -717,7 +717,7 @@ int gcta::constrain_varcmp(eigenVector &varcmp) {
     return num;
 }
 
-void gcta::reml(bool pred_rand_eff, bool est_fix_eff, vector<double> &reml_priors, vector<double> &reml_priors_var, double prevalence, double prevalence2, bool no_constrain, bool no_lrt, bool mlmassoc)
+void gcta::reml(bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, vector<double> &reml_priors, vector<double> &reml_priors_var, double prevalence, double prevalence2, bool no_constrain, bool no_lrt, bool mlmassoc)
 {
     int i = 0, j = 0, k = 0;
 
@@ -836,12 +836,24 @@ void gcta::reml(bool pred_rand_eff, bool est_fix_eff, vector<double> &reml_prior
         }
     }
     if (est_fix_eff) {
-        LOGGER << "Estimate" << (_X_c > 1 ? "s" : "") << "of fixed effect" << (_X_c > 1 ? "s" : "") << ":" << endl;
+        LOGGER << endl;
+        LOGGER << "Estimate" << (_X_c > 1 ? "s" : "") << " of fixed effect" << (_X_c > 1 ? "s" : "") << ":" << endl;
         LOGGER << "\nSource\tEstimate\tSE" << endl;
         for (i = 0; i < _X_c; i++) {
             if (i == 0) LOGGER << "mean\t";
             else LOGGER << "X_" << i + 1 << "\t";
             LOGGER << std::fixed << _b[i] << "\t" << sqrt(Xt_Vi_X_i(i, i)) << endl;
+        }
+    }
+
+    if (est_fix_eff_var) {
+       LOGGER << endl;
+       LOGGER << "Variance-covariance matrix of the estimated fixed effect"<< (_X_c > 1 ? "s" : "") << ":" << endl;
+        for (i = 0; i < _X_c; i++) {
+            for (j = 0; j < _X_c; j++) {
+               LOGGER << std::fixed << Xt_Vi_X_i(i, j) << "\t";
+            }
+            LOGGER << endl;
         }
     }
 

@@ -112,7 +112,7 @@ void option(int option_num, char* option_str[])
     int mphen = 1, mphen2 = 2, reml_mtd = 0, MaxIter = 100;
     bool reml_allow_constrain_run = false;
     double prevalence = -2.0, prevalence2 = -2.0;
-    bool reml_flag = false, pred_rand_eff = false, est_fix_eff = false, blup_snp_flag = false, no_constrain = false, reml_lrt_flag = false, no_lrt = false, bivar_reml_flag = false, ignore_Ce = false, within_family = false, reml_bending = false, HE_reg_flag = false, reml_diag_one = false, bivar_no_constrain = false;
+    bool reml_flag = false, pred_rand_eff = false, est_fix_eff = false, est_fix_eff_var = false, blup_snp_flag = false, no_constrain = false, reml_lrt_flag = false, no_lrt = false, bivar_reml_flag = false, ignore_Ce = false, within_family = false, reml_bending = false, HE_reg_flag = false, reml_diag_one = false, bivar_no_constrain = false;
     int reml_diagV_adj = 0;
     double reml_diag_mul = 0.01;
     int reml_inv_method = 0;
@@ -655,6 +655,10 @@ void option(int option_num, char* option_str[])
         } else if (strcmp(argv[i], "--reml-est-fix") == 0) {
             est_fix_eff = true;
             LOGGER << "--reml-est-fix" << endl;
+        } else if (strcmp(argv[i], "--reml-est-fix-varcov") == 0) {
+            est_fix_eff = true;
+            est_fix_eff_var = true;
+            LOGGER << "--reml-est-fix-varcov" << endl;
         } else if (strcmp(argv[i], "--reml-alg") == 0) {
             reml_mtd = atoi(argv[++i]);
             LOGGER << "--reml-alg " << reml_mtd << endl;
@@ -1259,6 +1263,7 @@ void option(int option_num, char* option_str[])
         if (grm_adj_fac>-1.0) LOGGER << "Warning: the option --grm-adj option is disabled in this analysis." << endl;
         if (dosage_compen>-1.0) LOGGER << "Warning: the option --dc option is disabled in this analysis." << endl;
         if (est_fix_eff) LOGGER << "Warning: the option --reml-est-fix option is disabled in this analysis." << endl;
+        if (est_fix_eff_var) LOGGER << "Warning: the option --reml-est-fix-varcov option is disabled in this analysis." << endl;
         if (pred_rand_eff) LOGGER << "Warning: the option --reml-pred-rand option is disabled in this analysis." << endl;
         if(cv_blup) LOGGER << "Warning: the option --cvblup option is disabled in this analysis." << endl;
         if (reml_lrt_flag) LOGGER << "Warning: the option --reml-lrt option is disabled in this analysis." << endl; 
@@ -1458,10 +1463,10 @@ void option(int option_num, char* option_str[])
     else if ((reml_flag || bivar_reml_flag) && phen_file.empty()) LOGGER.e(0, "\n a phenotype file is required for reml analysis.\n");
     else if (bivar_reml_flag) {
         pter_gcta->set_cv_blup(cv_blup);
-        pter_gcta->fit_bivar_reml(grm_file, phen_file, qcovar_file, covar_file, kp_indi_file, rm_indi_file, update_sex_file, mphen, mphen2, grm_cutoff, grm_adj_fac, dosage_compen, m_grm_flag, pred_rand_eff, est_fix_eff, reml_mtd, MaxIter, reml_priors, reml_priors_var, reml_drop, no_lrt, prevalence, prevalence2, no_constrain, ignore_Ce, fixed_rg_val, bivar_no_constrain);
+        pter_gcta->fit_bivar_reml(grm_file, phen_file, qcovar_file, covar_file, kp_indi_file, rm_indi_file, update_sex_file, mphen, mphen2, grm_cutoff, grm_adj_fac, dosage_compen, m_grm_flag, pred_rand_eff, est_fix_eff, est_fix_eff_var, reml_mtd, MaxIter, reml_priors, reml_priors_var, reml_drop, no_lrt, prevalence, prevalence2, no_constrain, ignore_Ce, fixed_rg_val, bivar_no_constrain);
     } else if (reml_flag) {
         pter_gcta->set_cv_blup(cv_blup);
-        pter_gcta->fit_reml(grm_file, phen_file, qcovar_file, covar_file, qgxe_file, gxe_file, kp_indi_file, rm_indi_file, update_sex_file, mphen, grm_cutoff, grm_adj_fac, dosage_compen, m_grm_flag, pred_rand_eff, est_fix_eff, reml_mtd, MaxIter, reml_priors, reml_priors_var, reml_drop, no_lrt, prevalence, no_constrain, mlma_flag, within_family, reml_bending, reml_diag_one, weight_file);
+        pter_gcta->fit_reml(grm_file, phen_file, qcovar_file, covar_file, qgxe_file, gxe_file, kp_indi_file, rm_indi_file, update_sex_file, mphen, grm_cutoff, grm_adj_fac, dosage_compen, m_grm_flag, pred_rand_eff, est_fix_eff, est_fix_eff_var, reml_mtd, MaxIter, reml_priors, reml_priors_var, reml_drop, no_lrt, prevalence, no_constrain, mlma_flag, within_family, reml_bending, reml_diag_one, weight_file);
     } else if (grm_flag || m_grm_flag) {
         if (pca_flag) pter_gcta->pca(grm_file, kp_indi_file, rm_indi_file, grm_cutoff, m_grm_flag, out_pc_num);
         else if (make_grm_flag) pter_gcta->save_grm(grm_file, kp_indi_file, rm_indi_file, update_sex_file, grm_cutoff, grm_adj_fac, dosage_compen, m_grm_flag, grm_out_bin_flag);

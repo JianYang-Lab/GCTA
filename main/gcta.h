@@ -112,7 +112,7 @@ public:
     void grm_bK(string grm_file, string keep_indi_file, string remove_indi_file, double threshold, bool grm_out_bin_flag);
 
     void enable_grm_bin_flag();
-    void fit_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string qGE_file, string GE_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, bool no_constrain, bool mlmassoc = false, bool within_family = false, bool reml_bending = false, bool reml_diag_one = false, string weight_file = "");
+    void fit_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string qGE_file, string GE_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, bool no_constrain, bool mlmassoc = false, bool within_family = false, bool reml_bending = false, bool reml_diag_one = false, string weight_file = "");
     //void HE_reg(string grm_file, string phen_file, string keep_indi_file, string remove_indi_file, int mphen); // old HE regression method
     void HE_reg(string grm_file, bool m_grm_flag, string phen_file, string keep_indi_file, string remove_indi_file, int mphen); // allow multiple regression
     void HE_reg_bivar(string grm_file, bool m_grm_flag, string phen_file, string keep_indi_file, string remove_indi_file, int mphen, int mphen2); // estimate genetic covariance between two traits
@@ -130,7 +130,7 @@ public:
     void set_reml_inv_method(int method);
 
     // bivariate REML analysis
-    void fit_bivar_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, int mphen2, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, double prevalence2, bool no_constrain, bool ignore_Ce, vector<double> &fixed_rg_val, bool bivar_no_constrain);
+    void fit_bivar_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, int mphen2, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, double prevalence2, bool no_constrain, bool ignore_Ce, vector<double> &fixed_rg_val, bool bivar_no_constrain);
 
     // LD
     void read_LD_target_SNPs(string snplistfile);
@@ -293,7 +293,7 @@ private:
     void drop_comp(vector<int> &drop);
     void construct_X(int n, map<string, int> &uni_id_map, bool qcovar_flag, int qcovar_num, vector<string> &qcovar_ID, vector< vector<string> > &qcovar, bool covar_flag, int covar_num, vector<string> &covar_ID, vector< vector<string> > &covar, vector<eigenMatrix> &E_float, eigenMatrix &qE_float);
     void coeff_mat(const vector<string> &vec, eigenMatrix &coeff_mat, string errmsg1, string errmsg2);
-    void reml(bool pred_rand_eff, bool est_fix_eff, vector<double> &reml_priors, vector<double> &reml_priors_var, double prevalence, double prevalence2, bool no_constrain, bool no_lrt, bool mlmassoc = false);
+    void reml(bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, vector<double> &reml_priors, vector<double> &reml_priors_var, double prevalence, double prevalence2, bool no_constrain, bool no_lrt, bool mlmassoc = false);
     double reml_iteration(eigenMatrix &Vi_X, eigenMatrix &Xt_Vi_X_i, eigenMatrix &Hi, eigenVector &Py, eigenVector &varcmp, bool prior_var_flag, bool no_constrain, bool reml_bivar_fix_rg = false);
     void init_varcomp(vector<double> &reml_priors_var, vector<double> &reml_priors, eigenVector &varcmp);
     bool calcu_Vi(eigenMatrix &Vi, eigenVector &prev_varcmp, double &logdet, int &iter);

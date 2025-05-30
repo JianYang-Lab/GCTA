@@ -197,7 +197,7 @@ void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, stri
     // run REML algorithm
     LOGGER << "\nPerforming MLM association analyses" << (subtract_grm_flag?"":" (including the candidate SNP)") << " ..."<<endl;
     unsigned long n=_keep.size(), m=_include.size();
-	reml(false, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
+	reml(false, true, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
     _P.resize(0,0);
     _A.clear();
     float *y=new float[n];
@@ -481,7 +481,7 @@ void gcta::mlma_loco(string phen_file, string qcovar_file, string covar_file, in
         }
         
         // run REML algorithm
-        reml(false, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
+        reml(false, true, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
         if(!no_adj_covar) y_buf=_y.array()-(_X*_b).array(); // adjust phenotype for covariates
         for(i=0; i<_n; i++) y[i]=y_buf[i];
         reml_priors.clear();

@@ -175,7 +175,8 @@ int main(int argc, char *argv[]){
             options["out"].push_back(outs[0]);
         }
     }else{
-        LOGGER.e(0, "the --out option is missing.");
+        LOGGER.w(0, "Warning: No output file specified. Using default output file 'output'.");
+        options["out"].push_back("output");
     }
 
     // multi thread mode

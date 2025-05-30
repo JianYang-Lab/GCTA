@@ -12,7 +12,7 @@
 
 #include "gcta.h"
 
-void gcta::fit_bivar_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, int mphen2, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, double prevalence2, bool no_constrain, bool ignore_Ce, vector<double> &fixed_rg_val, bool bivar_no_constrain) {
+void gcta::fit_bivar_reml(string grm_file, string phen_file, string qcovar_file, string covar_file, string keep_indi_file, string remove_indi_file, string sex_file, int mphen, int mphen2, double grm_cutoff, double adj_grm_fac, int dosage_compen, bool m_grm_flag, bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, int reml_mtd, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, vector<int> drop, bool no_lrt, double prevalence, double prevalence2, bool no_constrain, bool ignore_Ce, vector<double> &fixed_rg_val, bool bivar_no_constrain) {
     _bivar_reml = true;
     _bivar_no_constrain = bivar_no_constrain;
     no_lrt = true;
@@ -326,7 +326,7 @@ void gcta::fit_bivar_reml(string grm_file, string phen_file, string qcovar_file,
     _ignore_Ce = ignore_Ce;
 
     // run REML algorithm
-    reml(pred_rand_eff, est_fix_eff, reml_priors, reml_priors_var, prevalence, prevalence2, no_constrain, no_lrt, false);
+    reml(pred_rand_eff, est_fix_eff, est_fix_eff_var, reml_priors, reml_priors_var, prevalence, prevalence2, no_constrain, no_lrt, false);
 }
 
 bool gcta::calcu_Vi_bivar(eigenMatrix &Vi, eigenVector &prev_varcmp, double &logdet, int &iter) {

@@ -190,7 +190,7 @@ else()
     else()
         #target_link_libraries(gcta64 mainV1 ${libs_list} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,-Bdynamic pthread m dl)
         #target_link_libraries(gcta64 mainV1 ${libs_list} Pgenlib -static z sqlite3 zstd -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
-        target_link_libraries(gcta64 mainV1 ${libs_list} Pgenlib z sqlite3 zstd gsl gslcblas m -Wl,--start-group ${BLAS_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
+	target_link_libraries(gcta64 mainV1 -static ${libs_list} Pgenlib z sqlite3 zstd gsl gslcblas m -Wl,--start-group ${BLAS_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
     endif()
 endif()
 
