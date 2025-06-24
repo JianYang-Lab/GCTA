@@ -1,10 +1,68 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
-SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-SET(PROJECT_NAME_STR GCTA2)
-PROJECT(${PROJECT_NAME_STR} C CXX)
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-SET(CMAKE_CXX_STANDARD 11)
-SET(CMAKE_C_STANDARD 11)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
+
+project(GCTA2 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RELEASE)
+    message("Setting to release build")
+endif()
+
+# Fetch 3rd parties
+include(FetchContent)
+
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+set(FETCHCONTENT_QUIET OFF)
+
+set(BOOST_ENABLE_CMAKE ON)
+set(BOOST_INCLUDE_LIBRARIES algorithm math crc)
+FetchContent_Declare(
+    Boost
+    URL https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.xz
+    URL_MD5 893b5203b862eb9bbd08553e24ff146a
+    DOWNLOAD_EXTRACT_TIMESTAMP ON)
+
+FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 3.4.0
+    GIT_SHALLOW TRUE)
+
+FetchContent_Declare(
+    spectra
+    GIT_REPOSITORY https://github.com/yixuan/spectra.git
+    GIT_TAG v1.1.0
+    GIT_SHALLOW TRUE)
+
+FetchContent_MakeAvailable(Boost Eigen spectra)
+
+find_package(Threads REQUIRED)
+
+# NOTE: Install gsl sqlite3 zstd with your system package manager
+find_package(GSL REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(zstd REQUIRED CONFIG)
+
+if(LINUX)
+    if(NOT OMP_LIBRARY)
+        set(OMP_LIBRARY "/usr/lib/libgomp.so")
+    endif()
+    if(NOT MKL_DIR)
+        set(MKL_DIR "/opt/intel/mkl/lib/intel64/cmake/mkl")
+    endif()
+    set(MKL_THREADING "gnu_thread")
+endif()
+find_package(OpenMP REQUIRED)
+find_package(MKL REQUIRED)
 
 # get system architecture
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
@@ -36,31 +94,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 else()
     MESSAGE(FATAL_ERROR "GCTA can only compile with GCC or Clang")
 endif()
-
-SET(EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}")
-IF(NOT EIGEN3_INCLUDE_DIR)
-    MESSAGE(FATAL_ERROR "Specify environment variable EIGEN3_INCLUDE_DIR to the location of Eigen3 package")
-ENDIF()
-INCLUDE_DIRECTORIES("${EIGEN3_INCLUDE_DIR}")
-
-SET(SPECTRA_LIB "$ENV{SPECTRA_LIB}")
-IF(NOT SPECTRA_LIB)
-    MESSAGE(FATAL_ERROR "Specify environment variable SPECTRA_LIB to the location of Spectra package")
-ENDIF()
-INCLUDE_DIRECTORIES("${SPECTRA_LIB}")
-
-
-SET(BOOST_LIB "$ENV{BOOST_LIB}")
-IF(NOT BOOST_LIB)
-    MESSAGE(FATAL_ERROR "Specify environment variable BOOST_LIB to the location of BOOST library")
-ENDIF()
-INCLUDE_DIRECTORIES("${BOOST_LIB}")
-
-
-# PLINK2.0 pgen library;
-INCLUDE_DIRECTORIES("submods/plink-ng/2.0")
-INCLUDE_DIRECTORIES("submods/plink-ng/2.0/simde")
-
 
 message(STATUS "ARCHITECTURE:${CMAKE_LIBRARY_ARCHITECTURE}")
 if(CMAKE_LIBRARY_ARCHITECTURE STREQUAL "aarch64")
@@ -96,21 +129,6 @@ if(CMAKE_LIBRARY_ARCHITECTURE STREQUAL "aarch64")
     endif()
 
 else()
-    SET(MKLROOT "$ENV{MKLROOT}")
-    IF(NOT MKLROOT)
-        MESSAGE(FATAL_ERROR "Specify environment variable MKLROOT to the location of Intel MKL package")
-    ENDIF()
-    INCLUDE_DIRECTORIES("${MKLROOT}/include")
-
-    find_library(lib_lp64 NAMES mkl_intel_lp64 PATHS "${MKLROOT}/lib/intel64" "${MKLROOT}/lib")
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR APPLE)
-        find_library(lib_thread NAMES mkl_intel_thread PATHS "${MKLROOT}/lib/intel64" "${MKLROOT}/lib")
-    else()
-        find_library(lib_thread NAMES mkl_gnu_thread PATHS "${MKLROOT}/lib/intel64" "${MKLROOT}/lib")
-    endif()
-    find_library(lib_core NAMES mkl_core PATHS "${MKLROOT}/lib/intel64" "${MKLROOT}/lib")
-    set(BLAS_LIB ${lib_lp64} ${lib_thread} ${lib_core})
-
     IF(NOT SSE)
         set(SSE "-msse2")
         message("SSE build")
@@ -131,7 +149,7 @@ else()
         set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG") #-flto
         set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0 -fno-inline -fno-implicit-inline-templates -g3")
         add_compile_options(-fopenmp)
-        set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+        # set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
     elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp -axAVX2 -pthread")
         set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} -O3 -ipo -DNDEBUG")
@@ -141,56 +159,71 @@ else()
     endif()
 endif()
 
-IF(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE RELEASE)
-    message("Setting to release build")
-ENDIF()
-
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 set(MAIN_SOURCE "${PROJECT_SOURCE_DIR}/src/main.cpp")
-include_directories(${COMMON_INCLUDES})
-
 
 file(GLOB SRCS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM SRCS "${MAIN_SOURCE}")
 list(APPEND SRCS "${PROJECT_SOURCE_DIR}/src/acat.c")
 
-set(libs_list "")
-foreach(_lib ${SRCS})
-    get_filename_component(file_name "${_lib}" NAME_WE)
+set(GCTA_LIBS "")
+foreach(lib_src ${SRCS})
+    get_filename_component(file_name "${lib_src}" NAME_WE)
     string(TOLOWER ${file_name} lib_name)
-    add_library(${lib_name} STATIC "${_lib}")
-    list(APPEND libs_list ${lib_name})
-endforeach(_lib)
+    add_library(${lib_name} "${lib_src}")
 
-add_subdirectory(main)
-add_subdirectory(submods)
+    target_include_directories(${lib_name} PUBLIC
+        ${COMMON_INCLUDES}
+        ${MKL_INCLUDE}
+        # PLINK2.0 pgen library;
+        "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0"
+        "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/simde")
 
-if(APPLE)
-    link_directories(${MKLROOT}/lib)
-    link_directories(/usr/local/lib)
-else(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    #linux
-    link_directories(${MKLROOT}/../../../lib/intel64)
-endif()
+    target_link_libraries(${lib_name}
+        Boost::algorithm Boost::math Boost::crc
+        Eigen3::Eigen
+        Spectra)
+
+    list(APPEND GCTA_LIBS ${lib_name})
+endforeach(lib_src)
 
 add_executable(gcta64 ${MAIN_SOURCE})
 
+add_subdirectory(main)
+target_include_directories(mainV1 PUBLIC ${COMMON_INCLUDES} ${MKL_INCLUDE})
+target_link_libraries(mainV1 Eigen3::Eigen)
+
+add_subdirectory(submods)
+
+if(APPLE)
+    target_link_directories(gcta64 ${MKLROOT}/lib)
+    target_link_directories(gcta64 /usr/local/lib)
+elseif(LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_directories(gcta64 ${MKLROOT}/../../../lib/intel64)
+endif()
+
+target_include_directories(gcta64 PUBLIC
+    ${COMMON_INCLUDES}
+    ${MKL_INCLUDE}
+    # PLINK2.0 pgen library;
+    "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0"
+    "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/simde")
+
 if(APPLE)
     # iomp5
-    target_link_libraries(gcta64 ${libs_list} Pgenlib mainV1 z ${BLAS_LIB} sqlite3 zstd omp pthread m dl gsl gslcblas) 
+    target_link_libraries(gcta64 ${GCTA_LIBS} Pgenlib mainV1 z ${BLAS_LIB} sqlite3 zstd omp pthread m dl gsl gslcblas)
 else()
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # error keeps only
-        #target_link_libraries(gcta64 ${libs_list} mainV1 z ${MKL_LIB} iomp5 pthread m dl )
-        #target_link_libraries(gcta64 mainV1 ${libs_list} z ${MKL_LIB} pthread m dl)
+        #target_link_libraries(gcta64 ${GCTA_LIBS} mainV1 z ${MKL_LIB} iomp5 pthread m dl )
+        #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} z ${MKL_LIB} pthread m dl)
         # Dynamic link works
-        #target_link_libraries(gcta64 mainV1 ${libs_list} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group iomp5 -Wl,-Bdynamic pthread m dl)
-        target_link_libraries(gcta64 mainV1 ${libs_list} Pgenlib z sqlite3 zstd -Wl,--start-group ${BLAS_LIB} -Wl,--end-group iomp5 -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
+        #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group iomp5 -Wl,-Bdynamic pthread m dl)
+        target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib z sqlite3 zstd -Wl,--start-group ${BLAS_LIB} -Wl,--end-group iomp5 -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
     else()
-        #target_link_libraries(gcta64 mainV1 ${libs_list} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,-Bdynamic pthread m dl)
-        #target_link_libraries(gcta64 mainV1 ${libs_list} Pgenlib -static z sqlite3 zstd -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
-	target_link_libraries(gcta64 mainV1 -static ${libs_list} Pgenlib z sqlite3 zstd gsl gslcblas m -Wl,--start-group ${BLAS_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
+        #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,-Bdynamic pthread m dl)
+        #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib -static z sqlite3 zstd -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
+        target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib z m GSL::gsl GSL::gslcblas sqlite3 zstd MKL::MKL Threads::Threads)
     endif()
 endif()
 
@@ -199,9 +232,9 @@ endif()
 #ADD_SUBDIRECTORY(test)
 
 IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
-  EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
-    ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
-  )
+    EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+    )
 ENDIF()
 
