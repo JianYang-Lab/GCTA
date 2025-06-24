@@ -2948,7 +2948,8 @@ void Geno::bgen2bed(const vector<uint32_t> &raw_marker_index){
         }
         //LOGGER.i(0, "MIDDLE: " + to_string(index) + "NUM_thread: " + to_string(omp_get_max_threads()));
 
-        #pragma omp ordered
+        // exactly one 'ordered' directive must appear in the loop body of an enclosing directive
+        // #pragma omp ordered
         save_bed(buf, num_marker);
         delete[] buf;
         delete[] dec_data;

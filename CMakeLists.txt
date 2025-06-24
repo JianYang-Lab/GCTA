@@ -43,14 +43,34 @@ FetchContent_Declare(
     GIT_TAG v1.1.0
     GIT_SHALLOW TRUE)
 
-FetchContent_MakeAvailable(Boost Eigen spectra)
+set(ZSTD_BUILD_SHARED ON)
+FetchContent_Declare(
+    zstd
+    GIT_REPOSITORY https://github.com/facebook/zstd.git
+    GIT_TAG v1.5.6
+    GIT_SHALLOW TRUE
+    SOURCE_SUBDIR build/cmake
+)
+
+FetchContent_MakeAvailable(Boost Eigen spectra zstd)
 
 find_package(Threads REQUIRED)
 
-# NOTE: Install gsl sqlite3 zstd with your system package manager
+# NOTE: Install gsl sqlite3 with your system package manager
 find_package(GSL REQUIRED)
 find_package(SQLite3 REQUIRED)
-find_package(zstd REQUIRED CONFIG)
+
+# Find OpenMP
+if(APPLE)
+  # Use manual flags for OpenMP with Apple Clang
+  set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
+  set(OpenMP_C_LIB_NAMES "omp")
+  set(OpenMP_C_INCLUDE_DIR "/opt/homebrew/opt/libomp/include")
+  set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+  set(OpenMP_CXX_LIB_NAMES "omp")
+  set(OpenMP_CXX_INCLUDE_DIR "/opt/homebrew/opt/libomp/include")
+  set(OpenMP_omp_LIBRARY "/opt/homebrew/opt/libomp/lib/libomp.dylib")
+endif()
 
 if(LINUX)
     if(NOT OMP_LIBRARY)
@@ -59,10 +79,12 @@ if(LINUX)
     if(NOT MKL_DIR)
         set(MKL_DIR "/opt/intel/mkl/lib/intel64/cmake/mkl")
     endif()
+    set(MKL_INTERFACE "lp64")
     set(MKL_THREADING "gnu_thread")
+    find_package(MKL REQUIRED)
 endif()
+
 find_package(OpenMP REQUIRED)
-find_package(MKL REQUIRED)
 
 # get system architecture
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
@@ -95,7 +117,7 @@ else()
     MESSAGE(FATAL_ERROR "GCTA can only compile with GCC or Clang")
 endif()
 
-message(STATUS "ARCHITECTURE:${CMAKE_LIBRARY_ARCHITECTURE}")
+message(STATUS "arch:${CMAKE_LIBRARY_ARCHITECTURE}, compiler_id:${CMAKE_CXX_COMPILER_ID}")
 if(CMAKE_LIBRARY_ARCHITECTURE STREQUAL "aarch64")
     SET(OPENBLAS "$ENV{OPENBLAS}")
     IF(NOT OPENBLAS)
@@ -176,7 +198,7 @@ foreach(lib_src ${SRCS})
         ${COMMON_INCLUDES}
         ${MKL_INCLUDE}
         # PLINK2.0 pgen library;
-        "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0"
+        "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/include"
         "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/simde")
 
     target_link_libraries(${lib_name}
@@ -193,12 +215,51 @@ add_subdirectory(main)
 target_include_directories(mainV1 PUBLIC ${COMMON_INCLUDES} ${MKL_INCLUDE})
 target_link_libraries(mainV1 Eigen3::Eigen)
 
-add_subdirectory(submods)
+set(GCTA_TARGETS gcta64 mainV1 ${GCTA_LIBS})
+function(targets_includes targets include_dir)
+    foreach(target IN LISTS ${targets})
+        target_include_directories(${target} PUBLIC ${include_dir})
+    endforeach()
+endfunction()
 
 if(APPLE)
-    target_link_directories(gcta64 ${MKLROOT}/lib)
-    target_link_directories(gcta64 /usr/local/lib)
-elseif(LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
+        # For Eigen backend, OpenBLAS, LAPACK
+        # Get macOS SDK path
+        execute_process(
+            COMMAND xcrun --sdk macosx --show-sdk-path
+            OUTPUT_VARIABLE MACOSX_SDK_PATH
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        set(VECLIB_INCLUDE_DIR "${MACOSX_SDK_PATH}/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Headers")
+        set(OPENBLAS_INCLUDE_DIR "/opt/homebrew/opt/openblas/include")
+        set(GSL_INCLUDE_DIR "/opt/homebrew/opt/gsl/include")
+
+        targets_includes(GCTA_TARGETS ${VECLIB_INCLUDE_DIR})
+        targets_includes(GCTA_TARGETS ${OPENBLAS_INCLUDE_DIR})
+        targets_includes(GCTA_TARGETS ${GSL_INCLUDE_DIR})
+        targets_includes(GCTA_TARGETS ${zstd_SOURCE_DIR}/lib)
+
+        target_link_libraries(gcta64 OpenMP::OpenMP_CXX)
+        target_link_libraries(mainV1 OpenMP::OpenMP_CXX)
+        foreach(gcta_lib ${GCTA_LIBS})
+            target_link_libraries(${gcta_lib} OpenMP::OpenMP_CXX)
+        endforeach()
+
+        find_library(ACCELERATE_LIBRARY Accelerate)
+        target_link_libraries(gcta64 ${ACCELERATE_LIBRARY})
+        target_link_libraries(mainV1 ${ACCELERATE_LIBRARY})
+        foreach(gcta_lib ${GCTA_LIBS})
+            target_link_libraries(${gcta_lib} ${ACCELERATE_LIBRARY})
+        endforeach()
+
+    elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
+        # Do nothing
+    endif()
+endif()
+
+add_subdirectory(submods)
+
+if(LINUX AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_directories(gcta64 ${MKLROOT}/../../../lib/intel64)
 endif()
 
@@ -206,12 +267,12 @@ target_include_directories(gcta64 PUBLIC
     ${COMMON_INCLUDES}
     ${MKL_INCLUDE}
     # PLINK2.0 pgen library;
-    "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0"
+    "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/include"
     "${CMAKE_SOURCE_DIR}/submods/plink-ng/2.0/simde")
 
 if(APPLE)
     # iomp5
-    target_link_libraries(gcta64 ${GCTA_LIBS} Pgenlib mainV1 z ${BLAS_LIB} sqlite3 zstd omp pthread m dl gsl gslcblas)
+    target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib z m GSL::gsl GSL::gslcblas SQLite::SQLite3 libzstd_shared Threads::Threads)
 else()
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # error keeps only
@@ -223,7 +284,7 @@ else()
     else()
         #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} -Wl,-Bstatic z -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,-Bdynamic pthread m dl)
         #target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib -static z sqlite3 zstd -Wl,--start-group ${MKL_LIB} -Wl,--end-group gomp -Wl,--whole-archive -lpthread -Wl,--no-whole-archive m dl)
-        target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib z m GSL::gsl GSL::gslcblas sqlite3 zstd MKL::MKL Threads::Threads)
+        target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib z m GSL::gsl GSL::gslcblas sqlite3 libzstd_shared MKL::MKL Threads::Threads)
     endif()
 endif()
 
@@ -238,3 +299,22 @@ IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
     )
 ENDIF()
 
+
+get_property(imported_targets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+foreach(target IN LISTS imported_targets)
+    message(STATUS "imported target: ${target}")
+endforeach()
+
+get_property(local_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+foreach(t IN LISTS local_targets)
+    message(STATUS "built target: ${t}")
+endforeach()
+
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
+
+INSTALL(TARGETS gcta64 mainV1 ${GCTA_LIBS}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
