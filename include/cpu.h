@@ -47,7 +47,7 @@
   #define EIGEN_USE_BLAS
   #endif
   #include <cblas.h> 
-  #include <lapack.h>
+  #include <clapack.h>
 #endif
 
 #endif  //END GCTA_CPU_H
