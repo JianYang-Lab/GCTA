@@ -299,7 +299,7 @@ IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
     )
 ENDIF()
 
-
+# List all targets
 get_property(imported_targets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
 foreach(target IN LISTS imported_targets)
     message(STATUS "imported target: ${target}")
@@ -310,11 +310,21 @@ foreach(t IN LISTS local_targets)
     message(STATUS "built target: ${t}")
 endforeach()
 
+# Installation
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
 
-INSTALL(TARGETS gcta64 mainV1 ${GCTA_LIBS}
+# Targets
+install(TARGETS gcta64 mainV1 ${GCTA_LIBS}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
+
+# Resource
+install(FILES ${CMAKE_SOURCE_DIR}/resources/gcta64.desktop
+    DESTINATION share/applications)
+install(FILES ${CMAKE_SOURCE_DIR}/resources/gcta64.png
+    DESTINATION share/icons/hicolor/256x256/apps)
+install(FILES ${CMAKE_SOURCE_DIR}/resources/gcta64.svg
+    DESTINATION share/icons/hicolor/scalable/apps)
