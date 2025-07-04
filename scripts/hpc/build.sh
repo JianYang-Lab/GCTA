@@ -8,10 +8,13 @@ echo "Current working directory: ${CWD}"
 echo "Path of linuxdeploy ${LINUX_DEPLOY_BIN}"
 echo "Path of appimagetool ${APP_IMAGE_TOOL_BIN}"
 
-module load gcc/9.4.0 ninja intelmkl gsl
+module load cmake gcc/9.4.0 ninja intelmkl gsl
 
 # Generate cmake
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CWD}/build/Release/installed/usr -G Ninja -B build/Release -S .
+cmake -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_TOOLCHAIN_FILE=cmake/hpc-toolchain.cmake \
+    -DCMAKE_INSTALL_PREFIX=${CWD}/build/Release/installed/usr \
+    -G Ninja -B build/Release -S .
 
 # Build
 cmake --build build/Release
