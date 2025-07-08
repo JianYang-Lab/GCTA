@@ -7,6 +7,7 @@ CWD=$(pwd)
 echo "Current working directory: ${CWD}"
 echo "Path of linuxdeploy ${LINUX_DEPLOY_BIN}"
 echo "Path of appimagetool ${APP_IMAGE_TOOL_BIN}"
+echo "Path of appimagetool ${APP_IMAGE_RUNTIME_FILE}"
 
 module load gcc/8.4.0 cmake intelmkl gsl
 
@@ -29,4 +30,4 @@ ${LINUX_DEPLOY_BIN} --appdir build/Release/installed \
     --icon-file build/Release/installed/usr/share/icons/hicolor/256x256/apps/gcta64.png
 
 # NOTE: appimagetool need to access network
-${APP_IMAGE_TOOL_BIN} build/Release/installed
+${APP_IMAGE_TOOL_BIN} build/Release/installed --runtime-file ${APP_IMAGE_RUNTIME_FILE}
