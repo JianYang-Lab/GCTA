@@ -1,7 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef _WIN32
 #include <gsl/gsl_sf_gamma.h>
+#else
+#include <math.h>
+#define gsl_sf_gamma tgamma
+#endif
+
 #include <math.h>
 #include <stdbool.h>
 #include <ctype.h>

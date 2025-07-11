@@ -1,4 +1,4 @@
 [submodule "submods/plink-ng"]
-	path = submods/plink-ng
+	path = third_party/plink-ng
 	url = https://github.com/chrchang/plink-ng.git
 	ignore = all
