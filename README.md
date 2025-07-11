@@ -34,6 +34,7 @@ If you have any bug reports or questions please send an email to Jian Yang at <j
 ## Compilation
 
 #### Requirements
+
 1. Currently only x86\_64-based operating systems are supported.
 2. [Intel MKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html) 2017 or above (only needed when building on x86\-64 machines)
 3. OpenBLAS (only needed when building on AArch64 machines)
@@ -46,37 +47,44 @@ If you have any bug reports or questions please send an email to Jian Yang at <j
 10. [Spectra](https://spectralib.org/) >= 0.8.1
 11. gsl (GNU scientific library)
 
+Most of the dependencies above will be downloaded by CMake automatically. You only need to install the `gsl` and `Intel MKL` manually.
+
 #### Linux
+
 1. Kernel version >= 2.6.28 (otherwise the Intel MKL library doesn't work).
 2. GCC version >= 6.1 with C++ 11 support.
 
-#### Mac OS & Windows
-Here we do not provide instructions to compile GCTA in Mac OS or Windows because of the enormous complexity of the compilation process and differences among OS versions. We suggest you download the compiled executable files directly from the GCTA website.
+#### Before compilation 
 
-#### Before compilation (Linux)
-1. Export MKLROOT or OPENBLAS variable into shell environment  
-`export MKLROOT=where_your_MKL_located`  
-`export OPENBLAS=where_your_openblas_located`  
-2. Export EIGENE3_INCLUDE_DIR into your shell environment  
-`export EIGEN3_INCLUDE_DIR=where_your_eigen3_located`  
-3. Export BOOST_LIB environment variable  
-`export BOOST_LIB=where_your_boost_include_directory_located`  
-4. Export SPECTRA_LIB environment variable
-`export SPECTRA_LIB=where_your_spectra_include_directory_located`
-5. Other compilation Requirements should be placed in your compiler's header files and library searching paths.  
-6. Clone GCTA source code from github 
-`git clone https://github.com/jianyangqt/gcta GCTA_PATH`
-7. Clone plink_ng submods
-```
+Update [plink_ng](https://github.com/chrchang/plink-ng) submodule first.
+
+```sh
 git submodule update --init
 ```
 
-#### To compile
+On Windows, apply the patch under the `third_party` directory to the `plink-ng`.
+
+#### Build
+
+##### CMake Configuration
+
+On MacOS and Linux, use following command to generate the build system:
+
+```sh
+cmake -DCMAKE_BUILD_TYPE=Release -G Ninja -B build/Release -S .
 ```
-cd GCTA_PATH
-mkdir build
-cd build
-cmake ..
-make
+
+On Windows, you should use the toolchain file in `cmake/win-toolchain.cmake`:
+
+``` sh
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="cmake/win-toolchain.cmake" -G Ninja -B build/Release -S .
 ```
-Here is an [example](https://github.com/jianyangqt/gcta/blob/master/docs/build/gcta_build_steps_linux.sh) building the GCTA on linux.
+
+##### Compile
+
+```sh
+cmake --build build/Release
+```
+
+The executable binary will be generated under `build/Release`.
+
