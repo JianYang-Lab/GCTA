@@ -2352,7 +2352,7 @@ void Geno::getGenoArray_bed(const vector<uint32_t>& raw_marker_index, GenoBuf* g
         bool isEOF = false;
         std::tie(r_buf, isEOF) = asyncBufn->start_read();
         if(isEOF){
-            LOGGER.e(0, "the reading process reached to the end of the BED file but couldn’t finish.");
+            LOGGER.e(0, "the reading process reached to the end of the BED file but couldn't finish.");
         }
         move_geno(r_buf, keepMask64, rawCountSamples[0], gbuf->n_sample, numMarker, geno_buf); 
         asyncBufn->end_read();
@@ -3283,7 +3283,7 @@ void Geno::loop_64block(const vector<uint32_t> &raw_marker_index, vector<functio
 
         LOGGER.d(0, "Process block " + std::to_string(cur_block));
         if(isEOF && cur_block != (cur_num_blocks - 1)){
-            LOGGER.e(0, "the reading process reached to the end of the BED file but couldn’t finish.");
+            LOGGER.e(0, "the reading process reached to the end of the BED file but couldn't finish.");
         }
         //correct the marker read;
         if(cur_block == (cur_num_blocks - 1)){

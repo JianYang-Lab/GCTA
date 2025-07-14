@@ -939,7 +939,7 @@ int Pheno::registerOption(map<string, vector<string>>& options_in){
     addOneFileOption("pheno_file", "", "--fam", options_in, options);
     options_in.erase("--fam");
     addOneFileOption("sample_file", "", "--sample", options_in, options);
-    options_in.erase("--sample");
+    // options_in.erase("--sample");
 
     addOneFileOption("pheno_file", ".fam", "--bpfile", options_in, options);
     addOneFileOption("psam_file", ".psam", "--pfile", options_in, options);

@@ -270,6 +270,14 @@ int main(int argc, char *argv[]){
             LOGGER.e(0, "multiple main functions are not supported currently.");
         }
     }
+
+    // ==== Validate BGEN-related options ====
+    if (options.find("--mbgen") != options.end() || options.find("--bgen") != options.end()) {
+        if (options.find("--sample") == options.end()) {
+            LOGGER.e(0, "When using BGEN format files (--bgen or --mbgen), the --sample option is required to specify the sample information file.");
+        }
+    }
+
     bool unKnownFlag = false;
     for(string &key : keys){
         if(std::find(supported_flagsV2.begin(), supported_flagsV2.end(), key) == supported_flagsV2.end()){
