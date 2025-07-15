@@ -264,4 +264,15 @@ elseif(WIN32)
         ${MKL_ROOT}/bin/mkl_core.2.dll
         ${MKL_ROOT}/../../compiler/latest/bin/libiomp5md.dll
         DESTINATION bin)
+elseif(APPLE)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
+
+    # 安装目标可执行文件和库
+    install(TARGETS gcta64 mainV1 ${GCTA_LIBS}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
 endif()
