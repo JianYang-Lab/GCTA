@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+set -e
+set -o pipefail
+
 # You should cd to the project root
 CWD=$(pwd)
 
@@ -22,6 +25,9 @@ cmake --build build/Release
 
 # Install
 cmake --install build/Release
+
+cp /soft/compiler/intel/oneapi-2022.2/mkl/2022.1.0/lib/intel64/libmkl_avx512.so.2 build/Release/installed/usr/lib/
+strip build/Release/installed/usr/lib/libmkl_avx512.so.2
 
 # Packaging
 ${LINUX_DEPLOY_BIN} --appdir build/Release/installed \
