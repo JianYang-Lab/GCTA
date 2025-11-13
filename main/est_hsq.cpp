@@ -886,6 +886,22 @@ void gcta::reml(bool pred_rand_eff, bool est_fix_eff, bool est_fix_eff_var, vect
             o_reml << _hsq_name[j] << "\t" << Hsq[_bivar_pos[0][i]] << "\t" << sqrt(VarHsq[_bivar_pos[0][i]]) << endl;
             o_reml << _hsq_name[j + 1] << "\t" << Hsq[_bivar_pos[1][i]] << "\t" << sqrt(VarHsq[_bivar_pos[1][i]]) << endl;
         }
+        // Print variance-covariance matrix of variance component estimates (Hi)
+        o_reml << "\nVariance-covariance matrix of variance component estimates:" << endl;
+        o_reml << "\t";
+        for (int j = 0; j < _r_indx.size(); j++) {
+            o_reml << _var_name[j];
+            if (j < _r_indx.size() - 1) o_reml << "\t";
+        }
+        o_reml << endl;
+        for (int i = 0; i < _r_indx.size(); i++) {
+            o_reml << _var_name[i] << "\t";
+            for (int j = 0; j < _r_indx.size(); j++) {
+                o_reml << std::setprecision(5) << Hi(i, j);
+                if (j < _r_indx.size() - 1) o_reml << "\t";
+            }
+            o_reml << endl;
+        }
     } else {
         o_reml << "Vp\t" << Vp << "\t" << sqrt(VarVp) << endl;
         for (i = 0; i < Hsq.size(); i++) o_reml << _hsq_name[i] << "\t" << Hsq[i] << "\t" << sqrt(VarHsq[i]) << endl;
