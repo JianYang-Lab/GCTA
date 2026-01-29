@@ -2045,16 +2045,35 @@ bool gcta::make_XMat_subset(MatrixXf &X, vector<int> &snp_indx, bool divid_by_st
     int i = 0, j = 0, k = 0, n = _keep.size(), m = snp_indx.size();
 
     X.resize(n, m);
-    #pragma omp parallel for private(j, k)
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < m; j++) {
-            k = _include[snp_indx[j]];
-            if (!_snp_1[k][_keep[i]] || _snp_2[k][_keep[i]]) {
-                if (_allele1[k] == _ref_A[k]) X(i,j) = _snp_1[k][_keep[i]] + _snp_2[k][_keep[i]];
-                else X(i,j) = 2.0 - (_snp_1[k][_keep[i]] + _snp_2[k][_keep[i]]);
-                X(i,j) -= _mu[k];
-            } 
-            else X(i,j) = 0.0;
+    if (_dosage_flag) {
+        #pragma omp parallel for private(j)
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
+                k = _include[snp_indx[j]];
+                if (_geno_dose[_keep[i]][k] < 1e5) {
+                    if (_allele1[k] == _ref_A[k]) X(i,j) = _geno_dose[_keep[i]][k];
+                    else X(i,j) = 2.0 - _geno_dose[_keep[i]][k];
+                    X(i,j) -= _mu[k];
+                }
+                else {
+                    X(i,j) = 0.0;
+                }
+            }
+            //_geno_dose[i].clear();
+        }
+    }
+    else{
+        #pragma omp parallel for private(j, k)
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
+                k = _include[snp_indx[j]];
+                if (!_snp_1[k][_keep[i]] || _snp_2[k][_keep[i]]) {
+                    if (_allele1[k] == _ref_A[k]) X(i,j) = _snp_1[k][_keep[i]] + _snp_2[k][_keep[i]];
+                    else X(i,j) = 2.0 - (_snp_1[k][_keep[i]] + _snp_2[k][_keep[i]]);
+                    X(i,j) -= _mu[k];
+                }
+                else X(i,j) = 0.0;
+            }
         }
     }
 
