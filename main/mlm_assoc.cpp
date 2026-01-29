@@ -12,7 +12,7 @@
 
 #include "gcta.h"
 
-void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, string phen_file, string qcovar_file, string covar_file, int mphen, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, bool no_constrain, bool within_family, bool inbred, bool no_adj_covar, string weight_file)
+void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, string phen_file, string qcovar_file, string covar_file, int mphen, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, bool no_constrain, bool within_family, bool inbred, bool no_adj_covar, string weight_file, string save_reml_file, string load_reml_file)
 {
     _within_family=within_family;
     _reml_max_iter=MaxIter;
@@ -225,7 +225,28 @@ void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, stri
     // run REML algorithm
     LOGGER << "\nPerforming MLM association analyses" << (subtract_grm_flag?"":" (including the candidate SNP)") << " ..."<<endl;
     unsigned long n=_keep.size(), m=_include.size();
-	reml(false, true, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
+	
+    if(!load_reml_file.empty()) {
+            // Load REML state from file
+            LOGGER << "Loading REML state from [" << load_reml_file << "] ..." << endl;
+            load_reml_state(load_reml_file, no_adj_covar);
+    } else {
+        // Run REML estimation
+        reml(false, true, reml_priors, reml_priors_var, -2.0, -2.0, no_constrain, true, true);
+        
+        if(!save_reml_file.empty()) {
+            // Save REML state and exit - no need for genotype data beyond this point
+            LOGGER << "Saving REML state to [" << save_reml_file << "] ..." << endl;
+            save_reml_state(save_reml_file, no_adj_covar);
+            LOGGER << "REML estimation completed. Use --load-reml to perform association tests." << endl;
+            
+            // Clean up matrices that won't be needed
+            _P.resize(0,0);
+            _A.clear();
+            return;
+        }
+    }
+    
     _P.resize(0,0);
     _A.clear();
     float *y=new float[n];
@@ -565,3 +586,118 @@ void gcta::grm_minus_grm(float *grm, float *sub_grm)
 }
 
 
+void gcta::save_reml_state(string filename, bool no_adj_covar)
+{
+    gzofstream outfile(filename.c_str());
+    if(!outfile.good()) LOGGER.e(0, "cannot open the file ["+filename+"] to write.");
+    
+    // Write magic header
+    char magic[5] = "REML";
+    outfile.write(magic, 4);
+    
+    // Write dimensions
+    int n = _n;
+    int x_c = _X_c;
+    int num_varcmp = _varcmp.size();
+    int num_r_indx = _r_indx.size();
+    
+    outfile.write((char*)&n, sizeof(int));
+    outfile.write((char*)&x_c, sizeof(int));
+    outfile.write((char*)&num_varcmp, sizeof(int));
+    outfile.write((char*)&num_r_indx, sizeof(int));
+    
+    // Write _Vi matrix (row-major)
+    float f_buf = 0.0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            f_buf = (float)_Vi(i, j);
+            outfile.write((char*)&f_buf, sizeof(float));
+        }
+    }
+    
+    // Write _b vector (fixed effects) if covariates are adjusted
+    if(!no_adj_covar) {
+        for(int i = 0; i < x_c; i++) {
+            f_buf = (float)_b(i);
+            outfile.write((char*)&f_buf, sizeof(float));
+        }
+    }
+    
+    // Write _varcmp vector (variance components)
+    for(int i = 0; i < num_varcmp; i++) {
+        f_buf = (float)_varcmp[i];
+        outfile.write((char*)&f_buf, sizeof(float));
+    }
+    
+    // Write _r_indx vector
+    for(int i = 0; i < num_r_indx; i++) {
+        int idx = _r_indx[i];
+        outfile.write((char*)&idx, sizeof(int));
+    }
+    
+    outfile.close();
+}
+
+void gcta::load_reml_state(string filename, bool no_adj_covar)
+{
+    gzifstream infile(filename.c_str());
+    if(!infile.good()) LOGGER.e(0, "cannot open the file ["+filename+"] to read. Make sure you have run --mlma with --reml-only first.");
+    
+    // Read and verify magic header
+    char magic[5] = {0};
+    infile.read(magic, 4);
+    if(string(magic) != "REML") LOGGER.e(0, "file ["+filename+"] is not a valid REML state file.");
+    
+    // Read dimensions
+    int n = 0, x_c = 0, num_varcmp = 0, num_r_indx = 0;
+    infile.read((char*)&n, sizeof(int));
+    infile.read((char*)&x_c, sizeof(int));
+    infile.read((char*)&num_varcmp, sizeof(int));
+    infile.read((char*)&num_r_indx, sizeof(int));
+    
+    // Validate dimensions match current dataset
+    if(n != _n) {
+        LOGGER.e(0, "sample size mismatch: REML state has n=" + to_string(n) + " but current dataset has n=" + to_string(_n));
+    }
+    if(x_c != _X_c) {
+        LOGGER.e(0, "number of covariates mismatch: REML state has " + to_string(x_c) + " covariates but current dataset has " + to_string(_X_c));
+    }
+    
+    // Read _Vi matrix (row-major)
+    _Vi.resize(n, n);
+    float f_buf = 0.0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            infile.read((char*)&f_buf, sizeof(float));
+            _Vi(i, j) = f_buf;
+        }
+    }
+    
+    // Read _b vector (fixed effects) if covariates are adjusted
+    if(!no_adj_covar) {
+        _b.resize(x_c);
+        for(int i = 0; i < x_c; i++) {
+            infile.read((char*)&f_buf, sizeof(float));
+            _b(i) = f_buf;
+        }
+    }
+    
+    // Read _varcmp vector (variance components)
+    _varcmp.resize(num_varcmp);
+    for(int i = 0; i < num_varcmp; i++) {
+        infile.read((char*)&f_buf, sizeof(float));
+        _varcmp[i] = f_buf;
+    }
+    
+    // Read _r_indx vector
+    _r_indx.resize(num_r_indx);
+    for(int i = 0; i < num_r_indx; i++) {
+        int idx = 0;
+        infile.read((char*)&idx, sizeof(int));
+        _r_indx[i] = idx;
+    }
+    
+    infile.close();
+    
+    LOGGER << "Loaded REML state: n=" << n << ", covariates=" << x_c << ", variance components=" << num_varcmp << endl;
+}

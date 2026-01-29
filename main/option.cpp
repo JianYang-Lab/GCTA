@@ -134,7 +134,7 @@ void option(int option_num, char* option_str[])
 
     // mixed linear model association 
     bool mlma_flag = false, mlma_loco_flag = false, mlma_no_adj_covar = false;
-    string subtract_grm_file = "";
+    string subtract_grm_file = "", save_reml_file = "", load_reml_file = "";;
 
     // Fst
     bool fst_flag = false;
@@ -941,6 +941,13 @@ void option(int option_num, char* option_str[])
         } else if (strcmp(argv[i], "--mlma-no-preadj-covar") == 0) {
             mlma_no_adj_covar = true;	
             LOGGER << "--mlma-no-preadj-covar" << endl;	
+        } else if (strcmp(argv[i], "--save-reml") == 0) {
+            save_reml_file = argv[++i];
+            LOGGER << "--save-reml " << save_reml_file << endl;
+        } else if (strcmp(argv[i], "--load-reml") == 0) {
+            load_reml_file = argv[++i];
+            LOGGER << "--load-reml " << load_reml_file << endl;
+            CommFunc::FileExist(load_reml_file);
         } else if (strcmp(argv[i], "--fst") == 0) {
             fst_flag = true;
             LOGGER << "--fst " << endl;
@@ -1266,7 +1273,11 @@ void option(int option_num, char* option_str[])
         if (est_fix_eff_var) LOGGER << "Warning: the option --reml-est-fix-varcov option is disabled in this analysis." << endl;
         if (pred_rand_eff) LOGGER << "Warning: the option --reml-pred-rand option is disabled in this analysis." << endl;
         if(cv_blup) LOGGER << "Warning: the option --cvblup option is disabled in this analysis." << endl;
-        if (reml_lrt_flag) LOGGER << "Warning: the option --reml-lrt option is disabled in this analysis." << endl; 
+        if (reml_lrt_flag) LOGGER << "Warning: the option --reml-lrt option is disabled in this analysis." << endl;
+        if (!save_reml_file.empty() && !load_reml_file.empty()) LOGGER.e(0, "--save-reml and --load-reml cannot be used together.");
+        if ((!save_reml_file.empty() || !load_reml_file.empty()) && mlma_loco_flag) LOGGER.e(0, "--save-reml and --load-reml are not supported with --mlma-loco.");
+        if (!load_reml_file.empty() && !mlma_flag) LOGGER.e(0, "--load-reml can only be used with --mlma.");
+        if (!save_reml_file.empty() && !mlma_flag) LOGGER.e(0, "--save-reml can only be used with --mlma.");
     }
     if(bivar_reml_flag && prevalence_flag) LOGGER.e(0, "--prevalence option is not compatible with --reml-bivar option. Please check the --reml-bivar-prevalence option!");
     if(gsmr_flag || mtcojo_flag){
@@ -1398,7 +1409,7 @@ void option(int option_num, char* option_str[])
             else if (ld_mean_rsq_seg_flag) pter_gcta->ld_seg(LD_file, LD_seg, LD_wind, LD_rsq_cutoff, dominance_flag);
             else if (ld_max_rsq_flag) pter_gcta ->calcu_max_ld_rsq(LD_wind, LD_rsq_cutoff, dominance_flag);
             else if (blup_snp_flag) pter_gcta->blup_snp_geno();
-            else if (mlma_flag) pter_gcta->mlma(grm_file, m_grm_flag, subtract_grm_file, phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, within_family, make_grm_inbred_flag, mlma_no_adj_covar, weight_file);
+            else if (mlma_flag) pter_gcta->mlma(grm_file, m_grm_flag, subtract_grm_file, phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, within_family, make_grm_inbred_flag, mlma_no_adj_covar, weight_file, save_reml_file, load_reml_file);
             else if (mlma_loco_flag) pter_gcta->mlma_loco(phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, make_grm_inbred_flag, mlma_no_adj_covar);
             else if (massoc_slct_flag | massoc_joint_flag) {pter_gcta->set_massoc_pC_thresh(massoc_out_pC_thresh); pter_gcta->run_massoc_slct(massoc_file, massoc_wind, massoc_p, massoc_collinear, massoc_top_SNPs, massoc_joint_flag, massoc_gc_flag, massoc_gc_val, massoc_actual_geno_flag, massoc_mld_slct_alg);}
             else if (!massoc_cond_snplist.empty()) {pter_gcta->set_massoc_pC_thresh(massoc_out_pC_thresh); pter_gcta->run_massoc_cond(massoc_file, massoc_cond_snplist, massoc_wind, massoc_collinear, massoc_gc_flag, massoc_gc_val, massoc_actual_geno_flag);}
@@ -1456,7 +1467,7 @@ void option(int option_num, char* option_str[])
         else if (simu_qt_flag || simu_cc) pter_gcta->GWAS_simu(bfile, simu_rep, simu_causal, simu_case_num, simu_control_num, simu_h2, simu_K, simu_seed, simu_output_causal, simu_emb_flag, simu_eff_mod);
         else if (make_bed_flag) pter_gcta->save_plink();
         else if (fst_flag) pter_gcta->Fst(subpopu_file);
-        else if (mlma_flag) pter_gcta->mlma(grm_file, m_grm_flag, subtract_grm_file, phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, within_family, make_grm_inbred_flag, mlma_no_adj_covar, weight_file);
+        else if (mlma_flag) pter_gcta->mlma(grm_file, m_grm_flag, subtract_grm_file, phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, within_family, make_grm_inbred_flag, mlma_no_adj_covar, weight_file, save_reml_file, load_reml_file);
         else if (mlma_loco_flag) pter_gcta->mlma_loco(phen_file, qcovar_file, covar_file, mphen, MaxIter, reml_priors, reml_priors_var, no_constrain, make_grm_inbred_flag, mlma_no_adj_covar);
     } else if (HE_reg_flag) pter_gcta->HE_reg(grm_file, m_grm_flag, phen_file, kp_indi_file, rm_indi_file, mphen);
     else if (HE_reg_bivar_flag) pter_gcta->HE_reg_bivar(grm_file, m_grm_flag, phen_file, kp_indi_file, rm_indi_file, mphen, mphen2);
