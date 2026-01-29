@@ -12,7 +12,7 @@
 
 #include "gcta.h"
 
-void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, string phen_file, string qcovar_file, string covar_file, int mphen, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, bool no_constrain, bool within_family, bool inbred, bool no_adj_covar)
+void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, string phen_file, string qcovar_file, string covar_file, int mphen, int MaxIter, vector<double> reml_priors, vector<double> reml_priors_var, bool no_constrain, bool within_family, bool inbred, bool no_adj_covar, string weight_file)
 {
     _within_family=within_family;
     _reml_max_iter=MaxIter;
@@ -176,6 +176,34 @@ void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, stri
     }
     _A[_r_indx.size()-1]=eigenMatrix::Identity(_n, _n);
     
+    if(!weight_file.empty()){
+        vector<string> weight_ID;
+        vector<double> weights;
+
+        read_weight(weight_file, weight_ID, weights);
+        update_id_map_kp(weight_ID, _id_map, _keep);
+    //}
+    //if(!weight_file.empty()){
+        // contruct weight
+        VectorXd v_weight(_n);
+        for (int i = 0; i < weight_ID.size(); i++) {
+            iter = uni_id_map.find(weight_ID[i]);
+            if (iter == uni_id_map.end()) continue;
+            v_weight(iter->second) = weights[i];
+        }
+        //v_weight = 1.0 / v_weight.array();
+        //v_weight = 1.0 / v_weight.array() - (1.0 / v_weight.array()).mean() + 1;
+        /*
+        ofstream o_test("weight_out.txt");
+        for(int i = 0; i < v_weight.size(); i++){
+            o_test << v_weight[i] << "\t" << _y[i] << endl;
+        }
+        o_test.close();
+        */
+
+        _A[_r_indx.size() - 1].diagonal() = v_weight;
+    }
+
     // construct X matrix
     vector<eigenMatrix> E_float;
     eigenMatrix qE_float;
@@ -202,6 +230,9 @@ void gcta::mlma(string grm_file, bool m_grm_flag, string subtract_grm_file, stri
     _A.clear();
     float *y=new float[n];
     eigenVector y_buf=_y;
+
+    cout << "\nRegression coefficient(s) (e.g., general mean): " <<_b <<endl;
+    
     if(!no_adj_covar) y_buf=_y.array()-(_X*_b).array(); // adjust phenotype for covariates
     for(i=0; i<n; i++) y[i]=y_buf[i];
     

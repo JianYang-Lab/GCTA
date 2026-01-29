@@ -190,7 +190,7 @@ int gcta::read_GE(string GE_file, vector<string> &GE_ID, vector< vector<string> 
     return GE_num;
 }
 
-void read_weight(string phen_file, vector<string> &phen_ID, vector<double> &weights) {
+void gcta::read_weight(string phen_file, vector<string> &phen_ID, vector<double> &weights) {
     // Read phenotype data
     ifstream in_phen(phen_file.c_str());
     if (!in_phen) LOGGER.e(0, "cannot open the weight [" + phen_file + "] to read.");
