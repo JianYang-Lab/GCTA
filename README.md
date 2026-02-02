@@ -71,7 +71,8 @@ On Windows, apply the patch under the `third_party` directory to the `plink-ng`.
 On MacOS and Linux, use following command to generate the build system:
 
 ```sh
-cmake -DCMAKE_BUILD_TYPE=Release -G Ninja -B build/Release -S .
+# e.g MKL_DIR can be "/opt/intel/oneapi/mkl/latest/lib/cmake/mkl"
+cmake -DCMAKE_BUILD_TYPE=Release -DMKL_DIR=<your_mkl_cmake_path> -G Ninja -B build/Release -S .
 ```
 
 On Windows, you should use the toolchain file in `cmake/win-toolchain.cmake`:

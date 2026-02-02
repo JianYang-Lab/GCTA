@@ -933,6 +933,12 @@ void Pheno::getMaskBitMale(uint64_t *maskp){
     }
 }
 
+bool containFastGWA(const map<string, vector<string>> &options_in) {
+  for (const auto &[name, _args] : options_in) {
+    if (name.rfind("--fastGWA", 0) == 0) return true;
+  }
+  return false;
+}
 
 int Pheno::registerOption(map<string, vector<string>>& options_in){
     addOneFileOption("pheno_file", ".fam", "--bfile", options_in, options);
@@ -958,7 +964,10 @@ int Pheno::registerOption(map<string, vector<string>>& options_in){
 
     if(options_in.find("--pheno") != options_in.end()){
         addOneFileOption("qpheno_file", "", "--pheno", options_in, options);
-        options_in.erase("--pheno");
+        // Keep "--pheno" when it's used with fastGWA.
+        if (!containFastGWA(options_in)) {
+          options_in.erase("--pheno");
+        }
     }
 
     if(options_in.find("--mpheno") != options_in.end()){
