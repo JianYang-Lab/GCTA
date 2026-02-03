@@ -72,13 +72,13 @@ On MacOS and Linux, use following command to generate the build system:
 
 ```sh
 # e.g MKL_DIR can be "/opt/intel/oneapi/mkl/latest/lib/cmake/mkl"
-cmake -DCMAKE_BUILD_TYPE=Release -DMKL_DIR=<your_mkl_cmake_path> -G Ninja -B build/Release -S .
+cmake -DCMAKE_BUILD_TYPE=Release -DMKL_DIR="<your_mkl_cmake_path>" -G Ninja -B build/Release -S .
 ```
 
-On Windows, you should use the toolchain file in `cmake/win-toolchain.cmake`:
+On Windows, you should apply a patch for `plink` under `third_party/`, and then use the toolchain file in `cmake/win-toolchain.cmake`:
 
 ``` sh
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="cmake/win-toolchain.cmake" -G Ninja -B build/Release -S .
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="cmake/win-toolchain.cmake" -DLLVM_ROOT="<your_llvm_path>" -DMKL_DIR="<your_mkl_cmake_path>" -G Ninja -B build/Release -S .
 ```
 
 ##### Compile
