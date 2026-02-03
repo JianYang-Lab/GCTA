@@ -275,4 +275,8 @@ elseif(APPLE)
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
+    install(DIRECTORY ${zlib_BINARY_DIR}/
+        DESTINATION lib
+        FILES_MATCHING
+        PATTERN "libz.*.dylib")
 endif()

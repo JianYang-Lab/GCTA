@@ -9,13 +9,6 @@ INSTALL_DIR="$BUILD_DIR/installed"
 PACKAGE_DIR="${APP_NAME}-package"
 EXECUTABLE_PATH="$INSTALL_DIR/usr/bin/$APP_NAME"
 
-# 获取 zlib 路径
-ZLIB_DIR=$(brew --prefix zlib)/lib
-if [ ! -d "$ZLIB_DIR" ]; then
-  echo "❌ 未找到 zlib 安装目录：$ZLIB_DIR"
-  exit 1
-fi
-
 # 构建和安装
 echo "[1/5] CMake 构建..."
 cmake -DCMAKE_BUILD_TYPE=Release \
@@ -32,11 +25,12 @@ cp "$EXECUTABLE_PATH" "$PACKAGE_DIR/bin/$APP_NAME"
 
 #dylib 路径
 echo "[3/5] 修复 dylib 路径..."
+
 dylibbundler -od -b \
   -x "$PACKAGE_DIR/bin/$APP_NAME" \
   -d "$PACKAGE_DIR/lib" \
   -p @executable_path/../lib \
-  -s "$ZLIB_DIR"
+  -s "$INSTALL_DIR/usr/lib"
 
 #生成 run.sh 启动脚本
 echo "[4/5] 创建运行脚本..."
@@ -48,4 +42,3 @@ export DYLD_LIBRARY_PATH="\$DIR/lib"
 EOF
 
 chmod +x "$PACKAGE_DIR/run.sh"
-
