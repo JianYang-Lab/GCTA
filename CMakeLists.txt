@@ -151,6 +151,10 @@ target_include_directories(mainV1 PUBLIC ${COMMON_INCLUDES} ${MKL_INCLUDE})
 target_link_libraries(mainV1 Eigen3::Eigen)
 
 set(GCTA_TARGETS gcta64 mainV1 ${GCTA_LIBS})
+foreach(gcta_target IN LISTS GCTA_TARGETS)
+    target_link_libraries(${gcta_target} OpenMP::OpenMP_CXX)
+endforeach()
+
 function(targets_includes targets include_dir)
     foreach(target IN LISTS ${targets})
         target_include_directories(${target} PRIVATE ${include_dir})
@@ -177,12 +181,6 @@ if(APPLE)
 
     targets_includes(GCTA_TARGETS ${VECLIB_INCLUDE_DIR})
     targets_includes(GCTA_TARGETS ${OPENBLAS_INCLUDE_DIR})
-
-    target_link_libraries(gcta64 OpenMP::OpenMP_CXX)
-    target_link_libraries(mainV1 OpenMP::OpenMP_CXX)
-    foreach(gcta_lib ${GCTA_LIBS})
-        target_link_libraries(${gcta_lib} OpenMP::OpenMP_CXX)
-    endforeach()
 
     find_library(ACCELERATE_LIBRARY Accelerate)
     target_link_libraries(gcta64 ${ACCELERATE_LIBRARY})
