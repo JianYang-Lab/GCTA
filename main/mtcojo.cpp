@@ -1472,6 +1472,8 @@ double global_heidi_outlier_topsnp_iter(eigenVector bxy, eigenMatrix &cov_bxy, e
     vector<int> ci_index;
     // 1. removing SNPs with significant bzy
     ci_index = keep_non_associate_snp(bzy_pval, indices_snp, kept_ID, meta_snp_name_map, pval_thresh);
+    LOGGER.i(0, to_string(ci_index.size()) + " of " + to_string(n_indices_snp) +
+                    " SNPs remain eligible for focal-SNP selection after excluding SNPs associated with the outcome at p < 5e-8.");
 
     // 2. removing SNPs with extreme bxy, [0.05, 0.95]
     int n_candidate_snp = ci_index.size();
@@ -1480,6 +1482,8 @@ double global_heidi_outlier_topsnp_iter(eigenVector bxy, eigenMatrix &cov_bxy, e
     for(int i=0; i<n_indices_snp; i++) bxy_tmp(i) = bxy(kept_ID[i]);
     std::stable_sort(bxy_sort.data(), bxy_sort.data()+n_candidate_snp);
     ci_index = init_interval_bxy(bxy_sort, bxy_tmp, ci_index, 0.05, 0.95);
+    LOGGER.i(0, to_string(ci_index.size()) + " of " + to_string(n_candidate_snp) +
+                    " focal-SNP candidates remain after restricting bxy to the 5th-95th percentile interval.");
 
     if(ci_index.size() == 0) { kept_ID.clear(); return(-9); }
 
@@ -1594,6 +1598,9 @@ vector<double> gcta::gsmr_meta(vector<string> &snp_instru, eigenVector bzx, eige
 
     vector<int> remain_index(kept_ID);
     bool heidi_flag = CommFunc::FloatNotEqual(abs(global_heidi_thresh) + abs(std_heidi_thresh), 0) ? true : false;
+    if(heidi_flag && n_indices_snp < 10) {
+        LOGGER.w(0, "We suggest that users extract this exposure-outcome pair and rerun it as a separate job with HEIDI turned off for comparison.");
+    }
     if(heidi_flag && n_indices_snp <= 5) {
         LOGGER.w(0, "Only " + to_string(n_indices_snp) + " IVs clumped and HEIDI is not able to run.");
         heidi_flag = false;
@@ -2458,4 +2465,3 @@ void gcta::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, 
     LOGGER.i(0, "mtCOJO analysis completed.");
     mtcojo_cond_output(output_filename, _meta_snp_name, _meta_remain_snp, _meta_snp_a1, _meta_snp_a2, _meta_snp_freq, _meta_snp_b.col(0), _meta_snp_se.col(0), _meta_snp_pval.col(0), mtcojo_est, _meta_snp_n_o.col(0), nsnp);
 }
-
