@@ -2,7 +2,7 @@ import math
 from pathlib import Path
 
 
-def write_plink(prefix, genotypes):
+def write_plink(prefix, genotypes, chromosomes=None):
 	prefix = Path(prefix)
 	prefix.parent.mkdir(parents=True, exist_ok=True)
 	marker_count = len(genotypes)
@@ -11,17 +11,25 @@ def write_plink(prefix, genotypes):
 	assert sample_count > 0
 	assert all(len(marker) == sample_count for marker in genotypes)
 	assert all(value in (0, 1, 2, None) for marker in genotypes for value in marker)
+	if chromosomes is None:
+		chromosomes = [1] * marker_count
+	assert len(chromosomes) == marker_count
 
 	sample_ids = [("F1", f"I{index}") for index in range(sample_count)]
 	prefix.with_suffix(".fam").write_text(
 		"".join(f"{fid} {iid} 0 0 0 -9\n" for fid, iid in sample_ids), encoding="utf-8"
 	)
 	prefix.with_suffix(".bim").write_text(
-		"".join(f"1 rs{index} 0 {1000 + index} A G\n" for index in range(marker_count)),
+		"".join(
+			f"{chromosomes[index]} rs{index} 0 {1000 + index} A G\n"
+			for index in range(marker_count)
+		),
 		encoding="utf-8",
 	)
 	prefix.with_suffix(".map").write_text(
-		"".join(f"1 rs{index} 0 {1000 + index}\n" for index in range(marker_count)),
+		"".join(
+			f"{chromosomes[index]} rs{index} 0 {1000 + index}\n" for index in range(marker_count)
+		),
 		encoding="utf-8",
 	)
 
