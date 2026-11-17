@@ -41,9 +41,12 @@
 
 #include "FastFAM.h"
 #include "Covar.h"
+#include "Geno.h"
 #include "Logger.h"
+#include "Marker.h"
 #include "Matrix.hpp"
 #include "OptionIO.h"
+#include "Pheno.h"
 #include "StatLib.h"
 #include "utils.hpp"
 

@@ -20,15 +20,19 @@
 #define GCTA2_FASTFAM_H
 
 #include "cpu.h"
-#include "Logger.h"
-#include "Geno.h"
-#include "Pheno.h"
-#include "Marker.h" 
-#include "Eigen/Dense"
-#include "Eigen/Sparse"
+
+#include <cstdint>
+#include <cstdio>
+#include <fstream>
+#include <functional>
+#include <map>
+#include <string>
 #include <vector>
-#include <mutex>
-#include <omp.h>
+
+#include <Eigen/Dense>
+#include <Eigen/IterativeLinearSolvers>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
 
 using Eigen::Map;
 using Eigen::MatrixXd;
@@ -36,9 +40,16 @@ using Eigen::VectorXd;
 using Eigen::SparseMatrix;
 using Eigen::Dynamic;
 using Eigen::Ref;
+using std::function;
+using std::map;
+using std::string;
 using std::vector;
 
 typedef SparseMatrix<double, Eigen::ColMajor, long long> SpMat;
+
+class Geno;
+class Marker;
+class Pheno;
 
 // SPA
 struct SPARes {
