@@ -11,7 +11,7 @@
 #include "StatFunc.h"
 #include "numeric"
 #include <random>
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 
 ////////// P-value Calculatiion Functions Start ////////////////
 

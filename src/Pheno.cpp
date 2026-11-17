@@ -19,17 +19,17 @@
 #include <fstream>
 #include <sstream>
 #include <iterator>
-#include "constants.hpp"
-#include "Logger.h"
+#include "infrastructure/constants.hpp"
+#include "infrastructure/Logger.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
-#include "utils.hpp"
+#include "infrastructure/utils.hpp"
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 #include <boost/crc.hpp>
 #include <set>
-#include "OptionIO.h"
+#include "infrastructure/OptionIO.h"
 
 using std::to_string;
 

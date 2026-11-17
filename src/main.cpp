@@ -17,7 +17,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
 */
 #include <iostream>
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 #include "Geno.h"
 #include "Marker.h"
 #include "Pheno.h"
@@ -25,7 +25,7 @@
 #include "Covar.h"
 #include "FastFAM.h"
 #include "LD.h"
-#include "NumericBackend.h"
+#include "infrastructure/NumericBackend.h"
 #include <functional>
 #include <map>
 #include <vector>
@@ -33,11 +33,11 @@
 #include <chrono>
 #include <algorithm>
 #include "legacy/option.h"
-#include "utils.hpp" 
+#include "infrastructure/utils.hpp"
 #include <omp.h>
 #include <cstdlib>
-#include "mem.hpp"
-#include "config.h"
+#include "infrastructure/mem.hpp"
+#include "infrastructure/config.h"
 
 #include "acat.hpp" //add by fanghl 20210303
 #define ACAT_MODULE

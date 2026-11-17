@@ -19,7 +19,7 @@
 #ifndef GCTA2_FASTFAM_H
 #define GCTA2_FASTFAM_H
 
-#include "cpu.h"
+#include "infrastructure/cpu.h"
 
 #include <cstdint>
 #include <cstdio>

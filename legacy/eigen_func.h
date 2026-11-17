@@ -12,7 +12,7 @@
 #ifndef _EIGENFUNC_H
 #define _EIGENFUNC_H
 
-#include "cpu.h"
+#include "infrastructure/cpu.h"
 #include "CommFunc.h"
 #include "StatFunc.h"
 #include <Eigen/Dense>

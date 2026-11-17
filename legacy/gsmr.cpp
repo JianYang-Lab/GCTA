@@ -1,5 +1,5 @@
 #include "gcta.h"
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 #include <sstream>
 #include <iterator>
 

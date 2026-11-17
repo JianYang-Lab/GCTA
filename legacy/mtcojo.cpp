@@ -12,7 +12,7 @@
 
 
 #include "gcta.h"
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 #include "StatFunc.h"
 #include "zlib.h"
 #include <limits>

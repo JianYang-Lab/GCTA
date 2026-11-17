@@ -20,7 +20,7 @@
 #include <boost/math/distributions/chi_squared.hpp>
 #include <boost/math/distributions/normal.hpp>
 #include <boost/math/distributions/beta.hpp>
-#include "cpu.h"
+#include "infrastructure/cpu.h"
 
 using namespace boost::math;
 

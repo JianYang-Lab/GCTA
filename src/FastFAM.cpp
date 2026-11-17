@@ -15,7 +15,7 @@
    A copy of the GNU General Public License is attached along with this program.
    If not, see <http://www.gnu.org/licenses/>.
 */
-#include "cpu.h"
+#include "infrastructure/cpu.h"
 
 #include <algorithm>
 #include <charconv>
@@ -42,13 +42,13 @@
 #include "FastFAM.h"
 #include "Covar.h"
 #include "Geno.h"
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 #include "Marker.h"
-#include "Matrix.hpp"
-#include "OptionIO.h"
+#include "infrastructure/Matrix.hpp"
+#include "infrastructure/OptionIO.h"
 #include "Pheno.h"
 #include "StatLib.h"
-#include "utils.hpp"
+#include "infrastructure/utils.hpp"
 
 struct InvItem{
     int32_t row;

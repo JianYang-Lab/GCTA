@@ -18,7 +18,7 @@
 
 #define NOMINMAX
 #include "Geno.h"
-#include "constants.hpp"
+#include "infrastructure/constants.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <thread>
@@ -29,16 +29,16 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-#include "utils.hpp"
+#include "infrastructure/utils.hpp"
 #include "omp.h"
-#include "ThreadPool.h"
+#include "infrastructure/ThreadPool.h"
 #include <cstring>
 #include <boost/algorithm/string.hpp>
-#include "OptionIO.h"
+#include "infrastructure/OptionIO.h"
 #include "zlib.h"
 #include "zstd.h"
 #include <cstring>
-#include "cpu.h"
+#include "infrastructure/cpu.h"
 #include <Eigen/Eigen>
 #include <algorithm>
 #include "third_party/Pgenlib/PgenReader.h"

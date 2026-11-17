@@ -16,15 +16,15 @@
 
 #include <sstream>
 #include "Marker.h"
-#include "Logger.h"
-#include "constants.hpp"
+#include "infrastructure/Logger.h"
+#include "infrastructure/constants.hpp"
 #include <iterator>
 #include <algorithm>
 #include <numeric>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include "utils.hpp"
-#include "OptionIO.h"
+#include "infrastructure/utils.hpp"
+#include "infrastructure/OptionIO.h"
 #include <memory>
 #include <utility>
 #include <sqlite3.h>

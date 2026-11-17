@@ -9,7 +9,7 @@
  */
 
 #include "CommFunc.h"
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 
 double CommFunc::Abs(const double &x)
 {

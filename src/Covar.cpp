@@ -15,14 +15,14 @@
 */
 
 #include "Covar.h"
-#include "Logger.h"
-#include "OptionIO.h"
+#include "infrastructure/Logger.h"
+#include "infrastructure/OptionIO.h"
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <numeric>
-#include "utils.hpp"
+#include "infrastructure/utils.hpp"
 #include "StatLib.h"
 
 map<string, string> Covar::options;

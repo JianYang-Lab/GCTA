@@ -11,7 +11,7 @@
  */
 
 #include "gcta.h"
-#include "mem.hpp"
+#include "infrastructure/mem.hpp"
 
 void gcta::set_reml_diag_mul(double value){
     _reml_diag_mul = value;

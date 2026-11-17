@@ -14,7 +14,7 @@
 #include <iterator>
 #include <set>
 #include "gcta.h"
-#include "Logger.h"
+#include "infrastructure/Logger.h"
 #include "StrFunc.h"
 
 gcta::gcta(int autosome_num, double rm_ld_cutoff, string out)

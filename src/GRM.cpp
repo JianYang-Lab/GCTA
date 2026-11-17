@@ -16,7 +16,7 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "cpu_f77blas.h"
+#include "infrastructure/cpu_f77blas.h"
 
 #include <algorithm>
 #include <cstring>
@@ -30,12 +30,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
 
-#include "AsyncBuffer.hpp"
+#include "infrastructure/AsyncBuffer.hpp"
 #include "GRM.h"
-#include "Logger.h"
-#include "NumericBackend.h"
-#include "OptionIO.h"
-#include "utils.hpp"
+#include "infrastructure/Logger.h"
+#include "infrastructure/NumericBackend.h"
+#include "infrastructure/OptionIO.h"
+#include "infrastructure/utils.hpp"
 
 using std::to_string;
 

@@ -1,6 +1,6 @@
-#include "NumericBackend.h"
-#include "cpu_f77blas.h"
-#include "Logger.h"
+#include "infrastructure/NumericBackend.h"
+#include "infrastructure/cpu_f77blas.h"
+#include "infrastructure/Logger.h"
 #include <cstring>
 
 using std::string;

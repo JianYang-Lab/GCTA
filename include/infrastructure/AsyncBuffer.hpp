@@ -17,7 +17,7 @@
 #include <condition_variable>
 #include <tuple>
 #include <chrono>
-#include "mem.hpp"
+#include "infrastructure/mem.hpp"
 
 using std::mutex;
 using std::lock_guard;
