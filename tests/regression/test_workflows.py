@@ -4,8 +4,20 @@ import argparse
 from pathlib import Path
 
 from gcta_runner import assert_tables_close, read_table, run_gcta
+from plink import write_plink
+from synthetic import family_markers, write_family_phenotypes
 
-SCENARIOS = ("greml", "pca", "fastgwa_lr", "mlma")
+SCENARIOS = (
+	"greml",
+	"pca",
+	"fastgwa_lr",
+	"mlma",
+	"fastgwa_exact",
+	"fastgwa_mlm",
+	"fastgwa_glmm",
+	"mlma_loco",
+)
+FAMILY_SCENARIOS = {"fastgwa_exact", "fastgwa_mlm", "fastgwa_glmm", "mlma_loco"}
 
 
 def write_keep_file(data_dir, work_dir):
@@ -28,7 +40,72 @@ def make_grm(gcta, prefix, keep, work_dir, threads):
 	)
 
 
+def run_family_workflow(gcta, work_dir, scenario, threads):
+	markers, chromosomes = family_markers()
+	prefix = Path(work_dir) / "input" / "family"
+	write_plink(prefix, markers, chromosomes)
+	pheno, qcovar = write_family_phenotypes(prefix, markers)
+	if scenario == "mlma_loco":
+		output = run_gcta(
+			gcta,
+			work_dir,
+			"loco",
+			[
+				"--bfile", prefix,
+				"--mlma-loco",
+				"--pheno", pheno,
+				"--qcovar", qcovar,
+				"--reml-priors", 0.5,
+				"--reml-maxit", 100,
+			],
+			threads=threads,
+		)
+		log = output.with_suffix(".log").read_text(encoding="utf-8")
+		assert log.count("Log-likelihood ratio converged.") == 3
+		return {"mlma_loco.loco.mlma": output.with_suffix(".loco.mlma")}
+
+	sparse = run_gcta(
+		gcta,
+		work_dir,
+		"sparse",
+		["--bfile", prefix, "--make-grm", "--sparse-cutoff", 0.05],
+		threads=threads,
+	)
+	option_by_scenario = {
+		"fastgwa_exact": "--fastGWA-mlm-exact",
+		"fastgwa_mlm": "--fastGWA-mlm",
+		"fastgwa_glmm": "--fastGWA-mlm-binary",
+	}
+	arguments = [
+		"--bfile", prefix,
+		"--grm-sparse", sparse,
+		option_by_scenario[scenario],
+		"--pheno", pheno,
+		"--qcovar", qcovar,
+		"--seed", 12345,
+	]
+	if scenario == "fastgwa_glmm":
+		arguments.extend(("--mpheno", 2))
+	output = run_gcta(gcta, work_dir, scenario, arguments, threads=threads)
+	log = output.with_suffix(".log").read_text(encoding="utf-8")
+	if scenario == "fastgwa_glmm":
+		assert "Performing fastGWA generalized linear mixed model association analysis..." in log
+		assert "fastGWA-BB-REML converged." in log
+		rows = read_table(output.with_suffix(".fastGWA"))
+		converge_column = rows[0].index("CONVERGE")
+		assert all(row[converge_column] == "1" for row in rows[1:])
+	else:
+		assert "fastGWA-REML converged." in log
+		if scenario == "fastgwa_exact":
+			assert "Performing fastGWA mixed model association analysis (exact test)..." in log
+		else:
+			assert "Performing fastGWA mixed model association analysis..." in log
+	return {f"{scenario}.fastGWA": output.with_suffix(".fastGWA")}
+
+
 def run_workflow(gcta, data_dir, work_dir, scenario, threads):
+	if scenario in FAMILY_SCENARIOS:
+		return run_family_workflow(gcta, work_dir, scenario, threads)
 	legacy = Path(data_dir) / "gcta_legacy" / "test"
 	pheno = legacy.with_suffix(".phen")
 	keep = write_keep_file(data_dir, work_dir)

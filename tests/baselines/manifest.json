@@ -1,7 +1,9 @@
 {
   "production_commit": "21a0151af7a5741766a511704f2cda9469945135",
   "test_data_commit": "c6bbbee59b5b4960cae1893ad4afd63ab0fba726",
-  "sample_count": 64,
+  "legacy_sample_count": 64,
+  "synthetic_sample_count": 128,
+  "synthetic_marker_count": 2049,
   "generator": {
     "compiler": "GCC 16.2.1",
     "mkl": "2026.0.0"
@@ -15,6 +17,10 @@
     "pca.eigenval",
     "pca.eigenvec",
     "fastgwa_lr.fastGWA",
-    "mlma.mlma"
+    "mlma.mlma",
+    "fastgwa_exact.fastGWA",
+    "fastgwa_mlm.fastGWA",
+    "fastgwa_glmm.fastGWA",
+    "mlma_loco.loco.mlma"
   ]
 }
