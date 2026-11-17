@@ -8,7 +8,13 @@ from pathlib import Path
 import platform
 import statistics
 import subprocess
+import sys
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "regression"))
+from gcta_runner import run_gcta
+from plink import write_plink
+from synthetic import family_markers, write_family_phenotypes
 
 
 def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193):
@@ -31,6 +37,68 @@ def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193):
 					genotype = (sample * 3 + marker * 5 + sample * marker) % 3
 					packed |= codes[genotype] << (2 * within_byte)
 				stream.write(bytes((packed,)))
+
+
+def prepare_greml(gcta, data, work):
+	legacy = data / "gcta_legacy" / "test"
+	keep = work / "input" / "keep1024.txt"
+	keep.parent.mkdir(parents=True, exist_ok=True)
+	with legacy.with_suffix(".fam").open(encoding="utf-8") as stream:
+		keep.write_text("".join(stream.readlines()[:1024]), encoding="utf-8")
+	grm = run_gcta(
+		gcta,
+		work / "setup",
+		"grm",
+		["--bfile", legacy, "--keep", keep, "--make-grm"],
+	)
+	return [
+		"--grm", grm,
+		"--pheno", legacy.with_suffix(".phen"),
+		"--reml",
+		"--reml-priors", 0.5,
+		"--reml-maxit", 100,
+		"--reml-no-lrt",
+		"--reml-est-fix",
+	], 1024, 1000
+
+
+def prepare_fastgwa(gcta, work, scenario):
+	markers, chromosomes = family_markers(sample_count=1024, marker_count=8193)
+	prefix = work / "input" / "family"
+	write_plink(prefix, markers, chromosomes)
+	pheno, qcovar = write_family_phenotypes(prefix, markers)
+	arguments = ["--bfile", prefix]
+	if scenario != "fastgwa_lr":
+		sparse = run_gcta(
+			gcta,
+			work / "setup",
+			"sparse",
+			["--bfile", prefix, "--make-grm", "--sparse-cutoff", 0.05],
+		)
+		arguments.extend(("--grm-sparse", sparse))
+	option = {
+		"fastgwa_lr": "--fastGWA-lr",
+		"fastgwa_mlm": "--fastGWA-mlm",
+		"fastgwa_exact": "--fastGWA-mlm-exact",
+		"fastgwa_glmm": "--fastGWA-mlm-binary",
+	}[scenario]
+	arguments.extend((option, "--pheno", pheno, "--qcovar", qcovar, "--seed", 12345))
+	if scenario == "fastgwa_glmm":
+		arguments.extend(("--mpheno", 2))
+	return arguments, 1024, 8193
+
+
+def prepare_scenario(gcta, data, work, scenario):
+	if scenario == "grm_legacy":
+		prefix = data / "gcta_legacy" / "test"
+		return ["--bfile", prefix, "--make-grm"], 3925, 1000
+	if scenario == "grm_synthetic":
+		prefix = work / "input" / "synthetic"
+		write_synthetic_plink(prefix)
+		return ["--bfile", prefix, "--make-grm"], 2048, 8193
+	if scenario == "greml_legacy":
+		return prepare_greml(gcta, data, work)
+	return prepare_fastgwa(gcta, work, scenario)
 
 
 def sha256(path):
@@ -94,7 +162,19 @@ def main():
 	parser.add_argument("--gcta", required=True)
 	parser.add_argument("--data", required=True)
 	parser.add_argument("--work", required=True)
-	parser.add_argument("--scenario", required=True, choices=("grm_legacy", "grm_synthetic"))
+	parser.add_argument(
+		"--scenario",
+		required=True,
+		choices=(
+			"grm_legacy",
+			"grm_synthetic",
+			"greml_legacy",
+			"fastgwa_lr",
+			"fastgwa_mlm",
+			"fastgwa_exact",
+			"fastgwa_glmm",
+		),
+	)
 	parser.add_argument("--threads", nargs="+", type=int, default=(1, 2, 4))
 	parser.add_argument("--repeat", type=int, default=5)
 	args = parser.parse_args()
@@ -102,13 +182,10 @@ def main():
 	gcta = Path(args.gcta).resolve()
 	work = Path(args.work).resolve()
 	data = Path(args.data).resolve()
-	if args.scenario == "grm_legacy":
-		prefix = data / "gcta_legacy" / "test"
-		sample_count, marker_count = 3925, 1000
-	else:
-		prefix = work / "input" / "synthetic"
-		write_synthetic_plink(prefix)
-		sample_count, marker_count = 2048, 8193
+	scenario_work = work / args.scenario
+	arguments, sample_count, marker_count = prepare_scenario(
+		gcta, data, scenario_work, args.scenario
+	)
 
 	source_commit, source_dirty = source_state()
 	results = {
@@ -126,12 +203,11 @@ def main():
 		"measurements": {},
 	}
 	for threads in args.threads:
-		thread_work = work / f"threads_{threads}"
+		thread_work = scenario_work / f"threads_{threads}"
 		output = thread_work / "benchmark"
 		command = [
 			gcta,
-			"--bfile", prefix,
-			"--make-grm",
+			*arguments,
 			"--out", output,
 			"--thread-num", threads,
 		]
