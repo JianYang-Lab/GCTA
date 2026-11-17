@@ -25,6 +25,7 @@ endfunction()
 
 gcta_add_regression_test(grm.standard test_grm.py standard unit)
 gcta_add_regression_test(grm.weighted test_grm.py weighted unit)
+gcta_add_regression_test(grm.missing test_grm.py missing unit)
 gcta_add_regression_test(grm.threads test_grm.py threads integration)
 gcta_add_regression_test(grm.partitions test_grm.py partitions integration)
 gcta_add_regression_test(geno.decoding test_geno.py decoding integration)

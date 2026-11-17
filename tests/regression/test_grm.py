@@ -13,21 +13,36 @@ def make_fixture(work_dir):
 	return prefix, sample_ids
 
 
-def check_oracle(gcta, work_dir, algorithm):
+def check_oracle(gcta, work_dir, algorithm, markers=None):
+	if markers is None:
+		markers = synthetic_markers()
 	prefix = Path(work_dir) / "input" / "synthetic"
-	sample_ids = write_plink(prefix, synthetic_markers())
+	sample_ids = write_plink(prefix, markers)
 	output = run_gcta(
 		gcta,
 		work_dir,
 		f"algorithm_{algorithm}",
 		["--bfile", prefix, "--make-grm", "--make-grm-alg", algorithm],
 	)
-	expected_grm_values, expected_counts = expected_grm(synthetic_markers(), algorithm)
+	expected_grm_values, expected_counts = expected_grm(markers, algorithm)
 	assert_floats_close(read_floats(output.with_suffix(".grm.bin")), expected_grm_values, output)
 	actual_counts = read_floats(output.with_suffix(".grm.N.bin"))
 	assert actual_counts == expected_counts, f"GRM marker counts differ: {output}"
 	expected_ids = "".join(f"{fid}\t{iid}\n" for fid, iid in sample_ids)
 	assert output.with_suffix(".grm.id").read_text(encoding="utf-8") == expected_ids
+
+
+def check_missing(gcta, work_dir):
+	markers = [
+		[0, 1, None],
+		[2, 1, 0],
+		[0, None, 2],
+		[None, 2, 1],
+		[0, 0, 0],
+		[None, None, 1],
+	]
+	for algorithm in (0, 1):
+		check_oracle(gcta, Path(work_dir) / f"algorithm_{algorithm}", algorithm, markers)
 
 
 def check_threads(gcta, data_dir, work_dir):
@@ -63,7 +78,9 @@ def main():
 	parser.add_argument("--gcta", required=True)
 	parser.add_argument("--data", required=True)
 	parser.add_argument("--work", required=True)
-	parser.add_argument("--scenario", required=True, choices=("standard", "weighted", "threads", "partitions"))
+	parser.add_argument(
+		"--scenario", required=True, choices=("standard", "weighted", "missing", "threads", "partitions")
+	)
 	args = parser.parse_args()
 	work_dir = Path(args.work)
 	work_dir.mkdir(parents=True, exist_ok=True)
@@ -72,6 +89,8 @@ def main():
 		check_oracle(args.gcta, work_dir, 0)
 	elif args.scenario == "weighted":
 		check_oracle(args.gcta, work_dir, 1)
+	elif args.scenario == "missing":
+		check_missing(args.gcta, work_dir)
 	elif args.scenario == "threads":
 		check_threads(args.gcta, args.data, work_dir)
 	else:

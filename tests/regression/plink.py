@@ -49,17 +49,18 @@ def write_plink(prefix, genotypes):
 
 def expected_grm(genotypes, algorithm):
 	assert algorithm in (0, 1)
-	assert all(value is not None for marker in genotypes for value in marker), (
-		"The independent GRM oracle currently requires complete genotypes"
-	)
 	sample_count = len(genotypes[0])
 	element_count = sample_count * (sample_count + 1) // 2
 	sums = [0.0] * element_count
+	counts = [0] * element_count
 	variance_sum = 0.0
 	valid_markers = 0
 
 	for marker in genotypes:
-		frequency = sum(marker) / (2.0 * sample_count)
+		observed = [value for value in marker if value is not None]
+		if not observed:
+			continue
+		frequency = sum(observed) / (2.0 * len(observed))
 		variance = 2.0 * frequency * (1.0 - frequency)
 		if variance < 1e-50:
 			continue
@@ -67,21 +68,23 @@ def expected_grm(genotypes, algorithm):
 		variance_sum += variance
 		if algorithm == 0:
 			scale = math.sqrt(1.0 / variance)
-			values = [(value - 2.0 * frequency) * scale for value in marker]
+			values = [
+				(value - 2.0 * frequency) * scale if value is not None else 0.0 for value in marker
+			]
 		else:
-			values = [value - 2.0 * frequency for value in marker]
+			values = [value - 2.0 * frequency if value is not None else 0.0 for value in marker]
 		for row in range(sample_count):
 			offset = row * (row + 1) // 2
 			for column in range(row + 1):
-				sums[offset + column] += values[row] * values[column]
+				index = offset + column
+				sums[index] += values[row] * values[column]
+				if marker[row] is not None and marker[column] is not None:
+					counts[index] += 1
 
 	assert valid_markers > 0
-	if algorithm == 0:
-		grm = [value / valid_markers for value in sums]
-	else:
-		grm = [value / variance_sum for value in sums]
-	counts = [float(valid_markers)] * element_count
-	return grm, counts
+	weight = 1.0 if algorithm == 0 else valid_markers / variance_sum
+	grm = [sums[index] / count * weight if count else 0.0 for index, count in enumerate(counts)]
+	return grm, [float(count) for count in counts]
 
 
 def synthetic_markers(sample_count=7, marker_count=131):
