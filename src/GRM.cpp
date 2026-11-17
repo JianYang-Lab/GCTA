@@ -1333,8 +1333,13 @@ void GRM::calculate_GRM(uint64_t *buf, int num_marker) {
 bool write_GRM(float *grm, float *N, FILE *grm_out, FILE *N_out, uint32_t row_index, float thresh=-99){
     if(thresh == -99){
         //binary output
-        fwrite(grm, sizeof(float), row_index + 1, grm_out);
-        fwrite(N, sizeof(float), row_index + 1, N_out);
+        size_t count = row_index + 1;
+        if(fwrite(grm, sizeof(float), count, grm_out) != count){
+            LOGGER.e(0, "can't write GRM values.");
+        }
+        if(fwrite(N, sizeof(float), count, N_out) != count){
+            LOGGER.e(0, "can't write GRM marker counts.");
+        }
     }else{
         std::stringstream ss;
         ss << std::setprecision( std::numeric_limits<float>::digits10+2); 
@@ -1345,8 +1350,8 @@ bool write_GRM(float *grm, float *N, FILE *grm_out, FILE *N_out, uint32_t row_in
             }
         }
         const string tmp = ss.str();
-        if(tmp.size() > 0){
-            fputs(tmp.c_str(), grm_out);
+        if(tmp.size() > 0 && fputs(tmp.c_str(), grm_out) == EOF){
+            LOGGER.e(0, "can't write sparse GRM values.");
         }
     }
     return true;
@@ -1505,8 +1510,12 @@ void GRM::deduce_GRM(){
     */
 
 
-    if(grm_out)fclose(grm_out);
-    if(N_out)fclose(N_out);
+    if(grm_out && fclose(grm_out) != 0){
+        LOGGER.e(0, "can't finish writing GRM output.");
+    }
+    if(N_out && fclose(N_out) != 0){
+        LOGGER.e(0, "can't finish writing GRM marker counts.");
+    }
     delete[] w_grm;
     delete[] w_N;
     //t_print(begin, "  GRM deduce finished");

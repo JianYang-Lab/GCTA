@@ -6,7 +6,7 @@ from pathlib import Path
 import shutil
 import subprocess
 
-SCENARIOS = ("missing_input", "bad_magic", "truncated_bed", "unwritable_output")
+SCENARIOS = ("missing_input", "bad_magic", "truncated_bed", "unwritable_output", "grm_short_write")
 
 
 def expect_error(gcta, work_dir, name, arguments):
@@ -55,7 +55,7 @@ def main():
 	parser.add_argument("--work", required=True)
 	parser.add_argument("--scenario", required=True, choices=SCENARIOS)
 	args = parser.parse_args()
-	work = Path(args.work)
+	work = Path(args.work).resolve()
 	output = work / "result"
 	if args.scenario == "missing_input":
 		prefix = work / "absent" / "missing"
@@ -63,6 +63,15 @@ def main():
 	elif args.scenario == "unwritable_output":
 		prefix = Path(args.data) / "gcta_legacy" / "toy"
 		arguments = ["--bfile", prefix, "--make-grm", "--out", work / "absent" / "result"]
+	elif args.scenario == "grm_short_write":
+		if not Path("/dev/full").exists():
+			print("SKIP: /dev/full is unavailable")
+			return
+		work.mkdir(parents=True, exist_ok=True)
+		for suffix in (".grm.bin", ".grm.N.bin"):
+			Path(f"{output}{suffix}").symlink_to("/dev/full")
+		prefix = Path(args.data).resolve() / "gcta_legacy" / "test"
+		arguments = ["--bfile", prefix, "--make-grm", "--out", output]
 	else:
 		prefix = prepare_bed(args.data, work, args.scenario)
 		arguments = ["--bfile", prefix, "--make-grm", "--out", output]
