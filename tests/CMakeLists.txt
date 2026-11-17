@@ -48,3 +48,7 @@ gcta_add_regression_test(error.truncated_bed test_errors.py truncated_bed integr
 gcta_add_regression_test(error.unwritable_output test_errors.py unwritable_output integration)
 gcta_add_regression_test(error.grm_short_write test_errors.py grm_short_write integration)
 set_tests_properties(error.grm_short_write PROPERTIES SKIP_REGULAR_EXPRESSION "SKIP:")
+gcta_add_regression_test(model.lr_roundtrip test_model.py model_lr integration)
+gcta_add_regression_test(model.mlm_roundtrip test_model.py model_mlm integration)
+gcta_add_regression_test(model.exact_roundtrip test_model.py model_exact integration)
+gcta_add_regression_test(model.glmm_roundtrip test_model.py model_glmm integration)

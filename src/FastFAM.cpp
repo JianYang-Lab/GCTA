@@ -533,15 +533,14 @@ void FastFAM::loadModel(){
 
         if(covarFlag){
             LOGGER << "  loading " << head.covarVec_cols << " covariates..." << std::endl;
-            //TODO  H seems incorrect;
-            H.resize(num_indi, head.covarVec_cols);
+            H.resize(head.covarVec_cols, num_indi);
             if(fread(tempCovar, sizeof(double), num_covar_elements, ibin) != num_covar_elements){
                 LOGGER.e(0, "failed to read covariates from the saved model.");
             }
-            for(uint64_t i = 0; i < head.covarVec_cols; i++){
-                uint64_t cur_base = i * num_indi;
-                for(uint64_t j = 0; j < num_indi; j++){
-                    H(j, i) = tempCovar[cur_base + id2[j]];
+            for(uint64_t i = 0; i < num_indi; i++){
+                uint64_t cur_base = id2[i] * head.covarVec_cols;
+                for(uint64_t j = 0; j < head.covarVec_cols; j++){
+                    H(j, i) = tempCovar[cur_base + j];
                 }
             }
         }

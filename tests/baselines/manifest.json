@@ -32,6 +32,10 @@
     "fastgwa_lr_savebin.bin",
     "fastgwa_lr_savebin.snpinfo",
     "fastgwa_glmm_savebin.bin",
-    "fastgwa_glmm_savebin.snpinfo"
+    "fastgwa_glmm_savebin.snpinfo",
+    "model_lr.fastGWA",
+    "model_mlm.fastGWA",
+    "model_exact.fastGWA",
+    "model_glmm.fastGWA"
   ]
 }
