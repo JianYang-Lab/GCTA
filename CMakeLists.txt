@@ -155,7 +155,7 @@ endforeach(lib_src)
 add_executable(gcta64 ${MAIN_SOURCE})
 
 add_subdirectory(third_party)
-add_subdirectory(main)
+add_subdirectory(legacy)
 target_include_directories(mainV1 PUBLIC ${COMMON_INCLUDES} ${MKL_INCLUDE})
 target_link_libraries(mainV1 Eigen3::Eigen dcdflib)
 
