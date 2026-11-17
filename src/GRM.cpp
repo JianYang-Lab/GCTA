@@ -17,25 +17,25 @@
 */
 
 #include "cpu_f77blas.h"
-#include "NumericBackend.h"
-#include "GRM.h"
-#include "Logger.h"
-#include <iterator>
+
 #include <algorithm>
-#include <iomanip>
-#include <sstream>
 #include <cstring>
+#include <iomanip>
+#include <iterator>
 #include <numeric>
+#include <sstream>
 #include <unordered_set>
-#include "utils.hpp"
-#include "AsyncBuffer.hpp"
-#include "utils.hpp"
 #include <omp.h>
-#include "OptionIO.h"
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include <sstream>
-#include <csignal>
+
+#include "AsyncBuffer.hpp"
+#include "GRM.h"
+#include "Logger.h"
+#include "NumericBackend.h"
+#include "OptionIO.h"
+#include "utils.hpp"
 
 using std::to_string;
 

@@ -15,45 +15,37 @@
    A copy of the GNU General Public License is attached along with this program.
    If not, see <http://www.gnu.org/licenses/>.
 */
-#include "FastFAM.h"
-#include "OptionIO.h"
-#include "StatLib.h"
-#include <cmath>
+#include "cpu.h"
+
 #include <algorithm>
-#include <Eigen/SparseCholesky>
-
-#if GCTA_CPU_x86
-#include <Eigen/PardisoSupport>
-#endif
-
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/Sparse>
-#include <sstream>
-#include <iterator>
-#include "utils.hpp"
-#include "Logger.h"
-#include "ThreadPool.h"
-#include "omp.h"
-#include "Matrix.hpp"
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/lexical_cast.hpp>
-#include <iomanip>
-#include "Covar.h"
-#include <cstdio>
-#include <random>
-#include <chrono>
 #include <charconv>
+#include <chrono>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
+#include <iomanip>
+#include <iterator>
+#include <random>
+#include <sstream>
+#include <omp.h>
 
 #include <Eigen/Core>
+#include <Eigen/IterativeLinearSolvers>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
 #include <Eigen/SparseCore>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
 
-#include <Spectra/SymEigsSolver.h>
-#include <Spectra/MatOp/SparseSymMatProd.h>
-#include <boost/math/distributions/beta.hpp>
+#include "FastFAM.h"
+#include "Covar.h"
+#include "Logger.h"
+#include "Matrix.hpp"
+#include "OptionIO.h"
+#include "StatLib.h"
+#include "utils.hpp"
 
 struct InvItem{
     int32_t row;
