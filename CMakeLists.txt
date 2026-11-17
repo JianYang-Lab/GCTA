@@ -31,11 +31,19 @@ if(NOT CMAKE_BUILD_TYPE)
     message("Setting to release build")
 endif()
 
+option(GCTA_BUILD_TESTING "Build GCTA regression tests" ON)
+# Dependency projects share BUILD_TESTING; keep their test suites disabled.
+set(BUILD_TESTING OFF CACHE BOOL "Build dependency tests" FORCE)
+
 # Fetch 3rd parties
 include(cmake/CPM.cmake)
 set(FETCHCONTENT_QUIET OFF)
 
-CPMAddPackage("gh:madler/zlib@1.3.1")
+CPMAddPackage(
+    NAME zlib
+    GITHUB_REPOSITORY madler/zlib
+    GIT_TAG v1.3.1
+    OPTIONS "ZLIB_BUILD_EXAMPLES OFF")
 CPMAddPackage("gh:eigen-mirror/eigen#3.4.0")
 CPMAddPackage("gh:yixuan/spectra@1.1.0")
 
@@ -210,9 +218,11 @@ if (NOT APPLE)
     target_link_libraries(gcta64 MKL::MKL)
 endif()
 
-# Testing has some problems currently
-#enable_testing()
-#ADD_SUBDIRECTORY(test)
+if(GCTA_BUILD_TESTING)
+    enable_testing()
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    add_subdirectory(tests)
+endif()
 
 IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json")
     EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy_if_different
