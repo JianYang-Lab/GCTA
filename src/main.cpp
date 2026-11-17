@@ -20,7 +20,7 @@
 #include "infrastructure/Logger.h"
 #include "Geno.h"
 #include "Marker.h"
-#include "Pheno.h"
+#include "data/Pheno.h"
 #include "GRM.h"
 #include "Covar.h"
 #include "FastFAM.h"

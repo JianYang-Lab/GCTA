@@ -46,7 +46,7 @@
 #include "Marker.h"
 #include "infrastructure/Matrix.hpp"
 #include "infrastructure/OptionIO.h"
-#include "Pheno.h"
+#include "data/Pheno.h"
 #include "StatLib.h"
 #include "infrastructure/utils.hpp"
 

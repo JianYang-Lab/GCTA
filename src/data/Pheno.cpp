@@ -14,7 +14,7 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Pheno.h"
+#include "data/Pheno.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>

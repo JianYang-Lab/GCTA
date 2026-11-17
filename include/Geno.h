@@ -21,7 +21,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "Pheno.h"
+#include "data/Pheno.h"
 #include "Marker.h"
 #include "infrastructure/Logger.h"
 #include "infrastructure/AsyncBuffer.hpp"

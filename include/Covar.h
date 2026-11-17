@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "Pheno.h"
+#include "data/Pheno.h"
 
 using std::map;
 using std::vector;
