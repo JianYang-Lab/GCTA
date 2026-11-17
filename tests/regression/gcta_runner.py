@@ -6,7 +6,7 @@ import subprocess
 
 
 def run_gcta(gcta, work_dir, name, arguments, threads=1, timeout=120):
-	work_dir = Path(work_dir)
+	work_dir = Path(work_dir).resolve()
 	work_dir.mkdir(parents=True, exist_ok=True)
 	output = work_dir / name
 	environment = os.environ.copy()
@@ -16,7 +16,7 @@ def run_gcta(gcta, work_dir, name, arguments, threads=1, timeout=120):
 	environment["MKL_DYNAMIC"] = "FALSE"
 	command = [
 		str(Path(gcta).resolve()),
-		*(str(argument) for argument in arguments),
+		*(str(argument.resolve() if isinstance(argument, Path) else argument) for argument in arguments),
 		"--out", str(output),
 		"--thread-num", str(threads),
 	]
@@ -52,6 +52,37 @@ def assert_floats_close(actual, expected, path, rel_tol=2e-6, abs_tol=2e-6):
 		assert math.isclose(observed, reference, rel_tol=rel_tol, abs_tol=abs_tol), (
 			f"Value mismatch at {path}[{index}]: {observed} != {reference}"
 		)
+
+
+def read_table(path):
+	return [line.split() for line in Path(path).read_text(encoding="utf-8").splitlines()]
+
+
+def assert_tables_close(actual, expected, rel_tol=2e-5, abs_tol=1e-6):
+	actual_rows = read_table(actual)
+	expected_rows = read_table(expected)
+	assert len(actual_rows) == len(expected_rows), (
+		f"Row count mismatch for {actual}: {len(actual_rows)} != {len(expected_rows)}"
+	)
+	for row_index, (actual_row, expected_row) in enumerate(zip(actual_rows, expected_rows)):
+		assert len(actual_row) == len(expected_row), f"Column count mismatch at {actual}:{row_index + 1}"
+		for column_index, (observed, reference) in enumerate(zip(actual_row, expected_row)):
+			if observed == reference:
+				continue
+			try:
+				observed_number = float(observed)
+				reference_number = float(reference)
+			except ValueError:
+				raise AssertionError(
+					f"Text mismatch at {actual}:{row_index + 1}:{column_index + 1}: "
+					f"{observed} != {reference}"
+				)
+			if math.isnan(observed_number) and math.isnan(reference_number):
+				continue
+			assert math.isclose(observed_number, reference_number, rel_tol=rel_tol, abs_tol=abs_tol), (
+				f"Value mismatch at {actual}:{row_index + 1}:{column_index + 1}: "
+				f"{observed} != {reference}"
+			)
 
 
 def assert_grm_equal(first, second, rel_tol=2e-6, abs_tol=2e-6):
