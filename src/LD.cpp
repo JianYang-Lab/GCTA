@@ -186,8 +186,16 @@ void LD::processMain(){
             Pheno pheno;
             Marker marker;
             Geno geno(&pheno, &marker);
+            geno.init_keep();
+            geno.AFA1.resize(marker.count_extract());
+            geno.countMarkers.resize(marker.count_extract());
+            geno.init_AsyncBuffer();
             if(!geno.filterMAF()){
-                callBacks.push_back(std::bind(&Geno::freq64, &geno, _1, _2));
+                vector<function<void (uint64_t *, int)>> freqCallBacks;
+                freqCallBacks.push_back(std::bind(&Geno::freq64, &geno, _1, _2));
+                geno.loop_64block(marker.get_extract_index(), freqCallBacks);
+                geno.resetLoop();
+                geno.init_AsyncBuffer();
             }
  
             LD ld(&geno);
@@ -204,6 +212,8 @@ void LD::processMain(){
                 vector<uint32_t> indices1 = marker.getNextWindowIndex(cur_index_marker, window, chr_ends, isX);
                 geno_buffer[cur_buffer].reset(new double[indices1.size() * num_indi]);
                 cur_buffer_offset[cur_buffer] = 0;
+                geno.num_finished_markers = cur_index_marker;
+                geno.init_AsyncBuffer();
                 geno.loop_64block(indices1, callBacks, false);
                 cur_index_marker += indices1.size();
 

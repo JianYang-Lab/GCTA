@@ -6,7 +6,15 @@ from pathlib import Path
 import shutil
 import subprocess
 
-SCENARIOS = ("missing_input", "bad_magic", "truncated_bed", "unwritable_output", "grm_short_write")
+SCENARIOS = (
+    "missing_input",
+    "bad_magic",
+    "truncated_bed",
+    "unwritable_output",
+    "grm_short_write",
+    "legacy_invalid_option",
+    "ld_invalid_window",
+)
 
 
 def expect_error(gcta, work_dir, name, arguments):
@@ -60,6 +68,11 @@ def main():
     if args.scenario == "missing_input":
         prefix = work / "absent" / "missing"
         arguments = ["--bfile", prefix, "--make-grm", "--out", output]
+    elif args.scenario == "legacy_invalid_option":
+        arguments = ["--reml", "--reml-alg", 3, "--out", output]
+    elif args.scenario == "ld_invalid_window":
+        prefix = Path(args.data) / "gcta_legacy" / "toy"
+        arguments = ["--bfile", prefix, "--ld-matrix", "--ld-wind", "invalid", "--out", output]
     elif args.scenario == "unwritable_output":
         prefix = Path(args.data) / "gcta_legacy" / "toy"
         arguments = ["--bfile", prefix, "--make-grm", "--out", work / "absent" / "result"]
@@ -79,6 +92,9 @@ def main():
         prefix = prepare_bed(args.data, work, args.scenario)
         arguments = ["--bfile", prefix, "--make-grm", "--out", output]
     expect_error(args.gcta, work, args.scenario, arguments)
+    if args.scenario == "legacy_invalid_option":
+        console = (work / f"{args.scenario}.console").read_text(encoding="utf-8")
+        assert "Accepted options:" in console, "The legacy option parser was not entered"
     print(f"Passed I/O error regression scenario: {args.scenario}")
 
 
