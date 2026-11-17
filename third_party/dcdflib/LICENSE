@@ -1,0 +1,32 @@
+DCDFLIB legal notice from the February 1994 C release
+
+Code that appeared in an ACM publication is subject to their algorithms
+policy:
+
+Submittal of an algorithm for publication in one of the ACM Transactions
+implies that unrestricted use of the algorithm within a computer is
+permissible. General permission to copy and distribute the algorithm without
+fee is granted provided that the copies are not made or distributed for
+direct commercial advantage. The ACM copyright notice and the title of the
+publication and its date appear, and notice is given that copying is by
+permission of the Association for Computing Machinery. To copy otherwise, or
+to republish, requires a fee and/or specific permission.
+
+Krogh, F. Algorithms Policy. ACM Tran. Math. Softw. 13(1987), 183-186.
+
+We place the DCDFLIB code that we have written in the public domain.
+
+NO WARRANTY
+
+WE PROVIDE ABSOLUTELY NO WARRANTY OF ANY KIND EITHER EXPRESSED OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
+PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THIS PROGRAM PROVE DEFECTIVE,
+YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+IN NO EVENT SHALL THE UNIVERSITY OF TEXAS OR ANY OF ITS COMPONENT
+INSTITUTIONS INCLUDING M. D. ANDERSON HOSPITAL BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY LOST PROFITS, LOST MONIES, OR OTHER SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE (INCLUDING
+BUT NOT LIMITED TO LOSS OF DATA OR DATA OR ITS ANALYSIS BEING RENDERED
+INACCURATE OR LOSSES SUSTAINED BY THIRD PARTIES) THE PROGRAM.

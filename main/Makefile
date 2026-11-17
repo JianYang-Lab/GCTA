@@ -22,11 +22,12 @@ ifdef SINGLE_PRECISION
 endif
 
 OUTPUT = ./release/gcta64
+DCDFLIB_DIR = ../third_party/dcdflib
 
 ############################################
 ###  Linux configuration ##################
 
-CXXFLAGS = -w -s -O3 -m64 -fopenmp -DNDEBUG -msse2 -std=c++11 -DMKL_LP64 -I. -I$(MKLROOT)/include -I$(EIGEN)
+CXXFLAGS = -w -s -O3 -m64 -fopenmp -DNDEBUG -msse2 -std=c++11 -DMKL_LP64 -I. -I$(DCDFLIB_DIR) -I$(MKLROOT)/include -I$(EIGEN)
 LDFLAGS = -static -lz -Wl,--start-group  $(MKLROOT)/lib/intel64/libmkl_intel_lp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl
 
 ############################################
@@ -54,11 +55,11 @@ endif
 
 
 HDR += CommFunc.h \
-	   cdflib.h \
-	   dcdflib.h \
+	   $(DCDFLIB_DIR)/cdflib.h \
+	   $(DCDFLIB_DIR)/dcdflib.h \
 	   eigen_func.h \
            gcta.h \
-	   ipmpar.h \
+	   $(DCDFLIB_DIR)/ipmpar.h \
            StatFunc.h \
            StrFunc.h \
            zfstream.h
@@ -66,7 +67,6 @@ SRC = bivar_reml.cpp \
            CommFunc.cpp \
 	   eigen_func.cpp \
            data.cpp \
-	   dcdflib.cpp \
            edata.cpp \
            ejma.cpp \
            est_hsq.cpp \
@@ -85,7 +85,7 @@ SRC = bivar_reml.cpp \
            reml_within_family.cpp \
            zfstream.cpp
 	   
-OBJ = $(SRC:.cpp=.o)
+OBJ = $(SRC:.cpp=.o) dcdflib.o
 
 all : $(OUTPUT) 
 
@@ -94,6 +94,9 @@ $(OUTPUT) :
 	$(CXX) -o $(OUTPUT) $(OBJ) $(LDFLAGS) 
 
 $(OBJ) : $(HDR)
+
+dcdflib.o : $(DCDFLIB_DIR)/dcdflib.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .cpp.o : 
 	$(CXX) $(CXXFLAGS) -c $*.cpp

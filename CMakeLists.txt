@@ -154,9 +154,10 @@ endforeach(lib_src)
 
 add_executable(gcta64 ${MAIN_SOURCE})
 
+add_subdirectory(third_party)
 add_subdirectory(main)
 target_include_directories(mainV1 PUBLIC ${COMMON_INCLUDES} ${MKL_INCLUDE})
-target_link_libraries(mainV1 Eigen3::Eigen)
+target_link_libraries(mainV1 Eigen3::Eigen dcdflib)
 
 set(GCTA_TARGETS gcta64 mainV1 ${GCTA_LIBS})
 function(targets_includes targets include_dir)
@@ -199,8 +200,6 @@ if(APPLE)
         target_link_libraries(${gcta_lib} ${ACCELERATE_LIBRARY})
     endforeach()
 endif()
-
-add_subdirectory(third_party)
 
 target_include_directories(gcta64 PRIVATE
     ${COMMON_INCLUDES}
@@ -249,7 +248,7 @@ if(LINUX)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
 
     # Targets
-    install(TARGETS gcta64 mainV1 ${GCTA_LIBS}
+    install(TARGETS gcta64 mainV1 dcdflib ${GCTA_LIBS}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
@@ -262,7 +261,7 @@ if(LINUX)
     install(FILES ${CMAKE_SOURCE_DIR}/resources/gcta64.svg
         DESTINATION share/icons/hicolor/scalable/apps)
 elseif(WIN32)
-    install(TARGETS gcta64 mainV1 ${GCTA_LIBS} DESTINATION bin)
+    install(TARGETS gcta64 mainV1 dcdflib ${GCTA_LIBS} DESTINATION bin)
 
     file(GLOB RUNTIME_DLLS "${CMAKE_BINARY_DIR}/*.dll")
     install(FILES
@@ -280,7 +279,7 @@ elseif(APPLE)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
 
     # 安装目标可执行文件和库
-    install(TARGETS gcta64 mainV1 ${GCTA_LIBS}
+    install(TARGETS gcta64 mainV1 dcdflib ${GCTA_LIBS}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
