@@ -4392,7 +4392,7 @@ void FastFAM::estBinGamma(){
         o_inf << "CHR\tSNP\tPOS\tA1\tA2\tcinf" << std::endl;
         out_inf = true;
     }
-    for(int i=0; i<num_marker_rand; i++){
+    for(int i=0; i<curNumModel; i++){
         if(bValids[i]){
             if(out_inf){
                 //o_inf << marker->getMarkerStrExtract(marker_index[i]) << "\t" << v_c_infs[i] << std::endl;

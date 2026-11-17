@@ -108,6 +108,8 @@ def run_family_workflow(gcta, work_dir, scenario, threads):
     output = run_gcta(gcta, work_dir, scenario, arguments, threads=threads)
     log = output.with_suffix(".log").read_text(encoding="utf-8")
     if scenario == "fastgwa_glmm":
+        assert log.count("reading 200 SNP...") == 1
+        assert "Mean GRAMMAR-Gamma value = " in log
         assert "Performing fastGWA generalized linear mixed model association analysis..." in log
         assert "fastGWA-BB-REML converged." in log
         rows = read_table(output.with_suffix(".fastGWA"))
