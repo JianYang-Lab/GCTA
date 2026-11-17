@@ -152,6 +152,16 @@ foreach(lib_src ${SRCS})
     list(APPEND GCTA_LIBS ${lib_name})
 endforeach(lib_src)
 
+target_link_libraries(numericbackend logger)
+target_link_libraries(optionio logger)
+target_link_libraries(pheno logger optionio utils)
+target_link_libraries(marker logger optionio utils)
+target_link_libraries(geno pheno marker logger threadpool optionio utils tables mem)
+target_link_libraries(covar pheno logger optionio utils statlib)
+target_link_libraries(grm geno logger numericbackend optionio utils mem)
+target_link_libraries(fastfam covar geno marker pheno logger optionio statlib utils)
+target_link_libraries(ld geno logger statlib utils)
+
 add_executable(gcta64 ${MAIN_SOURCE})
 
 add_subdirectory(third_party)

@@ -39,7 +39,7 @@
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-#include "FastFAM.h"
+#include "analysis/FastFAM.h"
 #include "data/Covar.h"
 #include "data/Geno.h"
 #include "infrastructure/Logger.h"

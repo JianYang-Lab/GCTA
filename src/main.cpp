@@ -23,7 +23,7 @@
 #include "data/Pheno.h"
 #include "analysis/GRM.h"
 #include "data/Covar.h"
-#include "FastFAM.h"
+#include "analysis/FastFAM.h"
 #include "LD.h"
 #include "infrastructure/NumericBackend.h"
 #include <functional>
