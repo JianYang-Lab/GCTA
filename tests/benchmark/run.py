@@ -121,6 +121,11 @@ def prepare_scenario(gcta, data, work, scenario):
 		return ["--bfile", prefix, "--make-grm"], 2048, 8193
 	if scenario == "greml_legacy":
 		return prepare_greml(gcta, data, work)
+	if scenario in ("fastgwa_lr_binary", "fastgwa_glmm_binary"):
+		base_scenario = "fastgwa_lr" if scenario == "fastgwa_lr_binary" else "fastgwa_glmm"
+		arguments, sample_count, marker_count = prepare_fastgwa(gcta, work, base_scenario)
+		arguments.append("--save-bin")
+		return arguments, sample_count, marker_count
 	return prepare_fastgwa(gcta, work, scenario)
 
 
@@ -201,6 +206,8 @@ def main():
 			"fastgwa_lr_large",
 			"fastgwa_mlm_large",
 			"fastgwa_glmm_imbalanced",
+			"fastgwa_lr_binary",
+			"fastgwa_glmm_binary",
 		),
 	)
 	parser.add_argument("--threads", nargs="+", type=int, default=(1, 2, 4))
