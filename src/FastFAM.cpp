@@ -45,6 +45,7 @@
 #include <cstdio>
 #include <random>
 #include <chrono>
+#include <charconv>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -2753,6 +2754,20 @@ void FastFAM::output_res_spa(const vector<uint8_t> &isValids, const vector<uint3
 }
  
 
+template<typename T>
+static void append_float(string &text, T value){
+    char buffer[32];
+    auto result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::general, 6);
+    text.append(buffer, result.ptr - buffer);
+}
+
+template<typename T>
+static void append_integer(string &text, T value){
+    char buffer[32];
+    auto result = std::to_chars(buffer, buffer + sizeof(buffer), value);
+    text.append(buffer, result.ptr - buffer);
+}
+
 
 void FastFAM::output_res(const vector<uint8_t> &isValids, const vector<uint32_t> markerIndex){
     int numKept = 0;
@@ -2790,25 +2805,45 @@ void FastFAM::output_res(const vector<uint8_t> &isValids, const vector<uint32_t>
             }
         }
     }else{
+        string row;
+        row.reserve(256);
         for(int i = 0; i != num_marker; i++){
             if(isValids[i]){
                 numKept++;
-                osOut << marker->getMarkerStrExtract(markerIndex[i]) << "\t" << countMarkers[i]
-                    << "\t" << af[i] << "\t" << beta[i] << "\t" << se[i] << "\t" << p[i];
+                row.clear();
+                row += marker->getMarkerStrExtract(markerIndex[i]);
+                row += "\t";
+                append_integer(row, countMarkers[i]);
+                row += "\t";
+                append_float(row, af[i]);
+                row += "\t";
+                append_float(row, beta[i]);
+                row += "\t";
+                append_float(row, se[i]);
+                row += "\t";
+                append_float(row, p[i]);
                 if(hasInfo){
-                    osOut << "\t" << info[i];
+                    row += "\t";
+                    append_float(row, info[i]);
                 }
-                osOut << "\n";
+                row += "\n";
+                osOut.write(row.data(), row.size());
             }else{
                 if(bOutResAll){
                     numKept++;
-                osOut << marker->getMarkerStrExtract(markerIndex[i]) << "\t" << countMarkers[i]
-                    << "\t" << af[i] << "\tNA\tNA\tNA";
-                if(hasInfo){
-                    osOut << "\t" << info[i];
-                }
-                osOut << "\n";
- 
+                    row.clear();
+                    row += marker->getMarkerStrExtract(markerIndex[i]);
+                    row += "\t";
+                    append_integer(row, countMarkers[i]);
+                    row += "\t";
+                    append_float(row, af[i]);
+                    row += "\tNA\tNA\tNA";
+                    if(hasInfo){
+                        row += "\t";
+                        append_float(row, info[i]);
+                    }
+                    row += "\n";
+                    osOut.write(row.data(), row.size());
                 }
             }
         }
