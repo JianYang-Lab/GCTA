@@ -1157,8 +1157,8 @@ void Geno::getGenoDouble_bgen(uintptr_t *buf, int idx, GenoBufItem* gbuf){
         dec_data = new uint8_t[len_decomp + 8];
         uint32_t curCompSize = len_comp;
         if(compressFormat == 1){
-            uint32_t Ldecomp = len_decomp;
-            int z_result = uncompress((Bytef*)dec_data, (uLongf*)&Ldecomp, (Bytef*)curbuf, curCompSize);
+            uLongf Ldecomp = len_decomp;
+            int z_result = uncompress((Bytef*)dec_data, &Ldecomp, (Bytef*)curbuf, curCompSize);
             if(z_result != Z_OK || len_decomp != Ldecomp){
                 LOGGER.e(0, "decompressing genotype data error in " + error_promp); 
             }
