@@ -30,3 +30,4 @@ compile_commands.json
 *.db
 *.tar
 *.zip
+!tests/baselines/*.bin

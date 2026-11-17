@@ -8,6 +8,12 @@
     "compiler": "GCC 16.2.1",
     "mkl": "2026.0.0"
   },
+  "binary_generator": {
+    "production_commit": "4b0986b358c5b1a93b14251cb9ea8e2031697b04",
+    "compiler": "GCC 16.2.1",
+    "mkl": "2026.2.0",
+    "comparison": "exact bytes"
+  },
   "comparison": {
     "relative_tolerance": 0.00002,
     "absolute_tolerance": 0.000001
@@ -22,6 +28,10 @@
     "fastgwa_exact.fastGWA",
     "fastgwa_mlm.fastGWA",
     "fastgwa_glmm.fastGWA",
-    "mlma_loco.loco.mlma"
+    "mlma_loco.loco.mlma",
+    "fastgwa_lr_savebin.bin",
+    "fastgwa_lr_savebin.snpinfo",
+    "fastgwa_glmm_savebin.bin",
+    "fastgwa_glmm_savebin.snpinfo"
   ]
 }

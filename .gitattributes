@@ -16,3 +16,4 @@
 *.vcxproj.user text eol=crlf
 
 *.bed binary
+*.bin binary

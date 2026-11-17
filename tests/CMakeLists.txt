@@ -40,3 +40,5 @@ gcta_add_regression_test(workflow.fastgwa_exact test_workflows.py fastgwa_exact 
 gcta_add_regression_test(workflow.fastgwa_mlm test_workflows.py fastgwa_mlm integration)
 gcta_add_regression_test(workflow.fastgwa_glmm test_workflows.py fastgwa_glmm integration)
 gcta_add_regression_test(workflow.mlma_loco test_workflows.py mlma_loco integration)
+gcta_add_regression_test(binary.fastgwa_lr test_binary.py fastgwa_lr_savebin integration)
+gcta_add_regression_test(binary.fastgwa_glmm test_binary.py fastgwa_glmm_savebin integration)
