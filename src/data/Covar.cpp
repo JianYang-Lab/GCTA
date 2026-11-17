@@ -14,7 +14,7 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Covar.h"
+#include "data/Covar.h"
 #include "infrastructure/Logger.h"
 #include "infrastructure/OptionIO.h"
 #include <fstream>

@@ -22,7 +22,7 @@
 #include "data/Marker.h"
 #include "data/Pheno.h"
 #include "GRM.h"
-#include "Covar.h"
+#include "data/Covar.h"
 #include "FastFAM.h"
 #include "LD.h"
 #include "infrastructure/NumericBackend.h"
