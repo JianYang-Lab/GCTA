@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <numeric>
 #include "infrastructure/utils.hpp"
-#include "StatLib.h"
+#include "analysis/StatLib.h"
 
 map<string, string> Covar::options;
 using std::to_string;

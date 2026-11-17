@@ -47,7 +47,7 @@
 #include "infrastructure/Matrix.hpp"
 #include "infrastructure/OptionIO.h"
 #include "data/Pheno.h"
-#include "StatLib.h"
+#include "analysis/StatLib.h"
 #include "infrastructure/utils.hpp"
 
 struct InvItem{

@@ -13,7 +13,7 @@
    A copy of the GNU General Public License is attached along with this program.
    If not, see <http://www.gnu.org/licenses/>.
 */
-#include "StatLib.h"
+#include "analysis/StatLib.h"
 #include <cmath>
 #include <cstdio>
 #include <limits>

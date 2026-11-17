@@ -2,7 +2,7 @@
 #include "infrastructure/Logger.h"
 #include "infrastructure/constants.hpp"
 #include "infrastructure/utils.hpp"
-#include "StatLib.h"
+#include "analysis/StatLib.h"
 #include <numeric>
 #include <string>
 #include <functional>
