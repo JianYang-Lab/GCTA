@@ -1243,7 +1243,7 @@ void Geno::getGenoDouble_bgen(uintptr_t *buf, int idx, GenoBufItem* gbuf){
         uint32_t sindex = (*curSampleIndexPtr)[j];
         uint8_t item_ploidy = sample_ploidy[sindex];
         if(item_ploidy > 128){
-            miss_index.push_back(sindex);
+            miss_index.push_back(j);
             has_miss = true;
             dosages[j] = max_dos;
         }else if(item_ploidy == 2){

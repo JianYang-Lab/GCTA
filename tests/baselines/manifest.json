@@ -36,6 +36,9 @@
     "model_lr.fastGWA",
     "model_mlm.fastGWA",
     "model_exact.fastGWA",
-    "model_glmm.fastGWA"
+    "model_glmm.fastGWA",
+    "bgen_subset.grm.bin",
+    "bgen_subset.grm.N.bin",
+    "bgen_subset.grm.id"
   ]
 }

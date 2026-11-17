@@ -31,3 +31,4 @@ compile_commands.json
 *.tar
 *.zip
 !tests/baselines/*.bin
+!tests/baselines/*.id
