@@ -210,12 +210,12 @@ target_include_directories(Pgenlib PRIVATE ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR}
 
 target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib sqlite3 libzstd Threads::Threads zlib)
 
-if (NOT WIN32)
-    target_link_libraries(gcta64 GSL::gsl GSL::gslcblas)
-endif()
-
 if (NOT APPLE)
     target_link_libraries(gcta64 MKL::MKL)
+endif()
+
+if (NOT WIN32)
+    target_link_libraries(gcta64 GSL::gsl)
 endif()
 
 if(GCTA_BUILD_TESTING)

@@ -59,3 +59,5 @@ target_include_directories(async_buffer_test PRIVATE "${CMAKE_SOURCE_DIR}/includ
 target_link_libraries(async_buffer_test Threads::Threads)
 add_test(NAME async.buffer COMMAND async_buffer_test)
 set_tests_properties(async.buffer PROPERTIES LABELS "unit" TIMEOUT 120)
+gcta_add_regression_test(linkage.numeric_symbols test_linkage.py numeric_symbols integration)
+set_tests_properties(linkage.numeric_symbols PROPERTIES SKIP_REGULAR_EXPRESSION "SKIP:")
