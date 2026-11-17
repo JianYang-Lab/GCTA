@@ -46,6 +46,7 @@
 #include <random>
 #include <chrono>
 #include <charconv>
+#include <cstring>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -2686,6 +2687,13 @@ void FastFAM::calculate_gwa_2df_sandwich(uintptr_t * genobuf, const vector<uint3
     output_res_2df(isValids, markerIndex);
 }
 
+template<typename T>
+static void append_binary(vector<char> &buffer, size_t &offset, const T &value){
+    memcpy(buffer.data() + offset, &value, sizeof(T));
+    offset += sizeof(T);
+}
+
+
 void FastFAM::output_res_spa(const vector<uint8_t> &isValids, const vector<uint32_t> markerIndex){
     int numKept = 0;
     int num_marker = markerIndex.size();
@@ -2773,36 +2781,24 @@ void FastFAM::output_res(const vector<uint8_t> &isValids, const vector<uint32_t>
     int numKept = 0;
     int num_marker = markerIndex.size();
     if(bSaveBin){
-        int num_write = 1;
+        size_t record_size = 3 * sizeof(float) + sizeof(double) + sizeof(uint32_t);
+        if(hasInfo) record_size += sizeof(float);
+        vector<char> buffer(num_marker * record_size);
+        size_t offset = 0;
         for(int i = 0; i != num_marker; i++){
             if(isValids[i]){
                 numKept++;
                 osOut << marker->getMarkerStrExtract(markerIndex[i]) << "\n";
-                if(fwrite(&af[i], sizeof(float), num_write, bOut) != num_write){
-                    LOGGER.e(0, "can't write allele frequency to [" + sFileName + ".bin].");
-                }
-
-                if(fwrite(&beta[i], sizeof(float), num_write, bOut) != num_write){
-                    LOGGER.e(0, "can't write beta to [" + sFileName + ".bin].");
-                }
-                if(fwrite(&se[i], sizeof(float), num_write, bOut) != num_write){
-                    LOGGER.e(0, "can't write se to [" + sFileName + ".bin].");
-                }
-                if(fwrite(&p[i], sizeof(double), num_write, bOut) != num_write){
-                    LOGGER.e(0, "can't write p to [" + sFileName + ".bin].");
-                }
-
-                if(fwrite(&countMarkers[i], sizeof(uint32_t), num_write, bOut) != num_write){
-                    LOGGER.e(0, "can't write N to [" + sFileName + ".bin].");
-                }
-                if(hasInfo){
-                    if(fwrite(&info[i], sizeof(float), num_write, bOut) != num_write){
-                        LOGGER.e(0, "can't write INFO score to [" + sFileName + ".bin].");
-                    }
-                }
-
-
+                append_binary(buffer, offset, af[i]);
+                append_binary(buffer, offset, beta[i]);
+                append_binary(buffer, offset, se[i]);
+                append_binary(buffer, offset, p[i]);
+                append_binary(buffer, offset, countMarkers[i]);
+                if(hasInfo) append_binary(buffer, offset, info[i]);
             }
+        }
+        if(offset > 0 && fwrite(buffer.data(), 1, offset, bOut) != offset){
+            LOGGER.e(0, "can't write binary results to [" + sFileName + ".bin].");
         }
     }else{
         string row;
