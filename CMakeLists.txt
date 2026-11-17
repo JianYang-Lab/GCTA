@@ -128,7 +128,7 @@ set(MAIN_SOURCE "${CMAKE_SOURCE_DIR}/src/main.cpp")
 
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM SRCS "${MAIN_SOURCE}")
-list(APPEND SRCS "${CMAKE_SOURCE_DIR}/src/acat.c")
+list(APPEND SRCS "${CMAKE_SOURCE_DIR}/src/analysis/acat.c")
 
 set(GCTA_LIBS "")
 foreach(lib_src ${SRCS})

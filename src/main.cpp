@@ -39,7 +39,7 @@
 #include "infrastructure/mem.hpp"
 #include "infrastructure/config.h"
 
-#include "acat.hpp" //add by fanghl 20210303
+#include "analysis/acat.hpp" //add by fanghl 20210303
 #define ACAT_MODULE
 
 using std::bind;
