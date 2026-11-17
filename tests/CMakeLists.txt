@@ -42,3 +42,7 @@ gcta_add_regression_test(workflow.fastgwa_glmm test_workflows.py fastgwa_glmm in
 gcta_add_regression_test(workflow.mlma_loco test_workflows.py mlma_loco integration)
 gcta_add_regression_test(binary.fastgwa_lr test_binary.py fastgwa_lr_savebin integration)
 gcta_add_regression_test(binary.fastgwa_glmm test_binary.py fastgwa_glmm_savebin integration)
+gcta_add_regression_test(error.missing_input test_errors.py missing_input integration)
+gcta_add_regression_test(error.bad_magic test_errors.py bad_magic integration)
+gcta_add_regression_test(error.truncated_bed test_errors.py truncated_bed integration)
+gcta_add_regression_test(error.unwritable_output test_errors.py unwritable_output integration)
