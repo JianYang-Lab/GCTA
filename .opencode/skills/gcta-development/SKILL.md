@@ -1,6 +1,6 @@
 ---
 name: gcta-development
-description: Use when working on the GCTA (Genome-wide Complex Trait Analysis) C++ codebase — adding/modifying analysis modules, command-line options, genotype/phenotype/GRM processing, or debugging build issues. Covers the v2 module system in src/, the legacy v1 gcta class in main/, the CMake/CPM build, the Logger singleton, OpenMP threading, and the option-registration dispatch pattern.
+description: Use when working on the GCTA (Genome-wide Complex Trait Analysis) C++ codebase — adding/modifying analysis modules, command-line options, genotype/phenotype/GRM processing, or debugging build issues. Covers the v2 module system in src/, the legacy v1 gcta class in legacy/, the CMake/CPM build, the Logger singleton, OpenMP threading, and the option-registration dispatch pattern.
 ---
 
 # GCTA Development Skill
@@ -20,10 +20,13 @@ analysis-specific binary/text outputs.
 ## Repository layout
 
 ```
-src/            v2 implementation (the "mock layer"). One .cpp per module.
-include/        v2 headers. Each module exposes registerOption/processMain.
-main/           v1 implementation: the legacy `gcta` class + option parser.
-third_party/    plink-ng (git submodule), Pgenlib, zstd wrapper.
+src/main.cpp       v2 option parsing and dispatch entry point.
+src/data/          v2 phenotype, marker, genotype, and covariate processing.
+src/analysis/      v2 GRM, fastGWA, LD, ACAT, and statistical routines.
+src/infrastructure/ v2 logging, I/O, numerical backend, threading, and utilities.
+include/           v2 headers in matching data/analysis/infrastructure directories.
+legacy/            v1 implementation: the legacy `gcta` class + option parser.
+third_party/       plink-ng (git submodule), Pgenlib, zstd wrapper.
 cmake/          CPM.cmake, toolchain files.
 resources/      desktop entry + icons.
 scripts/        HPC and macOS helper scripts.
@@ -31,14 +34,14 @@ docs/           (mostly empty) Sphinx-style manual.
 ```
 
 The executable target is `gcta64`, built from `src/main.cpp` + per-module
-libraries auto-globbed from `src/*.cpp`, plus the `mainV1` library from
-`main/CMakeLists.txt`.
+libraries auto-globbed recursively from `src/`, plus the `mainV1` library from
+`legacy/CMakeLists.txt`.
 
 ## Two-layer architecture (IMPORTANT)
 
 GCTA has TWO coexisting code generations. Understand which one you are touching:
 
-1. **v2 ("mock layer")** — `src/*.cpp` + `include/*.h`.
+1. **v2 ("mock layer")** — `src/{data,analysis,infrastructure}/` + matching `include/` directories.
    - Modular: each module is a class (`Pheno`, `Marker`, `Geno`, `Covar`,
      `GRM`, `FastFAM`, `LD`) with static `registerOption(options)` and
      `processMain()` methods.
@@ -50,11 +53,11 @@ GCTA has TWO coexisting code generations. Understand which one you are touching:
    - The `supported_flagsV2` list in `src/main.cpp` enumerates which flags
      are handled by v2. Anything else falls through to v1.
 
-2. **v1 (legacy)** — `main/*.cpp` + `main/gcta.h`.
+2. **v1 (legacy)** — `legacy/*.cpp` + `legacy/gcta.h`.
    - The monolithic `gcta` class (~700 lines in the header) holds all
      genotype/phenotype/GRM state and methods like `read_bimfile`,
      `make_grm`, `mlm_assoc`, `cojo`, `gsmr`, etc.
-   - `main/option.cpp` / `option.h` parse the command line via the legacy
+   - `legacy/option.cpp` / `option.h` parse the command line via the legacy
      `option(argc, argv)` function, called as a fallback when v2 does not
      claim the main slot.
    - v1 uses Eigen dense/sparse matrices and the `CommFunc`/`StatFunc`/
@@ -74,12 +77,12 @@ main() -> parse argv into options map
 
 To add a new v2 module or understand an existing one:
 
-1. **Header** (`include/Foo.h`): declare a class with:
+1. **Header** (`include/analysis/Foo.h`): declare a class with:
    ```cpp
    static int registerOption(map<string, vector<string>>& options_in);
    static void processMain();
    ```
-2. **Source** (`src/Foo.cpp`): implement `registerOption` to scan `options_in`
+2. **Source** (`src/analysis/Foo.cpp`): implement `registerOption` to scan `options_in`
    for this module's flags and return `1` if a main action is requested (or
    `0` if the module only contributes data). Implement `processMain` as the
    entry point executed by `main()`.
@@ -95,7 +98,7 @@ before consumers (GRM, FastFAM, LD).
 
 ## Logger (global singleton)
 
-`include/Logger.h` + `src/Logger.cpp`. Accessed via the `LOGGER` macro.
+`include/infrastructure/Logger.h` + `src/infrastructure/Logger.cpp`. Accessed via the `LOGGER` macro.
 - `LOGGER.i(level, msg)` / `LOGGER.w(...)` / `LOGGER.e(level, msg)` —
   `e` logs an error and EXITS the program.
 - `LOGGER.m(level, msg)` — terminal-only message (not written to log file).
@@ -122,7 +125,7 @@ before consumers (GRM, FastFAM, LD).
 ## Threading
 
 - OpenMP is used throughout (`#pragma omp parallel`, `omp_set_num_threads`).
-- `src/ThreadPool.cpp` provides a custom thread pool for task-based
+- `src/infrastructure/ThreadPool.cpp` provides a custom thread pool for task-based
   parallelism.
 - Thread count is read from `OMP_NUM_THREADS` env var or `--thread-num` /
   `--threads` CLI flags.
@@ -148,21 +151,21 @@ before consumers (GRM, FastFAM, LD).
   cmake -DCMAKE_BUILD_TYPE=Release -G Ninja -B build/Release -S .
   cmake --build build/Release
   ```
-- Each `src/*.cpp` is compiled into its own static library, then linked into
+- Each v2 module `.cpp` is compiled into its own static library, then linked into
   the `gcta64` executable along with `mainV1`.
 - `compile_commands.json` is generated and copied to the source root for
   IDE/clangd integration.
 
 ## Key data types
 
-- **`GenoBuf`** (`include/Geno.h`): buffered genotype block with allele
+- **`GenoBuf`** (`include/data/Geno.h`): buffered genotype block with allele
   frequencies, missing-data bits, and centered/standardized genotype vectors.
 - **`GenoBufItem`**: per-marker extracted genotype result (geno vector,
   missing bits, af, mean, sd, info, nValidN, nValidAllele).
-- **`MarkerInfo`** / **`MarkerParam`** (`include/Marker.h`): SNP metadata
+- **`MarkerInfo`** / **`MarkerParam`** (`include/data/Marker.h`): SNP metadata
   (chr, name, pd, alleles, A_rev) and BGEN parsing parameters.
-- **`PhenoMask`** (`include/Pheno.h`): bitmask + shift for phenotype flags.
-- **Eigen types** (v1, `main/gcta.h`): `eigenMatrix`, `eigenVector`,
+- **`PhenoMask`** (`include/data/Pheno.h`): bitmask + shift for phenotype flags.
+- **Eigen types** (v1, `legacy/gcta.h`): `eigenMatrix`, `eigenVector`,
   `eigenSparseMat`, `eigenDiagMat` — aliased to double or float based on
   `SINGLE_PRECISION` define.
 
@@ -184,8 +187,8 @@ Multi-file input: `--bfile` (single) / `--mbfile` (multi); `--pfile` /
 The ACAT (Aggregated Cauchy Association Test) module has special handling in
 `src/main.cpp` (lines ~107-148): if `--acat` is passed with `--gene-list`
 and `--snp-list`, it calls `acat_func()` directly and exits before the normal
-option dispatch. The ACAT implementation is in `src/acat.c` /
-`include/acat.hpp`.
+option dispatch. The ACAT implementation is in `src/analysis/acat.c` /
+`include/analysis/acat.hpp`.
 
 ## Common development tasks
 
@@ -198,7 +201,7 @@ option dispatch. The ACAT implementation is in `src/acat.c` /
 
 ### Adding a new v2 module
 
-1. Create `include/Foo.h` and `src/Foo.cpp` following the registration
+1. Create `include/analysis/Foo.h` and `src/analysis/Foo.cpp` following the registration
    pattern above.
 2. Add the module to `module_names`, `registers`, and `processMains` in
    `src/main.cpp`.
@@ -207,15 +210,15 @@ option dispatch. The ACAT implementation is in `src/acat.c` /
 
 ### Modifying v1 (legacy) functionality
 
-1. Edit `main/option.cpp` / `option.h` for CLI parsing changes.
-2. Edit the relevant `main/*.cpp` file (e.g., `est_hsq.cpp` for GREML,
+1. Edit `legacy/option.cpp` / `option.h` for CLI parsing changes.
+2. Edit the relevant `legacy/*.cpp` file (e.g., `est_hsq.cpp` for GREML,
    `grm.cpp` for GRM construction, `gsmr.cpp` for GSMR, etc.).
-3. The `gcta` class in `main/gcta.h` is the central data structure.
+3. The `gcta` class in `legacy/gcta.h` is the central data structure.
 
 ### Debugging
 
 - Use `LOGGER.d(level, msg)` for debug messages (only visible in debug builds).
-- `#ifndef NDEBUG` blocks in `include/GRM.h` show test-only file handles.
+- `#ifndef NDEBUG` blocks in `include/analysis/GRM.h` show test-only file handles.
 - Build in Debug mode: `cmake -DCMAKE_BUILD_TYPE=Debug ...`.
 - The `--verbose` flag shows peak memory usage on Linux.
 
@@ -231,7 +234,8 @@ option dispatch. The ACAT implementation is in `src/acat.c` /
 - **Naming**: classes are PascalCase (`Geno`, `GRM`, `FastFAM`); methods are
   snake_case or camelCase; static members prefixed with `s` or in static
   maps; member variables often prefixed with `b` (bool) or `n` (count).
-- **Includes**: v2 headers in `include/`, v1 headers in `main/`. Use
-  `"Header.h"` for project headers, `<Header>` for system/third-party.
+- **Includes**: v2 headers live under `include/{data,analysis,infrastructure}/`,
+  v1 headers in `legacy/`. Use qualified project includes such as
+  `"data/Geno.h"`, and `<Header>` for system/third-party headers.
 - **Third-party headers**: PLINK2 pgen library at
   `third_party/plink-ng/2.0/include`; Eigen at `eigen-mirror/eigen#3.4.0`.
