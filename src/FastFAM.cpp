@@ -2417,7 +2417,7 @@ void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerI
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
 
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(static)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
         GenoBufItem item;
