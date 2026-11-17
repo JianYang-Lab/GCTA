@@ -11,13 +11,14 @@ SCENARIOS = (
 	"greml",
 	"pca",
 	"fastgwa_lr",
+	"fastgwa_lr_nofilter",
 	"mlma",
 	"fastgwa_exact",
 	"fastgwa_mlm",
 	"fastgwa_glmm",
 	"mlma_loco",
 )
-FAMILY_SCENARIOS = {"fastgwa_exact", "fastgwa_mlm", "fastgwa_glmm", "mlma_loco"}
+FAMILY_SCENARIOS = {"fastgwa_exact", "fastgwa_mlm", "fastgwa_glmm", "mlma_loco", "fastgwa_lr_nofilter"}
 
 
 def write_keep_file(data_dir, work_dir):
@@ -45,6 +46,24 @@ def run_family_workflow(gcta, work_dir, scenario, threads):
 	prefix = Path(work_dir) / "input" / "family"
 	write_plink(prefix, markers, chromosomes)
 	pheno, qcovar = write_family_phenotypes(prefix, markers)
+	if scenario == "fastgwa_lr_nofilter":
+		output = run_gcta(
+			gcta,
+			work_dir,
+			"fastgwa",
+			[
+				"--bfile", prefix,
+				"--fastGWA-lr",
+				"--pheno", pheno,
+				"--qcovar", qcovar,
+				"--seed", 12345,
+				"--nofilter",
+			],
+			threads=threads,
+		)
+		log = output.with_suffix(".log").read_text(encoding="utf-8")
+		assert "Performing fastGWA linear regression analysis..." in log
+		return {f"{scenario}.fastGWA": output.with_suffix(".fastGWA")}
 	if scenario == "mlma_loco":
 		output = run_gcta(
 			gcta,
@@ -195,12 +214,38 @@ def assert_eigenvectors_close(actual, expected):
 	assert_tables_close(actual_temporary, expected_temporary)
 
 
+def assert_nofilter_close(actual, expected):
+	actual_path = Path(actual)
+	actual_rows = read_table(actual_path)
+	expected_rows = read_table(expected)
+	assert len(actual_rows) == len(expected_rows) == 2050
+	for rows in (actual_rows, expected_rows):
+		invalid_count = 0
+		for row in rows[1:]:
+			if row[7] == "NA":
+				invalid_count += 1
+				assert row[8] == row[9] == "NA"
+				row[5] = row[6] = "0"
+		assert invalid_count == 2
+	actual_temporary = actual_path.parent / f"{actual_path.name}.normalized"
+	expected_temporary = actual_path.parent / f"{actual_path.name}.expected.normalized"
+	actual_temporary.write_text(
+		"".join("\t".join(row) + "\n" for row in actual_rows), encoding="utf-8"
+	)
+	expected_temporary.write_text(
+		"".join("\t".join(row) + "\n" for row in expected_rows), encoding="utf-8"
+	)
+	assert_tables_close(actual_temporary, expected_temporary)
+
+
 def compare_outputs(actual, baseline, scenario):
 	for name, actual_path in actual.items():
 		baseline_path = Path(baseline) / name
 		assert baseline_path.exists(), f"Missing baseline: {baseline_path}"
 		if scenario == "pca" and name.endswith(".eigenvec"):
 			assert_eigenvectors_close(actual_path, baseline_path)
+		elif scenario == "fastgwa_lr_nofilter":
+			assert_nofilter_close(actual_path, baseline_path)
 		else:
 			assert_tables_close(actual_path, baseline_path)
 

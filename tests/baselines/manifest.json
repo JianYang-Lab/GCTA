@@ -17,6 +17,7 @@
     "pca.eigenval",
     "pca.eigenvec",
     "fastgwa_lr.fastGWA",
+    "fastgwa_lr_nofilter.fastGWA",
     "mlma.mlma",
     "fastgwa_exact.fastGWA",
     "fastgwa_mlm.fastGWA",
