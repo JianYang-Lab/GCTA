@@ -69,7 +69,10 @@ def main():
 			return
 		work.mkdir(parents=True, exist_ok=True)
 		for suffix in (".grm.bin", ".grm.N.bin"):
-			Path(f"{output}{suffix}").symlink_to("/dev/full")
+			link = Path(f"{output}{suffix}")
+			if link.exists() or link.is_symlink():
+				link.unlink()
+			link.symlink_to("/dev/full")
 		prefix = Path(args.data).resolve() / "gcta_legacy" / "test"
 		arguments = ["--bfile", prefix, "--make-grm", "--out", output]
 	else:
