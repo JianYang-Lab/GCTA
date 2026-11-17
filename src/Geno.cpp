@@ -1498,7 +1498,6 @@ void Geno::loopDouble(const vector<uint32_t> &extractIndex, int numMarkerBuf, bo
    
     preGenoDouble(numMarkerBuf, bMakeGeno, bGenoCenter, bGenoStd, bMakeMiss);
     thread read_thread([this, &extractIndex](){this->readGeno(extractIndex);});
-    read_thread.detach();
     // main loop
     
     LOGGER.ts("LOOP_GENO_PRE");
@@ -1558,6 +1557,7 @@ void Geno::loopDouble(const vector<uint32_t> &extractIndex, int numMarkerBuf, bo
         LOGGER.i(1, ss.str());
         LOGGER << nFinishedMarker << " SNPs have been processed." << std::endl;
     }
+    read_thread.join();
     endGenoDouble();
 }
 
@@ -3264,7 +3264,6 @@ void Geno::loop_64block(const vector<uint32_t> &raw_marker_index, vector<functio
     }
     //LOGGER << "DEBUG num_finished_markers: " << num_finished_markers << std::endl;
     thread read_thread([this, &raw_marker_index](){this->read_bed(raw_marker_index);});
-    read_thread.detach();
 
     uint8_t *r_buf = NULL;
     bool isEOF = false;
@@ -3340,6 +3339,7 @@ void Geno::loop_64block(const vector<uint32_t> &raw_marker_index, vector<functio
             }
         }
     }
+    read_thread.join();
     delete[] geno_buf;
     if(showLog){
         std::ostringstream ss;
@@ -3686,7 +3686,6 @@ void Geno::loopDoublePre(const vector<uint32_t> &extractMarkerIndex, GenoBuf *gb
 
     int nMarker = gbuf->n_marker;
     thread read_thread([this, nMarker](){this->read_bed2(this->rawMarkerIndexProceed, nMarker);});
-    read_thread.detach();
 
  
     int nTMarker = extractMarkerIndex.size();
@@ -3726,6 +3725,7 @@ void Geno::loopDoublePre(const vector<uint32_t> &extractMarkerIndex, GenoBuf *gb
             }
         }
     }
+    read_thread.join();
     if(showLog){
         std::ostringstream ss;
         ss << std::fixed << std::setprecision(1) << "100% finished in " << LOGGER.tp("LOOP_GENO_TOT") << " sec";

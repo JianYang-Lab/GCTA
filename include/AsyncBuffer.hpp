@@ -61,6 +61,7 @@ public:
     }
 
     T* start_write(){
+        std::unique_lock<std::mutex> lock(mut);
         uint8_t curBufferWrite = m_stat.nextBufferWrite;
         if(m_stat.accessed[curBufferWrite] &&
                 m_stat.write_count[curBufferWrite] == 0 &&
@@ -71,7 +72,6 @@ public:
 
             return buffer[curBufferWrite];
         }else{
-            std::unique_lock<std::mutex> lock(wmut);
             wcv.wait_for(lock, std::chrono::milliseconds(20000));
             lock.unlock();
 
@@ -83,10 +83,12 @@ public:
      * Please don't call this if the stream to read is not end;
     */
     void setEOF(){
+        lock_guard<mutex> lock(mut);
         m_stat.eof[m_stat.nextBufferWrite] = true;
     }
 
     void end_write(){
+        lock_guard<mutex> lock(mut);
         uint8_t curBufferWrite = m_stat.nextBufferWrite;
         m_stat.write_count[curBufferWrite] -= 1;
         if(!m_stat.eof[curBufferWrite]){
@@ -96,12 +98,12 @@ public:
     }
 
     tuple<T*, bool> start_read(){
+        std::unique_lock<std::mutex> lock(mut);
         uint8_t curBufferRead = m_stat.nextBufferRead;
         if(m_stat.write_count[curBufferRead] == 0 && !m_stat.accessed[curBufferRead]){
             m_stat.read_count[curBufferRead] += 1;
             return tuple<T*, bool>{buffer[curBufferRead], m_stat.eof[curBufferRead]};
         }else{
-            std::unique_lock<std::mutex> lock(rmut);
             rcv.wait_for(lock, std::chrono::milliseconds(5000));
             lock.unlock();
             
@@ -110,6 +112,7 @@ public:
     }
 
     void end_read(){
+        lock_guard<mutex> lock(mut);
         uint8_t curBufferRead = m_stat.nextBufferRead;
         m_stat.read_count[curBufferRead] -= 1;
         if((m_stat.read_count[curBufferRead] == 0) && (!m_stat.eof[curBufferRead])){
@@ -120,7 +123,7 @@ public:
     }
 
 private:
-    mutex rmut, wmut;
+    mutex mut;
     BufferStat m_stat;
     condition_variable rcv, wcv;
     T* buffer[3];

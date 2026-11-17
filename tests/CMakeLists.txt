@@ -53,3 +53,9 @@ gcta_add_regression_test(model.mlm_roundtrip test_model.py model_mlm integration
 gcta_add_regression_test(model.exact_roundtrip test_model.py model_exact integration)
 gcta_add_regression_test(model.glmm_roundtrip test_model.py model_glmm integration)
 gcta_add_regression_test(format.bgen_subset test_formats.py bgen_subset integration)
+
+add_executable(async_buffer_test async_buffer_test.cpp)
+target_include_directories(async_buffer_test PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(async_buffer_test Threads::Threads)
+add_test(NAME async.buffer COMMAND async_buffer_test)
+set_tests_properties(async.buffer PROPERTIES LABELS "unit" TIMEOUT 120)
