@@ -25,6 +25,7 @@
 #include "Covar.h"
 #include "FastFAM.h"
 #include "LD.h"
+#include "NumericBackend.h"
 #include <functional>
 #include <map>
 #include <vector>
@@ -300,6 +301,7 @@ int main(int argc, char *argv[]){
 
     LOGGER.open(options["out"][0] + ".log");
     out_ver(true);
+    NumericBackend::initialize();
     if(mains.size() != 0 && !unKnownFlag){
         // List all of the options
         LOGGER.i(0, "Options: ");

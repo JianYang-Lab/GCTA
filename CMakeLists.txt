@@ -208,7 +208,7 @@ target_include_directories(gcta64 PRIVATE
 
 target_include_directories(Pgenlib PRIVATE ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
 
-target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib sqlite3 libzstd Threads::Threads zlib)
+target_link_libraries(gcta64 mainV1 ${GCTA_LIBS} Pgenlib sqlite3 libzstd Threads::Threads zlib ${CMAKE_DL_LIBS})
 
 if (NOT APPLE)
     target_link_libraries(gcta64 MKL::MKL)
