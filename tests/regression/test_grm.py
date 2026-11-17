@@ -52,6 +52,27 @@ def check_threads(gcta, data_dir, work_dir):
 	assert_grm_equal(single, multi)
 
 
+def check_snp_merge(gcta, work_dir):
+	prefix, _ = make_fixture(work_dir)
+	whole = run_gcta(gcta, work_dir, "whole", ["--bfile", prefix, "--make-grm"])
+	subset_outputs = []
+	for subset, remainder in enumerate((0, 1)):
+		snplist = Path(work_dir) / f"subset_{subset}.snplist"
+		snplist.write_text(
+			"".join(f"rs{index}\n" for index in range(131) if index % 2 == remainder), encoding="utf-8"
+		)
+		subset_outputs.append(run_gcta(
+			gcta,
+			work_dir,
+			f"subset_{subset}",
+			["--bfile", prefix, "--extract", snplist, "--make-grm"],
+		))
+	mgrm = Path(work_dir) / "mgrm.txt"
+	mgrm.write_text("".join(f"{output}\n" for output in subset_outputs), encoding="utf-8")
+	merged = run_gcta(gcta, work_dir, "merged", ["--mgrm", mgrm, "--make-grm"])
+	assert_grm_equal(whole, merged)
+
+
 def check_partitions(gcta, work_dir):
 	prefix, _ = make_fixture(work_dir)
 	whole = run_gcta(gcta, work_dir, "whole", ["--bfile", prefix, "--make-grm"])
@@ -79,7 +100,9 @@ def main():
 	parser.add_argument("--data", required=True)
 	parser.add_argument("--work", required=True)
 	parser.add_argument(
-		"--scenario", required=True, choices=("standard", "weighted", "missing", "threads", "partitions")
+		"--scenario",
+		required=True,
+		choices=("standard", "weighted", "missing", "threads", "snp_merge", "partitions"),
 	)
 	args = parser.parse_args()
 	work_dir = Path(args.work)
@@ -93,6 +116,8 @@ def main():
 		check_missing(args.gcta, work_dir)
 	elif args.scenario == "threads":
 		check_threads(args.gcta, args.data, work_dir)
+	elif args.scenario == "snp_merge":
+		check_snp_merge(args.gcta, work_dir)
 	else:
 		check_partitions(args.gcta, work_dir)
 	print(f"Passed GRM regression scenario: {args.scenario}")
