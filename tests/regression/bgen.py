@@ -62,7 +62,10 @@ def write_bgen(prefix, genotypes, chromosomes=None, sample_indices=None):
 		for sample in sample_indices:
 			stream.write(f"F1 I{sample} 0 0\n")
 
-	connection = sqlite3.connect(Path(f"{bgen_path}.bgi"))
+	index_path = Path(f"{bgen_path}.bgi")
+	if index_path.exists():
+		index_path.unlink()
+	connection = sqlite3.connect(index_path)
 	with connection:
 		connection.execute(
 			"CREATE TABLE Metadata (filename TEXT, file_size INTEGER, reserved INTEGER, first_1000_bytes BLOB)"
