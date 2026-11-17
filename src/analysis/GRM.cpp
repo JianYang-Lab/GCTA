@@ -31,7 +31,7 @@
 #include <boost/algorithm/string/join.hpp>
 
 #include "infrastructure/AsyncBuffer.hpp"
-#include "GRM.h"
+#include "analysis/GRM.h"
 #include "infrastructure/Logger.h"
 #include "infrastructure/NumericBackend.h"
 #include "infrastructure/OptionIO.h"

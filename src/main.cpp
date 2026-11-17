@@ -21,7 +21,7 @@
 #include "data/Geno.h"
 #include "data/Marker.h"
 #include "data/Pheno.h"
-#include "GRM.h"
+#include "analysis/GRM.h"
 #include "data/Covar.h"
 #include "FastFAM.h"
 #include "LD.h"
