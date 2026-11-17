@@ -18,7 +18,7 @@
 */
 #include <iostream>
 #include "infrastructure/Logger.h"
-#include "Geno.h"
+#include "data/Geno.h"
 #include "data/Marker.h"
 #include "data/Pheno.h"
 #include "GRM.h"

@@ -1,7 +1,7 @@
 
 #ifndef GCTA_LD_H
 #define GCTA_LD_H
-#include "Geno.h"
+#include "data/Geno.h"
 #include <string>
 #include <vector>
 #include <map>

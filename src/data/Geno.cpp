@@ -17,7 +17,7 @@
 */
 
 #define NOMINMAX
-#include "Geno.h"
+#include "data/Geno.h"
 #include "infrastructure/constants.hpp"
 #include <stdio.h>
 #include <stdlib.h>

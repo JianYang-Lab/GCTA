@@ -18,7 +18,7 @@
 
 #ifndef GCTA2_GRM_H
 #define GCTA2_GRM_H
-#include "Geno.h"
+#include "data/Geno.h"
 #include <string>
 #include <vector>
 #include <utility>

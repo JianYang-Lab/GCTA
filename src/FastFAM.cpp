@@ -41,7 +41,7 @@
 
 #include "FastFAM.h"
 #include "Covar.h"
-#include "Geno.h"
+#include "data/Geno.h"
 #include "infrastructure/Logger.h"
 #include "data/Marker.h"
 #include "infrastructure/Matrix.hpp"
