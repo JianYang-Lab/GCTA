@@ -139,7 +139,7 @@ private:
     //std::mutex chisq_lock;
     //
     //REML
-    vector<SpMat> A;
+    std::vector<SpMat, Eigen::aligned_allocator<SpMat>> A;
     void logLREML(const Ref<const VectorXd> pheno, vector<double> &varcomp, double &logL, double *Hinv=NULL);
 
     void loadModel();
