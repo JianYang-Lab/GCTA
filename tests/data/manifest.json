@@ -1,0 +1,43 @@
+{
+  "source_repository": "https://github.com/jianyangqt/gcta",
+  "source_commit": "c6bbbee59b5b4960cae1893ad4afd63ab0fba726",
+  "source_directory": "test/tests/data",
+  "files": [
+    {
+      "path": "gcta_legacy/test.bed",
+      "sha256": "f334b5efccb41922991026c2306e140ea126e363a57a68c7507f4f6e4fd4852c"
+    },
+    {
+      "path": "gcta_legacy/test.bim",
+      "sha256": "a60668ae8405b075dea69f07cf7cbe600eefd6fafe2354383ae308bb695b5c1d"
+    },
+    {
+      "path": "gcta_legacy/test.fam",
+      "sha256": "9a9b33efc4b21fd82bb86a7c04a5997e39976768a71ac43388aa6f4f3f0d5cf1"
+    },
+    {
+      "path": "gcta_legacy/test.phen",
+      "sha256": "5065f884e1788beb1bf973d828499cb65b20a6fa681d5244d560cfcca6052a4d"
+    },
+    {
+      "path": "gcta_legacy/toy.bed",
+      "sha256": "8ca24a6fb981a74aeb051a484ebb86efcddbc67514ff77020bd8fab37d25d39f"
+    },
+    {
+      "path": "gcta_legacy/toy.bim",
+      "sha256": "e6ec41d14ba2e975759e38ec940c0a25e8f1381e4ac17a6dec89227f7b00f873"
+    },
+    {
+      "path": "gcta_legacy/toy.fam",
+      "sha256": "5ac97d8d8e3f179adce0aa429d48672130b3cc1acb30244fdf599116d78289ee"
+    },
+    {
+      "path": "gcta_legacy/toy.ped",
+      "sha256": "08acbb57a40131a1b693c43b2743b6471da4f625b687265752739e63cb0d47f5"
+    },
+    {
+      "path": "gcta_legacy/toy.map",
+      "sha256": "c541a4cb3acba8fcc8cdcaa16f2593fed4888f6689690f83a9e4fb1172056c84"
+    }
+  ]
+}
