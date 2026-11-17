@@ -24,7 +24,7 @@
 #include "analysis/GRM.h"
 #include "data/Covar.h"
 #include "analysis/FastFAM.h"
-#include "LD.h"
+#include "analysis/LD.h"
 #include "infrastructure/NumericBackend.h"
 #include <functional>
 #include <map>
