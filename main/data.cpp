@@ -219,8 +219,8 @@ void gcta::read_bedfile(string bedfile)
     _snp_1.resize(_include.size());
     _snp_2.resize(_include.size());
     for (i = 0; i < _include.size(); i++) {
-        _snp_1[i].reserve(_keep.size());
-        _snp_2[i].reserve(_keep.size());
+        _snp_1[i].resize(_keep.size());
+        _snp_2[i].resize(_keep.size());
     }
     fstream BIT(bedfile.c_str(), ios::in | ios::binary);
     if (!BIT) LOGGER.e(0, "cannot open the file [" + bedfile + "] to read.");
@@ -674,8 +674,8 @@ void gcta::read_multi_bedfiles(vector<string> multi_bfiles) {
     _snp_1.clear(); _snp_2.clear();
     _snp_1.resize(_include.size()); _snp_2.resize(_include.size());
     for (i = 0; i < _include.size(); i++) {
-        _snp_1[i].reserve(_keep.size());
-        _snp_2[i].reserve(_keep.size());
+        _snp_1[i].resize(_keep.size());
+        _snp_2[i].resize(_keep.size());
     }
 
     // Update the map to retrieve individuals and SNPs

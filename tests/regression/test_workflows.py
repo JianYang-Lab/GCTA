@@ -80,7 +80,11 @@ def run_family_workflow(gcta, work_dir, scenario, threads):
             threads=threads,
         )
         log = output.with_suffix(".log").read_text(encoding="utf-8")
+        assert "Genotype data for 128 individuals and 2049 SNPs to be included" in log
         assert log.count("Log-likelihood ratio converged.") == 3
+        rows = read_table(output.with_suffix(".loco.mlma"))
+        assert len(rows) == len(markers) + 1
+        assert [row[1] for row in rows[1:]] == [f"rs{index}" for index in range(len(markers))]
         return {"mlma_loco.loco.mlma": output.with_suffix(".loco.mlma")}
 
     sparse = run_gcta(
@@ -184,7 +188,12 @@ def run_workflow(gcta, data_dir, work_dir, scenario, threads):
         ],
         threads=threads,
     )
-    assert "Log-likelihood ratio converged." in output.with_suffix(".log").read_text(encoding="utf-8")
+    log = output.with_suffix(".log").read_text(encoding="utf-8")
+    assert "Genotype data for 64 individuals and 1000 SNPs to be included" in log
+    assert "Log-likelihood ratio converged." in log
+    rows = read_table(output.with_suffix(".mlma"))
+    assert len(rows) == 1001
+    assert all(len(row) == 9 for row in rows)
     return {"mlma.mlma": output.with_suffix(".mlma")}
 
 
