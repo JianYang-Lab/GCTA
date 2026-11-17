@@ -22,7 +22,7 @@
 #include <map>
 #include <vector>
 #include "data/Pheno.h"
-#include "Marker.h"
+#include "data/Marker.h"
 #include "infrastructure/Logger.h"
 #include "infrastructure/AsyncBuffer.hpp"
 #include <functional>

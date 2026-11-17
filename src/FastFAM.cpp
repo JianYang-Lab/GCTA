@@ -43,7 +43,7 @@
 #include "Covar.h"
 #include "Geno.h"
 #include "infrastructure/Logger.h"
-#include "Marker.h"
+#include "data/Marker.h"
 #include "infrastructure/Matrix.hpp"
 #include "infrastructure/OptionIO.h"
 #include "data/Pheno.h"

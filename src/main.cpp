@@ -19,7 +19,7 @@
 #include <iostream>
 #include "infrastructure/Logger.h"
 #include "Geno.h"
-#include "Marker.h"
+#include "data/Marker.h"
 #include "data/Pheno.h"
 #include "GRM.h"
 #include "Covar.h"
