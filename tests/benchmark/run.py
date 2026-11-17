@@ -17,7 +17,7 @@ from plink import write_plink
 from synthetic import family_markers, write_family_phenotypes
 
 
-def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193):
+def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193, profile="regular"):
 	prefix = Path(prefix)
 	prefix.parent.mkdir(parents=True, exist_ok=True)
 	prefix.with_suffix(".fam").write_text(
@@ -27,7 +27,8 @@ def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193):
 		"".join(f"1 rs{marker} 0 {1000 + marker} A G\n" for marker in range(marker_count)),
 		encoding="utf-8",
 	)
-	codes = (3, 2, 0)
+	codes = {0: 3, 1: 2, 2: 0, None: 1}
+	missing_rates = (0, 10, 50, 200)
 	with prefix.with_suffix(".bed").open("wb") as stream:
 		stream.write(b"\x6c\x1b\x01")
 		for marker in range(marker_count):
@@ -35,6 +36,14 @@ def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193):
 				packed = 0
 				for within_byte, sample in enumerate(range(offset, min(offset + 4, sample_count))):
 					genotype = (sample * 3 + marker * 5 + sample * marker) % 3
+					if profile == "missing":
+						if marker % 257 == 0:
+							genotype = marker % 3
+						elif marker % 131 == 0:
+							genotype = 1 if sample == 0 else 0
+						missing_value = (sample * 31 + marker * 17 + sample * marker) % 1000
+						if missing_value < missing_rates[marker % 4]:
+							genotype = None
 					packed |= codes[genotype] << (2 * within_byte)
 				stream.write(bytes((packed,)))
 
@@ -63,12 +72,15 @@ def prepare_greml(gcta, data, work):
 
 
 def prepare_fastgwa(gcta, work, scenario):
-	markers, chromosomes = family_markers(sample_count=1024, marker_count=8193)
+	sample_count = 2048 if scenario.endswith("_large") else 1024
+	marker_count = 16385 if scenario.endswith("_large") else 8193
+	case_fraction = 0.1 if scenario == "fastgwa_glmm_imbalanced" else 0.5
+	markers, chromosomes = family_markers(sample_count=sample_count, marker_count=marker_count)
 	prefix = work / "input" / "family"
 	write_plink(prefix, markers, chromosomes)
-	pheno, qcovar = write_family_phenotypes(prefix, markers)
+	pheno, qcovar = write_family_phenotypes(prefix, markers, case_fraction=case_fraction)
 	arguments = ["--bfile", prefix]
-	if scenario != "fastgwa_lr":
+	if scenario not in ("fastgwa_lr", "fastgwa_lr_large"):
 		sparse = run_gcta(
 			gcta,
 			work / "setup",
@@ -81,11 +93,14 @@ def prepare_fastgwa(gcta, work, scenario):
 		"fastgwa_mlm": "--fastGWA-mlm",
 		"fastgwa_exact": "--fastGWA-mlm-exact",
 		"fastgwa_glmm": "--fastGWA-mlm-binary",
+		"fastgwa_lr_large": "--fastGWA-lr",
+		"fastgwa_mlm_large": "--fastGWA-mlm",
+		"fastgwa_glmm_imbalanced": "--fastGWA-mlm-binary",
 	}[scenario]
 	arguments.extend((option, "--pheno", pheno, "--qcovar", qcovar, "--seed", 12345))
-	if scenario == "fastgwa_glmm":
+	if scenario in ("fastgwa_glmm", "fastgwa_glmm_imbalanced"):
 		arguments.extend(("--mpheno", 2))
-	return arguments, 1024, 8193
+	return arguments, sample_count, marker_count
 
 
 def prepare_scenario(gcta, data, work, scenario):
@@ -95,6 +110,14 @@ def prepare_scenario(gcta, data, work, scenario):
 	if scenario == "grm_synthetic":
 		prefix = work / "input" / "synthetic"
 		write_synthetic_plink(prefix)
+		return ["--bfile", prefix, "--make-grm"], 2048, 8193
+	if scenario == "grm_large":
+		prefix = work / "input" / "synthetic"
+		write_synthetic_plink(prefix, sample_count=4096, marker_count=16385)
+		return ["--bfile", prefix, "--make-grm"], 4096, 16385
+	if scenario == "grm_missing":
+		prefix = work / "input" / "synthetic"
+		write_synthetic_plink(prefix, profile="missing")
 		return ["--bfile", prefix, "--make-grm"], 2048, 8193
 	if scenario == "greml_legacy":
 		return prepare_greml(gcta, data, work)
@@ -168,11 +191,16 @@ def main():
 		choices=(
 			"grm_legacy",
 			"grm_synthetic",
+			"grm_large",
+			"grm_missing",
 			"greml_legacy",
 			"fastgwa_lr",
 			"fastgwa_mlm",
 			"fastgwa_exact",
 			"fastgwa_glmm",
+			"fastgwa_lr_large",
+			"fastgwa_mlm_large",
+			"fastgwa_glmm_imbalanced",
 		),
 	)
 	parser.add_argument("--threads", nargs="+", type=int, default=(1, 2, 4))

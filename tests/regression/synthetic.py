@@ -42,7 +42,7 @@ def family_markers(sample_count=128, marker_count=2049):
 	return markers, chromosomes
 
 
-def write_family_phenotypes(prefix, markers):
+def write_family_phenotypes(prefix, markers, case_fraction=0.5):
 	prefix = Path(prefix)
 	sample_count = len(markers[0])
 	marker_count = len(markers)
@@ -79,8 +79,11 @@ def write_family_phenotypes(prefix, markers):
 			- 0.1 * qcovar2
 		)
 		quantitative.append(value)
+	assert 0.0 < case_fraction < 1.0
+	case_count = max(1, min(sample_count - 1, round(sample_count * case_fraction)))
 	ordered = sorted(quantitative)
-	threshold = (ordered[sample_count // 2 - 1] + ordered[sample_count // 2]) / 2.0
+	threshold_index = sample_count - case_count
+	threshold = (ordered[threshold_index - 1] + ordered[threshold_index]) / 2.0
 	binary = [1 if value > threshold else 0 for value in quantitative]
 
 	prefix.with_suffix(".phen").write_text(
