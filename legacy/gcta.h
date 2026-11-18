@@ -208,18 +208,6 @@ public:
     void pc_adjust(string pcadjust_list_file, string eigenvalue_file, double freq_thresh, int wind_size);
     void read_pc_adjust_file(string pcadjust_list_file, string pc_file);
 
-    /////////////////////////
-    // gene expresion data
-    void read_efile(string efile);
-
-    // ecojo
-    void read_eR(string eR_file);
-    void run_ecojo_slct(string e_metafile, double p_cutoff, double collinear);
-    void run_ecojo_blup_efile(string e_metafile, double lambda);
-    void run_ecojo_blup_eR(string e_metafile, double lambda);
-
-    // ERM
-    void make_erm(int erm_mtd, bool output_bin); 
 
 
 private:
@@ -418,27 +406,6 @@ private:
     void rm_cor_sbat(MatrixXf &R, double R_cutoff, int m, vector<int> &rm_ID1);
 
 
-    //////////////////////
-    // gene expresion data
-    void init_e_include();
-    void std_probe(vector< vector<bool> > &X_bool, bool divid_by_std);
-    void std_probe_ind(vector< vector<bool> > &X_bool, bool divid_by_std);
-    
-    // ecojo
-    void calcu_eR();
-    void read_e_metafile(string e_metafile);
-    void ecojo_slct_output(bool joint_only, vector<int> &slct, eigenVector &bJ, eigenVector &bJ_se, eigenVector &pJ);
-    void ecojo_slct(vector<int> &slct, vector<int> &remain, eigenVector &bC, eigenVector &bC_se, eigenVector &pC);
-    bool ecojo_slct_entry(vector<int> &slct, vector<int> &remain, eigenVector &bC, eigenVector &bC_se, eigenVector &pC);
-    void ecojo_slct_stay(vector<int> &slct, eigenVector &bJ, eigenVector &bJ_se, eigenVector &pJ);
-    void ecojo_joint(const vector<int> &slct, eigenVector &bJ, eigenVector &bJ_se, eigenVector &pJ);
-    void ecojo_cond(const vector<int> &slct, const vector<int> &remain, eigenVector &bC, eigenVector &bC_se, eigenVector &pC);
-    bool ecojo_init_R(const vector<int> &slct);
-    void ecojo_init_RC(const vector<int> &slct, const vector<int> &remain);
-    bool ecojo_insert_R(const vector<int> &slct, int insert_indx);
-    void ecojo_erase_R(const vector<int> &slct);
-    void ecojo_inv_R();
-    void ecojo_blup(double lambda);   
 
     // mtCOJO and GSMR
     void init_meta_snp_map(vector<string> snplist, map<string, int> &snp_name_map, vector<string> &snp_name, vector<int> &remain_snp);
@@ -642,22 +609,6 @@ private:
     vector<double> _meta_popu_prev;
     vector<double> _meta_smpl_prev;
     
-    // gene-trait association
-    map<string, int> _probe_name_map;
-    vector<string> _probe_name;
-    int _probe_num;
-    eigenMatrix _probe_data;
-    vector<int> _e_include;
-    eigenVector _ecojo_z;
-    eigenVector _ecojo_b;
-    eigenVector _ecojo_se;
-    eigenVector _ecojo_n;
-    eigenVector _ecojo_pval;
-    eigenMatrix _ecojo_R;
-    eigenMatrix _ecojo_RC;
-    eigenMatrix _ecojo_wholeR;
-    double _ecojo_p_cutoff;
-    double _ecojo_collinear;
 
     // PC adjustment
     double _ttl_mk_num;

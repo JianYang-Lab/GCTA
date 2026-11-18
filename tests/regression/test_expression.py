@@ -84,10 +84,7 @@ def run_erm(gcta, work_dir, scenario, threads):
     arguments = ["--efile", expression, *option]
     output = run_gcta(gcta, work_dir, "erm", arguments, threads=threads)
     assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
-    legacy = run_gcta(gcta, work_dir, "erm_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
-    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     prefix = Path(f"{output}.E")
-    assert_grm_equal(prefix, Path(f"{legacy}.E"))
     expected, expected_denominators = expected_erm(algorithm)
     assert_floats_close(read_floats(Path(f"{prefix}.grm.bin")), expected, prefix)
     assert_floats_close(read_floats(Path(f"{prefix}.grm.N.bin")), expected_denominators, prefix)
@@ -102,14 +99,7 @@ def run_erm_gz(gcta, work_dir, threads):
     arguments = ["--efile", expression, "--make-erm-gz"]
     output = run_gcta(gcta, work_dir, "erm", arguments, threads=threads)
     assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
-    legacy = run_gcta(gcta, work_dir, "erm_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
-    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     result = Path(f"{output}.E.grm.gz")
-    with gzip.open(result, "rt", encoding="utf-8") as stream:
-        current_text = stream.read()
-    with gzip.open(f"{legacy}.E.grm.gz", "rt", encoding="utf-8") as stream:
-        legacy_text = stream.read()
-    assert current_text == legacy_text
     expected, expected_denominators = expected_erm(0)
     with gzip.open(result, "rt", encoding="utf-8") as stream:
         rows = [line.split() for line in stream.read().splitlines()]
@@ -219,10 +209,7 @@ def run_ecojo_select(gcta, work_dir, threads, collinear=None):
         arguments.extend(("--ecojo-collinear", collinear))
     output = run_gcta(gcta, work_dir, "select", arguments, threads=threads)
     assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
-    legacy = run_gcta(gcta, work_dir, "select_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
-    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     result = Path(f"{output}.slct.ecojo")
-    assert_tables_close(result, Path(f"{legacy}.slct.ecojo"))
     rows = read_table(result)
     assert len(rows) == (2 if collinear is not None else 3)
     b, se = ecojo_marginals()
@@ -253,9 +240,6 @@ def run_ecojo_blup(gcta, work_dir, threads):
         arguments = [option, data, "--ecojo", summary, "--ecojo-blup", ECOJO_LAMBDA]
         output = run_gcta(gcta, work_dir, name, arguments, threads=threads)
         assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
-        legacy = run_gcta(gcta, work_dir, f"{name}_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
-        assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
-        assert_tables_close(Path(f"{output}.blup.ecojo"), Path(f"{legacy}.blup.ecojo"))
         outputs.append(Path(f"{output}.blup.ecojo"))
     b, se = ecojo_marginals()
     r_value = ecojo_correlation()
@@ -273,10 +257,7 @@ def run_ecojo_no_signal(gcta, work_dir, threads):
     arguments = ["--efile", expression, "--ecojo", summary, "--ecojo-slct"]
     output = run_gcta(gcta, work_dir, "no_signal", arguments, threads=threads)
     assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
-    legacy = run_gcta(gcta, work_dir, "no_signal_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
-    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     assert not Path(f"{output}.slct.ecojo").exists()
-    assert not Path(f"{legacy}.slct.ecojo").exists()
     console = Path(f"{output}.console").read_text(encoding="utf-8")
     assert "No probe has been selected." in console
 

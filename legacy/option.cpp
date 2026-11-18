@@ -151,12 +151,6 @@ void option(int option_num, char* option_str[])
     int mbat_wind = 50000;
     bool mbat_print_all_p = false;
    
-    // gene expression data
-    string efile="", eR_file = "", ecojo_ma_file="";
-    int make_erm_mtd = 1;
-    double ecojo_p = 5e-6, ecojo_collinear = 0.9, ecojo_lambda = -1;
-    bool efile_flag=false, eR_file_flag = false, ecojo_slct_flag = false, ecojo_blup_flag = false, make_erm_flag = false;
-
     // mtCOJO
     char chbuf = '\0';
     string mtcojolist_file="", mtcojo_bxy_file="", ref_ld_dirt="", w_ld_dirt="";
@@ -1009,61 +1003,7 @@ void option(int option_num, char* option_str[])
             if (mbat_wind < 0 || mbat_wind > 1000) LOGGER.e(0, "\n invalid value for --mBAT-wind. Valid range: 0 ~ 1000\n");
             mbat_wind *= 1000;
         } 
-        else if (strcmp(argv[i], "--efile") == 0) {
-            efile = argv[++i];
-            efile_flag = true;
-            LOGGER << "--efile " << efile << endl;
-            CommFunc::FileExist(efile);
-        } 
-        else if (strcmp(argv[i], "--e-cor") == 0) {
-            eR_file = argv[++i];
-            eR_file_flag = true;
-            LOGGER << "--e-cor " << eR_file << endl;
-            CommFunc::FileExist(eR_file);
-        } 
-        else if (strcmp(argv[i], "--ecojo") == 0) {
-            ecojo_ma_file = argv[++i];
-            LOGGER << "--ecojo " << ecojo_ma_file << endl;
-            CommFunc::FileExist(ecojo_ma_file);
-        } 
-        else if (strcmp(argv[i], "--ecojo-slct") == 0) {
-            ecojo_slct_flag = true;
-            LOGGER << "--ecojo-slct" << endl;
-        } 
-        else if (strcmp(argv[i], "--ecojo-p") == 0) {
-            ecojo_p = atof(argv[++i]);
-            LOGGER << "--ecojo-p " << ecojo_p << endl;
-            if (ecojo_p > 0.05 || ecojo_p <= 0) LOGGER.e(0, "\n  --ecojo-p should be within the range from 0 to 0.05.\n");
-        } 
-        else if (strcmp(argv[i], "--ecojo-collinear") == 0) {
-            ecojo_collinear = atof(argv[++i]);
-            LOGGER << "--ecojo-collinear " << ecojo_collinear << endl;
-            if (ecojo_collinear > 1 || ecojo_collinear < 0.01) LOGGER.e(0, "\n --ecojo-collinear should be within the range from 0.01 to 0.99.\n");
-        }
-        else if (strcmp(argv[i], "--ecojo-blup") == 0) {
-            ecojo_blup_flag = true;
-            ecojo_lambda = atof(argv[++i]);
-            LOGGER << "--ecojo-blup " << ecojo_lambda << endl;
-            if (ecojo_lambda < 0.01 || ecojo_lambda > 0.99) LOGGER.e(0, "\n --ecojo-blup should be within the range from 0.01 to 0.99.\n");
-        } 
-        else if (strcmp(argv[i], "--make-erm") == 0) {
-            make_erm_flag = true;
-            thread_flag = true;
-            LOGGER << argv[i] << endl;
-        }
-        else if (strcmp(argv[i], "--make-erm-gz") == 0) {
-            make_erm_flag = true;
-            grm_out_bin_flag = false;
-            thread_flag = true;
-            LOGGER << "--make-erm-gz" << endl;
-        }
-        else if (strcmp(argv[i], "--make-erm-alg") == 0) {
-            make_erm_flag = true;
-            make_erm_mtd = atoi(argv[++i]);
-            thread_flag = true;
-            LOGGER << "--make-erm-alg " << make_erm_mtd << endl;
-            if (make_erm_mtd < 1 || make_erm_mtd > 3) LOGGER.e(0, "\n --make-erm-alg should be 1, 2 or 3.\n");
-        } else if (strcmp(argv[i], "--gsmr-file") == 0 ) {
+        else if (strcmp(argv[i], "--gsmr-file") == 0 ) {
             gsmr_flag = true;
 
             vector<string> gsmr_file_list;
@@ -1333,16 +1273,6 @@ void option(int option_num, char* option_str[])
         if (RG_summary_file.empty()) LOGGER.e(0, "please input the summary information for the raw data files by the option --raw-summary.");
         pter_gcta->read_IRG_fnames(RG_summary_file, RG_fname_file, GC_cutoff);
     } 
-    else if(efile_flag){
-        pter_gcta->read_efile(efile);
-        if (make_erm_flag) pter_gcta->make_erm(make_erm_mtd - 1, grm_out_bin_flag);
-        else if(ecojo_slct_flag) pter_gcta->run_ecojo_slct(ecojo_ma_file, ecojo_p, ecojo_collinear);
-        else if(ecojo_blup_flag) pter_gcta->run_ecojo_blup_efile(ecojo_ma_file, ecojo_lambda);
-    }
-    else if(eR_file_flag){
-        pter_gcta->read_eR(eR_file);
-        pter_gcta->run_ecojo_blup_eR(ecojo_ma_file, ecojo_lambda);
-    }
     else if (bfile_flag) {
         if (hapmap_genet_dst) pter_gcta->genet_dst(bfile, hapmap_genet_dst_file);
         else {
