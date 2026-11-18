@@ -282,6 +282,9 @@ void gcta::run_massoc_slct(string metafile, int wind_size, double p_cutoff, doub
 
     // output conditional results
     if (!joint_only && mld_slct_alg!=2) {
+        if (pC.size() != remain.size()) {
+            massoc_cond(slct, remain, bC, bC_se, pC);
+        }
         massoc_cond_output(remain, bC, bC_se, pC);
         LOGGER << "(" << _jma_snpnum_backward << " SNPs eliminated by backward selection and " << _jma_snpnum_collienar << " SNPs filtered by collinearity test are not included in the output)" << endl;
     }
