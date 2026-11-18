@@ -183,18 +183,16 @@ hash_func(char * chrom_s)
 static const char *
 unhash_func(unsigned int chrom_hash)
 {
-    char * chrom_s = (char *)malloc(10);
+    static char chrom_s[16];
 
     if (chrom_hash == 99)
-        chrom_s = "X";
-    else if (chrom_hash == 98)
-        chrom_s = "Y";
-    else if (chrom_hash == 97)
-        chrom_s = "XY";
-    else
-        sprintf(chrom_s, "%d", chrom_hash);
+        return "X";
+    if (chrom_hash == 98)
+        return "Y";
+    if (chrom_hash == 97)
+        return "XY";
+    snprintf(chrom_s, sizeof(chrom_s), "%u", chrom_hash);
     return chrom_s;
-    
 }
 
 
