@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import math
 from pathlib import Path
 
 from gcta_runner import assert_tables_close, read_table, run_gcta
@@ -230,6 +231,14 @@ def assert_nofilter_close(actual, expected):
     actual_rows = read_table(actual_path)
     expected_rows = read_table(expected)
     assert len(actual_rows) == len(expected_rows) == 2050
+    invalid_rows = {row[1]: row for row in actual_rows[1:] if row[7] == "NA"}
+    expected_metadata = {"rs0": ("128", 0.0), "rs2048": ("128", 1.0)}
+    assert set(invalid_rows) == set(expected_metadata)
+    for snp, (count, frequency) in expected_metadata.items():
+        row = invalid_rows[snp]
+        assert row[5] == count
+        assert math.isclose(float(row[6]), frequency, rel_tol=0.0, abs_tol=1e-6)
+        assert row[7:10] == ["NA", "NA", "NA"]
     for rows in (actual_rows, expected_rows):
         invalid_count = 0
         for row in rows[1:]:
