@@ -60,6 +60,8 @@ gcta_add_regression_test(cli.threads_alias test_legacy.py threads_alias integrat
 gcta_add_regression_test(error.thread_conflict test_legacy.py thread_conflict integration)
 gcta_add_regression_test(error.ld_invalid_window test_errors.py ld_invalid_window integration)
 gcta_add_regression_test(analysis.ld test_ld.py matrix integration)
+gcta_add_regression_test(legacy.ld_score test_ld_legacy.py score integration)
+gcta_add_regression_test(legacy.ld_pruning test_ld_legacy.py pruning integration)
 gcta_add_regression_test(analysis.acat test_acat.py output integration)
 gcta_add_regression_test(error.acat_missing_input test_acat.py missing_input integration)
 gcta_add_regression_test(model.lr_roundtrip test_model.py model_lr integration)
