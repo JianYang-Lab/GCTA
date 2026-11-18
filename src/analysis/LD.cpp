@@ -66,6 +66,13 @@ void LD::calcLD(){
     double alpha = 1.0 / (nr - 1);
     double *ptr1 = geno_buffer[cacl_index_buffer].get();
     double *res1 = new double[nc1 * nc1];
+
+    // GWAS LD is a band: only markers within the physical window are written.
+    vector<uint32_t> band_sizes(nc1);
+    for(int i = 0; i < nc1; i++){
+        band_sizes[i] = geno->marker->getNextWindowSize(cur_process_marker_index + i, ld_window);
+    }
+
 #if GCTA_CPU_x86
     dsyrk(&uplo, &trans, &nc1, &nr, &alpha, ptr1, &nr, &zero, res1, &nc1);
 #else
@@ -76,22 +83,37 @@ void LD::calcLD(){
     // is previous buffer active?
     int nc2 = 0;
     if(geno_buffer[!cacl_index_buffer]){
-        //TODO: reduce half calculation
         nc2 = cur_buffer_offset[!cacl_index_buffer] / nr;
         double *ptr2 = geno_buffer[!cacl_index_buffer].get();
         res2 = new double[nc2 * nc1];
+        // Only the rows whose window extends into the next buffer, and only
+        // the columns each row needs, contribute to the banded output.
+        const int row_block = 64;
+        for(int r0 = 0; r0 < nc1; r0 += row_block){
+            const int br = std::min(row_block, nc1 - r0);
+            const int last = r0 + br - 1;
+            const uint32_t inside = nc1 - last;
+            uint32_t need = band_sizes[last] > inside ? band_sizes[last] - inside : 0;
+            need = std::min<uint32_t>(need, nc2);
+            if(need == 0){
+                continue;
+            }
+            const int need_size = need;
+            // res2 is stored as next-buffer markers by current-buffer markers,
+            // so the block of rows [r0, r0 + br) starts at r0 * nc2.
 #if GCTA_CPU_x86
-        dgemm(&trans, &notrans, &nc2, &nc1, &nr, &alpha, ptr2, &nr, ptr1, &nr, &zero, res2, &nc2);
+            dgemm(&trans, &notrans, &need_size, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, res2 + (int64_t)r0 * nc2, &nc2);
 #else
-        dgemm_(&trans, &notrans, &nc2, &nc1, &nr, &alpha, ptr2, &nr, ptr1, &nr, &zero, res2, &nc2);
+            dgemm_(&trans, &notrans, &need_size, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, res2 + (int64_t)r0 * nc2, &nc2);
 #endif
+        }
     }
     
     for(int i = 0; i < nc1; i++){
         uint32_t cur_size;
         float *buffer;
         if(res2){ 
-            cur_size = geno->marker->getNextWindowSize(cur_process_marker_index, ld_window);
+            cur_size = band_sizes[i];
             buffer = new float[cur_size];
             uint32_t cur_size1 = nc1 - i;
             uint32_t cur_size2 = cur_size - cur_size1;
