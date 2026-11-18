@@ -1,12 +1,9 @@
 #include "analysis/mr/MTCOJO.h"
 
-#include "analysis/StatLib.h"
-
 #include "infra/Logger.h"
 
 #include "legacy/CommFunc.h"
 #include "legacy/StatFunc.h"
-#include "legacy/StrFunc.h"
 #include "legacy/zfstream.h"
 
 #include <algorithm>
@@ -14,10 +11,11 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
-#include <limits>
 #include <map>
-#include <set>
 #include <sstream>
+
+using namespace Eigen;
+using namespace std;
 
 const double eps = 1e-6;
 

@@ -5,8 +5,8 @@
 #include <zlib.h>
 
 #include <algorithm>
-#include <cmath>
 #include <fstream>
+#include <limits>
 #include <functional>
 #include <sstream>
 

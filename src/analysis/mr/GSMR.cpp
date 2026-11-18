@@ -2,14 +2,14 @@
 
 #include "infra/Logger.h"
 
-#include "legacy/CommFunc.h"
-#include "legacy/StatFunc.h"
-#include "legacy/StrFunc.h"
 #include "legacy/zfstream.h"
 
+#include <cmath>
 #include <iomanip>
-#include <iterator>
 #include <sstream>
+
+using namespace Eigen;
+using namespace std;
 
 void update_id_map_kp_by_map(map<string, int> &id_list_map, map<string, int> &id_map, vector<int> &keep) {
     int i = 0;
