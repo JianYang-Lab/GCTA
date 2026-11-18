@@ -14,6 +14,7 @@ SCENARIOS = (
     "grm_short_write",
     "legacy_invalid_option",
     "ld_invalid_window",
+    "ld_file_sparse",
 )
 
 
@@ -73,6 +74,17 @@ def main():
     elif args.scenario == "ld_invalid_window":
         prefix = Path(args.data) / "gcta_legacy" / "toy"
         arguments = ["--bfile", prefix, "--ld-matrix", "--ld-wind", "invalid", "--out", output]
+    elif args.scenario == "ld_file_sparse":
+        work.mkdir(parents=True, exist_ok=True)
+        score = work / "sparse.score.ld"
+        score.write_text(
+            "SNP chr bp freq mean_rsq snp_num max_rsq ldscore\n"
+            "rs0 1 1000 0.2 0.1 1 0.1 1.1\n"
+            "rs1 1 20000 0.3 0.1 1 0.1 1.2\n"
+            "rs2 1 40000 0.4 0.1 1 0.1 1.3\n",
+            encoding="utf-8",
+        )
+        arguments = ["--ld-file", score, "--ld-score-region", 10, "--out", output]
     elif args.scenario == "unwritable_output":
         prefix = Path(args.data) / "gcta_legacy" / "toy"
         arguments = ["--bfile", prefix, "--make-grm", "--out", work / "absent" / "result"]
@@ -95,6 +107,9 @@ def main():
     if args.scenario == "legacy_invalid_option":
         console = (work / f"{args.scenario}.console").read_text(encoding="utf-8")
         assert "Accepted options:" in console, "The legacy option parser was not entered"
+    elif args.scenario == "ld_file_sparse":
+        console = (work / f"{args.scenario}.console").read_text(encoding="utf-8")
+        assert "at least 3 SNPs" in console, "Missing sparse-region diagnostic"
     print(f"Passed I/O error regression scenario: {args.scenario}")
 
 

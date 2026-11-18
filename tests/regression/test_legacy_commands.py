@@ -37,6 +37,7 @@ SCENARIOS = (
     "make-grm-inbred-formats",
     "recode",
     "ld",
+    "ld-file",
     "ld-score-multi",
     "ld-score-region",
     "ld-max-rsq",
@@ -587,6 +588,47 @@ def scenario_ld(gcta, work):
             assert_close(float(value), expected_r, "signed LD correlation")
         outputs.append(output)
     compare_suffixes(outputs[0], outputs[1], (".rsq.ld", ".r.ld", ".snp.ld"))
+
+
+def scenario_ld_file(gcta, work):
+    for marker_count in (4, 40):
+        markers = synthetic_markers(8, marker_count)
+        prefix = Path(work) / f"input/ld{marker_count}"
+        write_plink(prefix, markers)
+        score = run_gcta(
+            gcta,
+            Path(work) / f"score{marker_count}",
+            "score",
+            ["--bfile", prefix, "--ld-score", "--ld-wind", 1000],
+            threads=1,
+        )
+        score_file = Path(f"{score}.score.ld")
+        score_rows = [row for row in read_table(score_file) if row]
+        assert len(score_rows) == len(markers) + 1
+        expected_mean = sum(float(row[7]) for row in score_rows[1:]) / len(markers)
+        outputs = []
+        for threads in (1, 4):
+            output = run_legacy(
+                gcta,
+                Path(work) / f"ldfile{marker_count}" / f"threads_{threads}",
+                "region",
+                ["--ld-file", score_file, "--ld-score-region", 10],
+                threads,
+                "Calculating regional mean LD score",
+            )
+            rows = read_table(output.with_suffix(".score.ld"))
+            assert rows[0] == [
+                "SNP", "chr", "bp", "freq", "mean_rsq", "snp_num", "max_rsq", "ldscore_SNP", "ldscore_region"
+            ]
+            assert len(rows) == len(markers) + 1
+            for index, row in enumerate(rows[1:]):
+                assert row[:3] == [f"rs{index}", "1", str(1000 + index)]
+                values = [float(value) for value in row[4:]]
+                assert all(math.isfinite(value) for value in values)
+                assert_close(values[3], 1.0 + values[0] * values[1], f"LD file identity {index}")
+                assert_close(values[4], expected_mean, f"regional LD mean {index}")
+            outputs.append(output)
+        compare_suffixes(outputs[0], outputs[1], (".score.ld",))
 
 
 def scenario_ld_multi(gcta, work):
@@ -1274,6 +1316,8 @@ def main():
         scenario_recode(args.gcta, work)
     elif scenario == "ld":
         scenario_ld(args.gcta, work)
+    elif scenario == "ld-file":
+        scenario_ld_file(args.gcta, work)
     elif scenario == "ld-score-multi":
         scenario_ld_multi(args.gcta, work)
     elif scenario == "ld-score-region":

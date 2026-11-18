@@ -1992,17 +1992,18 @@
     },
     "--ld-file": {
       "scope": "M2",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted standalone --ld-file --ld-score-region with generated 4- and 40-SNP score files; both SIGSEGV in gcta::ld_seg after input is read. Requires a boundary fix and region-breakpoint oracle.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld-file",
+        "error.ld_file_sparse"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Reads a per-SNP LD score file and writes regional means; asserts the LD-score identity, the regional mean, finite values, and identical 1/4-thread output. A sparse three-SNP score file fails with the regional-block diagnostic instead of crashing.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; the sparse-input diagnostic is deterministic.",
       "parsers": [
         "legacy"
-      ],
-      "exclusion": {
-        "attempted": "standalone --ld-file score.ld --ld-score-region 10/100",
-        "required": "Fix gcta::ld_seg crash and add boundary coverage."
-      }
+      ]
     },
     "--ld-i": {
       "scope": "M2",

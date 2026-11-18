@@ -816,18 +816,21 @@ void gcta::ld_seg(string i_ld_file, int seg_size, int wind_size, double rsq_cuto
 
     get_lds_brkpnt(brk_pnt1, brk_pnt2, seg_size);
     int size = 0, mean_size = 0, count = 0;
-    for (i = 0; i < brk_pnt1.size() - 1; i++) {
+    for (i = 0; i + 1 < brk_pnt1.size(); i++) {
         size = brk_pnt1[i + 1] - brk_pnt1[i] + 1;
         if (size > 2){
             mean_size += size; 
             count++;
         }
     }
+    if (count == 0) {
+        LOGGER.e(0, "no region contains at least 3 SNPs; cannot calculate regional LD score.");
+    }
     mean_size /= count;
     get_lds_brkpnt(brk_pnt1, brk_pnt2, 0, mean_size);
 
     vector<double> lds(m);
-    for (i = 0; i < brk_pnt1.size() - 1; i++){
+    for (i = 0; i + 1 < brk_pnt1.size(); i++){
         size = brk_pnt1[i + 1] - brk_pnt1[i] + 1;
         if(size < 3) continue;
         double ld_score = 0.0;
@@ -835,7 +838,7 @@ void gcta::ld_seg(string i_ld_file, int seg_size, int wind_size, double rsq_cuto
         ld_score /= (double)size;
         for(j = brk_pnt1[i]; j <= brk_pnt1[i + 1]; j++) lds[j] = ld_score; 
     }
-    for (i = 0; i < brk_pnt2.size() - 1; i++){
+    for (i = 0; i + 1 < brk_pnt2.size(); i++){
         size = brk_pnt2[i + 1] - brk_pnt2[i] + 1;
         if(size < 3) continue;
         double ld_score = 0.0;
