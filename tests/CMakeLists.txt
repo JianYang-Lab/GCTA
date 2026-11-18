@@ -62,6 +62,8 @@ gcta_add_regression_test(model.mlm_roundtrip test_model.py model_mlm integration
 gcta_add_regression_test(model.exact_roundtrip test_model.py model_exact integration)
 gcta_add_regression_test(model.glmm_roundtrip test_model.py model_glmm integration)
 gcta_add_regression_test(format.bgen_subset test_formats.py bgen_subset integration)
+gcta_add_regression_test(format.pgen_hardcall test_pgen.py hardcall integration)
+gcta_add_regression_test(format.pgen_dosage test_pgen.py dosage integration)
 
 add_executable(async_buffer_test async_buffer_test.cpp)
 target_include_directories(async_buffer_test PRIVATE "${CMAKE_SOURCE_DIR}/include")

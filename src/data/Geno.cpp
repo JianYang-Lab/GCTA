@@ -182,19 +182,19 @@ Geno::Geno(Pheno* pheno, Marker* marker) {
 
     // register format handlers subset manner
     preGenoDoubleFuncs["BED"] = &Geno::preGenoDouble_bed;
-    preGenoDoubleFuncs["PGEN"] = &Geno::preGenoDouble_bed;
+    preGenoDoubleFuncs["PGEN"] = &Geno::preGenoDouble_pgen;
     preGenoDoubleFuncs["BGEN"] = &Geno::preGenoDouble_bgen;
 
     getGenoDoubleFuncs["BED"] = &Geno::getGenoDouble_bed;
-    getGenoDoubleFuncs["PGEN"] = &Geno::getGenoDouble_bed;
+    getGenoDoubleFuncs["PGEN"] = &Geno::getGenoDouble_pgen;
     getGenoDoubleFuncs["BGEN"] = &Geno::getGenoDouble_bgen;
 
     endGenoDoubleFuncs["BED"] = &Geno::endGenoDouble_bed;
-    endGenoDoubleFuncs["PGEN"] = &Geno::endGenoDouble_bed;
+    endGenoDoubleFuncs["PGEN"] = &Geno::endGenoDouble_pgen;
     endGenoDoubleFuncs["BGEN"] = &Geno::endGenoDouble_bgen;
 
     readGenoFuncs["BED"] = &Geno::readGeno_bed;
-    readGenoFuncs["PGEN"] = &Geno::readGeno_bed;
+    readGenoFuncs["PGEN"] = &Geno::readGeno_pgen;
     readGenoFuncs["BGEN"] = &Geno::readGeno_bgen;
     
     //BED legacy codes
@@ -828,57 +828,130 @@ void Geno::setGenoItemSize(uint32_t &genoSize, uint32_t &missSize){
 }
 
 void Geno::getGenoDouble_pgen(uintptr_t *buf, int idx, GenoBufItem* gbuf){
-    SNPInfo snpinfo;
     uintptr_t *cur_buf = buf + idx * pgenGenoBuf1PtrSize;
-    uintptr_t *geno_buf = cur_buf;
     uintptr_t *dosage_present = cur_buf + pgenGenoPtrSize;
     uint16_t *dosage_main = reinterpret_cast<uint16_t*>(cur_buf + pgenGenoPtrSize + pgenDosagePresentPtrSize);
     uint32_t dosage_ct = cur_buf[pgenGenoBuf1PtrSize - 1];
     uint8_t isSexXY = isMarkersSexXYs[curBufferIndex];
+    if(dosage_ct != 0 && dosage_ct != keepSampleCT){
+        LOGGER.e(0, "GCTA can't support mix hard-call and dosage currently.");
+    }
 
-    const vector<uint32_t> *curMaleIndex = NULL;
+    vector<double> rawGeno(keepSampleCT);
+    plink2::Dosage16ToDoublesMinus9(cur_buf, dosage_present, dosage_main, keepSampleCT, dosage_ct, rawGeno.data());
+
+    vector<bool> maleMask(keepSampleCT, false);
+    for(auto index : keepMaleExtractIndex) maleMask[index] = true;
+
+    uint32_t validN = 0;
+    double dosage = 0.0;
+    double dosageSq = 0.0;
+    double maleDosage = 0.0;
+    uint32_t maleValidN = 0;
+    uint32_t maleHetN = 0;
+    uint32_t homAltN = 0;
+    for(uint32_t i = 0; i < keepSampleCT; i++){
+        if(rawGeno[i] == -9.0) continue;
+        double value = rawGeno[i];
+        validN++;
+        dosage += value;
+        dosageSq += value * value;
+        if(value == 2.0) homAltN++;
+        if(isSexXY == 1 && maleMask[i]){
+            maleValidN++;
+            maleDosage += value;
+            if(value == 1.0) maleHetN++;
+        }
+    }
+    gbuf->valid = false;
+    if(validN == 0) return;
+
+    double af;
+    double mean;
+    uint32_t validAllele;
     if(isSexXY == 1){
-        curMaleIndex = &keepMaleExtractIndex;
+        double dosageHalf = dosage - maleDosage - 0.5 * maleHetN;
+        validAllele = 2 * validN - maleValidN;
+        af = dosageHalf / validAllele;
+        mean = (iDC == 1) ? dosage / validN : dosageHalf / validN;
+    }else{
+        validAllele = 2 * validN;
+        af = dosage / validAllele;
+        mean = 2.0 * af;
     }
-
-    string err;
-    if(!PgenReader::CountHardDosage(cur_buf, dosage_main, dosage_present, curMaleIndex, keepSampleCT, dosage_ct, &snpinfo, err)){
-        LOGGER.e(0, err);
+    double sampleVariance = 0.0;
+    if(validN > 1){
+        if(isSexXY == 1 && iDC != 1){
+            double dosageHalf = dosage - maleDosage - 0.5 * maleHetN;
+            sampleVariance = (dosage + 2.0 * homAltN - 0.75 * maleHetN - 3.0 * homAltN
+                - dosageHalf * mean) / (validN - 1.0);
+        }else{
+            sampleVariance = (dosageSq - validN * mean * mean) / (validN - 1.0);
+        }
     }
-
-    double af = snpinfo.af;
-    double std = snpinfo.std;
     if(bHasPreAF){
         af = AFA1[gbuf->extractedMarkerIndex];
-        std = 2.0 * af * (1.0 - af);
+        mean = 2.0 * af;
     }
-    double maf = std::min(af, 1.0 - af);
-    if(maf >= min_maf && maf <= max_maf && snpinfo.nMissRate >= dFilterMiss){
-        gbuf->valid = true;
-        gbuf->af = af;
-        gbuf->nValidN = snpinfo.N;
-        gbuf->nValidAllele = snpinfo.AlCount;
-        gbuf->mean = 2.0 * af;
-        gbuf->sd = std;
 
-        if(bMakeGeno){
-            // get get genotype in lookup table
-            
-            if(isSexXY == 1){
-                double weight;
-                bool needWeight;
-                setMaleWeight(weight, needWeight);
-                if(needWeight){
-                    for(int i = 0 ; i < keepMaleSampleCT; i++){
-                        gbuf->geno[keepMaleExtractIndex[i]] *= weight;
-                    }
+    double maf = std::min(af, 1.0 - af);
+    if(maf < min_maf || maf > max_maf || 1.0 * validN / keepSampleCT < dFilterMiss) return;
+    gbuf->valid = true;
+    gbuf->af = af;
+    gbuf->nValidN = validN;
+    gbuf->nValidAllele = validAllele;
+    gbuf->mean = mean;
+    gbuf->sd = f_std ? sampleVariance : mean * (1.0 - af);
+    if(bHasPreAF) gbuf->sd = 2.0 * af * (1.0 - af);
+
+    if(bMakeMiss) gbuf->missing.resize(missPtrSize, 0);
+    if(!bMakeGeno) return;
+
+    double sd = gbuf->sd;
+    if(sd < 1.0e-50){
+        gbuf->valid = false;
+        return;
+    }
+    double center_value = bGenoCenter ? mean : 0.0;
+    double missing_value = (mean - center_value);
+    double rdev = 1.0;
+    if(bGRMDom){
+        double psq = 0.5 * mean * mean;
+        if(bGenoCenter) center_value = psq;
+        missing_value = psq - center_value;
+        if(bGenoStd) rdev = 1.0 / sd;
+    }else if(bGenoStd){
+        rdev = sqrt(1.0 / sd);
+    }
+
+    gbuf->geno.resize(keepSampleCT);
+    for(uint32_t i = 0; i < keepSampleCT; i++){
+        if(rawGeno[i] == -9.0){
+            gbuf->geno[i] = missing_value;
+            if(bMakeMiss) gbuf->missing[i / 64] |= (1UL << (i % 64));
+        }else{
+            gbuf->geno[i] = (rawGeno[i] - center_value) * rdev;
+        }
+    }
+
+    if(isSexXY == 1){
+        double weight;
+        bool needWeight;
+        setMaleWeight(weight, needWeight);
+        if(needWeight){
+            if(bGRM){
+                for(int i = 0; i < keepMaleSampleCT; i++){
+                    gbuf->geno[keepMaleExtractIndex[i]] *= weight;
+                }
+            }else{
+                double correctWeight = (weight - 1) * rdev * center_value;
+                for(int i = 0; i < keepMaleSampleCT; i++){
+                    uint32_t curIndex = keepMaleExtractIndex[i];
+                    gbuf->geno[curIndex] *= weight;
+                    gbuf->geno[curIndex] += correctWeight;
                 }
             }
         }
-        if(bMakeMiss){
-            gbuf->missing.resize(missPtrSize, 0);
-        }
-
     }
 }
 
