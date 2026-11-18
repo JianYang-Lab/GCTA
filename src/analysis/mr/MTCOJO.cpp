@@ -4,7 +4,7 @@
 #include "legacy/StatFunc.h"
 #include "legacy/StrFunc.h"
 #include "legacy/zfstream.h"
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <limits>
 #include <cmath>
 #include <iostream>

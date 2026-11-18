@@ -1,6 +1,6 @@
-#include "infrastructure/io/RelationshipIO.h"
+#include "infra/io/RelationshipIO.h"
 
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <fstream>
 #include <iomanip>
 #include <sstream>

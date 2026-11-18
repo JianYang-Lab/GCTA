@@ -23,10 +23,10 @@
 #include <vector>
 #include "data/Pheno.h"
 #include "data/Marker.h"
-#include "infrastructure/Logger.h"
-#include "infrastructure/AsyncBuffer.hpp"
+#include "infra/Logger.h"
+#include "infra/AsyncBuffer.hpp"
 #include <functional>
-#include "infrastructure/tables.h"
+#include "infra/tables.h"
 #include <unordered_map>
 
 using std::function;

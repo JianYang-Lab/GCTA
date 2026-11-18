@@ -1,8 +1,8 @@
 #include "analysis/expression/ECOJO.h"
 
 #include "analysis/StatLib.h"
-#include "infrastructure/numeric/MatrixOperations.h"
-#include "infrastructure/Logger.h"
+#include "infra/numeric/MatrixOperations.h"
+#include "infra/Logger.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>

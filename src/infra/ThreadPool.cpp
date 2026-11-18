@@ -14,7 +14,7 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "infrastructure/ThreadPool.h"
+#include "infra/ThreadPool.h"
 
 ThreadPool* ThreadPool::m_pThis = NULL;
 

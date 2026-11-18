@@ -22,7 +22,7 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <iostream>
 #include <cstdlib>
 

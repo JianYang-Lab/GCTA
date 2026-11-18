@@ -1,5 +1,5 @@
-#include "infrastructure/OptionIO.h"
-#include "infrastructure/Logger.h"
+#include "infra/OptionIO.h"
+#include "infra/Logger.h"
 #include <iostream>
 #include <sstream>
 #include <set>

@@ -7,7 +7,7 @@ The v2 implementation uses mirrored source and header directories:
 ```text
 src/data/                  include/data/
 src/analysis/              include/analysis/
-src/infrastructure/        include/infrastructure/
+src/infra/        include/infra/
 legacy/                    v1 implementation and fallback option parser
 ```
 
@@ -15,8 +15,8 @@ Current module groups include:
 
 - `data/expression` and `analysis/expression`: expression input, ERM, and eCOJO.
 - `data/summary` and `analysis/mr`: summary statistics, reference genotypes, GSMR, and mtCOJO.
-- `infrastructure/io`: relationship-matrix output and other shared I/O.
-- `infrastructure/numeric`: matrix operations and numerical backends.
+- `infra/io`: relationship-matrix output and other shared I/O.
+- `infra/numeric`: matrix operations and numerical backends.
 
 The legacy PC-adjustment workflow still uses shared legacy summary support. `StatFunc`, string utilities, and compressed text helpers have not been fully consolidated and must not be replaced merely for architectural symmetry.
 

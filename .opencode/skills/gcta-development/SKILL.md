@@ -23,8 +23,8 @@ analysis-specific binary/text outputs.
 src/main.cpp       v2 option parsing and dispatch entry point.
 src/data/          v2 phenotype, marker, genotype, and covariate processing.
 src/analysis/      v2 GRM, fastGWA, LD, ACAT, and statistical routines.
-src/infrastructure/ v2 logging, I/O, numerical backend, threading, and utilities.
-include/           v2 headers in matching data/analysis/infrastructure directories.
+src/infra/ v2 logging, I/O, numerical backend, threading, and utilities.
+include/           v2 headers in matching data/analysis/infra directories.
 legacy/            v1 implementation: the legacy `gcta` class + option parser.
 third_party/       plink-ng (git submodule), Pgenlib, zstd wrapper.
 cmake/          CPM.cmake, toolchain files.
@@ -41,7 +41,7 @@ libraries auto-globbed recursively from `src/`, plus the `mainV1` library from
 
 GCTA has TWO coexisting code generations. Understand which one you are touching:
 
-1. **v2 ("mock layer")** — `src/{data,analysis,infrastructure}/` + matching `include/` directories.
+1. **v2 ("mock layer")** — `src/{data,analysis,infra}/` + matching `include/` directories.
    - Modular: each module is a class (`Pheno`, `Marker`, `Geno`, `Covar`,
      `GRM`, `FastFAM`, `LD`) with static `registerOption(options)` and
      `processMain()` methods.
@@ -98,7 +98,7 @@ before consumers (GRM, FastFAM, LD).
 
 ## Logger (global singleton)
 
-`include/infrastructure/Logger.h` + `src/infrastructure/Logger.cpp`. Accessed via the `LOGGER` macro.
+`include/infra/Logger.h` + `src/infra/Logger.cpp`. Accessed via the `LOGGER` macro.
 - `LOGGER.i(level, msg)` / `LOGGER.w(...)` / `LOGGER.e(level, msg)` —
   `e` logs an error and EXITS the program.
 - `LOGGER.m(level, msg)` — terminal-only message (not written to log file).
@@ -125,7 +125,7 @@ before consumers (GRM, FastFAM, LD).
 ## Threading
 
 - OpenMP is used throughout (`#pragma omp parallel`, `omp_set_num_threads`).
-- `src/infrastructure/ThreadPool.cpp` provides a custom thread pool for task-based
+- `src/infra/ThreadPool.cpp` provides a custom thread pool for task-based
   parallelism.
 - Thread count is read from `OMP_NUM_THREADS` env var or `--thread-num` /
   `--threads` CLI flags.
@@ -234,7 +234,7 @@ option dispatch. The ACAT implementation is in `src/analysis/acat.c` /
 - **Naming**: classes are PascalCase (`Geno`, `GRM`, `FastFAM`); methods are
   snake_case or camelCase; static members prefixed with `s` or in static
   maps; member variables often prefixed with `b` (bool) or `n` (count).
-- **Includes**: v2 headers live under `include/{data,analysis,infrastructure}/`,
+- **Includes**: v2 headers live under `include/{data,analysis,infra}/`,
   v1 headers in `legacy/`. Use qualified project includes such as
   `"data/Geno.h"`, and `<Header>` for system/third-party headers.
 - **Third-party headers**: PLINK2 pgen library at

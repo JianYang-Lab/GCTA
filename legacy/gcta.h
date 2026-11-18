@@ -17,7 +17,7 @@
 #define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 #endif
 
-#include "infrastructure/cpu.h"
+#include "infra/cpu.h"
 #include <cstdio>
 #include "CommFunc.h"
 #include "StrFunc.h"
@@ -33,8 +33,8 @@
 #include <unsupported/Eigen/SparseExtra>
 #include <unsupported/Eigen/IterativeSolvers>
 #include <omp.h>
-#include "infrastructure/Logger.h"
-#include "infrastructure/Matrix.hpp"
+#include "infra/Logger.h"
+#include "infra/Matrix.hpp"
 
 #ifdef SINGLE_PRECISION
 typedef Eigen::SparseMatrix<float, Eigen::ColMajor, long long> eigenSparseMat;

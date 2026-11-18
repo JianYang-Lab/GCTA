@@ -1,13 +1,13 @@
 #include "analysis/LD.h"
-#include "infrastructure/Logger.h"
-#include "infrastructure/constants.hpp"
-#include "infrastructure/utils.hpp"
+#include "infra/Logger.h"
+#include "infra/constants.hpp"
+#include "infra/utils.hpp"
 #include "analysis/StatLib.h"
 #include <numeric>
 #include <string>
 #include <functional>
 #include <omp.h>
-#include "infrastructure/cpu_f77blas.h"
+#include "infra/cpu_f77blas.h"
 #include <cstdio>
 #include <algorithm>
 

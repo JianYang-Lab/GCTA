@@ -23,8 +23,8 @@
 #include <vector>
 #include <utility>
 #include <cmath>
-#include "infrastructure/constants.hpp"
-#include "infrastructure/mem.hpp"
+#include "infra/constants.hpp"
+#include "infra/mem.hpp"
 
 using std::string;
 using std::vector;

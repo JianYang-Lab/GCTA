@@ -13,7 +13,7 @@
    A copy of the GNU General Public License is attached along with this program.
    If not, see <http://www.gnu.org/licenses/>.
 */
-#include "infrastructure/tables.h"
+#include "infra/tables.h"
 
 GBitCountTable::GBitCountTable(){
     count_geno_init(geno_count8, 256);

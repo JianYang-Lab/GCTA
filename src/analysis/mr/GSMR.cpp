@@ -3,7 +3,7 @@
 #include "legacy/StatFunc.h"
 #include "legacy/StrFunc.h"
 #include "legacy/zfstream.h"
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <sstream>
 #include <iterator>
 #include <iomanip>

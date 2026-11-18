@@ -17,7 +17,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
 */
 #include <iostream>
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include "data/Geno.h"
 #include "data/Marker.h"
 #include "data/Pheno.h"
@@ -29,7 +29,7 @@
 #include "analysis/expression/ECOJO.h"
 #include "analysis/mr/GSMR.h"
 #include "analysis/mr/MTCOJO.h"
-#include "infrastructure/NumericBackend.h"
+#include "infra/NumericBackend.h"
 #include <functional>
 #include <map>
 #include <vector>
@@ -37,11 +37,11 @@
 #include <chrono>
 #include <algorithm>
 #include "legacy/option.h"
-#include "infrastructure/utils.hpp"
+#include "infra/utils.hpp"
 #include <omp.h>
 #include <cstdlib>
-#include "infrastructure/mem.hpp"
-#include "infrastructure/config.h"
+#include "infra/mem.hpp"
+#include "infra/config.h"
 
 #include "analysis/acat.hpp" //add by fanghl 20210303
 #define ACAT_MODULE

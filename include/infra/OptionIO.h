@@ -20,7 +20,7 @@
 #include <string>
 #include <map>
 #include <cstdio>
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 using std::map;
 using std::vector;
 using std::string;

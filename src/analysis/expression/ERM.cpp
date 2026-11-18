@@ -1,7 +1,7 @@
 #include "analysis/expression/ERM.h"
 
-#include "infrastructure/io/RelationshipIO.h"
-#include "infrastructure/Logger.h"
+#include "infra/io/RelationshipIO.h"
+#include "infra/Logger.h"
 
 using std::map;
 using std::string;

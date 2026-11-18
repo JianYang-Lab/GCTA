@@ -1,6 +1,6 @@
 #include "data/summary/SummaryData.h"
 
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <algorithm>
 #include <cmath>
 #include <fstream>

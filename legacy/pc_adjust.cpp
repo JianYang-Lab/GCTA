@@ -1,5 +1,5 @@
 #include "gcta.h"
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <iterator>
 
 void gcta::read_pc_adjust_file(string pcadjust_list_file, string pc_file) {

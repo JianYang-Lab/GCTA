@@ -1,7 +1,7 @@
-#include "infrastructure/numeric/MatrixOperations.h"
+#include "infra/numeric/MatrixOperations.h"
 
-#include "infrastructure/cpu_f77blas.h"
-#include "infrastructure/Logger.h"
+#include "infra/cpu_f77blas.h"
+#include "infra/Logger.h"
 #include <vector>
 
 namespace MatrixOperations {

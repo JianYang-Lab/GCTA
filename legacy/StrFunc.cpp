@@ -10,7 +10,7 @@
 
 #include "StrFunc.h"
 #include <cctype>
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 
 int StrFunc::split_string(const string &str, vector<string> &vec_str, string separator)
 {

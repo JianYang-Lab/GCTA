@@ -1,6 +1,6 @@
 #include "data/summary/ReferenceData.h"
 
-#include "infrastructure/Logger.h"
+#include "infra/Logger.h"
 #include <sstream>
 
 using std::string;

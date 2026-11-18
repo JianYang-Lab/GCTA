@@ -92,7 +92,7 @@ On Linux, the installed executable locates bundled libraries through `$ORIGIN/..
 
 ## Development overview
 
-The v2 implementation is organized under `src/{data,analysis,infrastructure}` with mirrored headers in `include/`. Modules expose `registerOption` and `processMain`; unsupported options fall back to `legacy/`. See `docs/development/dev.md` for the module boundaries and migration checklist.
+The v2 implementation is organized under `src/{data,analysis,infra}` with mirrored headers in `include/`. Modules expose `registerOption` and `processMain`; unsupported options fall back to `legacy/`. See `docs/development/dev.md` for the module boundaries and migration checklist.
 
 ## MCP Server
 
