@@ -46,6 +46,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iomanip>
 #include <iterator>
@@ -247,7 +248,7 @@ public:
         SPA::nSample = mu.size();
     }
 
-    SPA(double q, double qinv, Ref<VectorXd> rgen, const vector<uint32_t> &index){
+    SPA(double q, double qinv, const Ref<const VectorXd> &rgen, const vector<uint32_t> &index){
         this->q = q;
         this->qinv = qinv;
         //new (&geno) Map<VectorXd>(xp, nSample);
@@ -2514,7 +2515,124 @@ void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerI
     output_res(isValids, markerIndex);
 }
 
+void FastFAM::decodeGenoBlock(uintptr_t * genobuf, const vector<uint32_t> &markerIndex, int start, int count,
+                              MatrixXd &X, vector<uint8_t> &isValids){
+    static thread_local GenoBufItem item;
+    #pragma omp parallel for schedule(static)
+    for(int j = 0; j < count; j++){
+        int i = start + j;
+        item.valid = false;
+        item.extractedMarkerIndex = markerIndex[i];
+        geno->getGenoDouble(genobuf, i, &item);
+
+        af[i] = (float)item.af;
+        countMarkers[i] = item.nValidN;
+        info[i] = item.info;
+        isValids[i] = item.valid;
+        if(item.valid){
+            memcpy(X.col(j).data(), item.geno.data(), num_indi * sizeof(double));
+        }else{
+            X.col(j).setZero();
+        }
+    }
+}
+
 void FastFAM::calculate_gwa_2df(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
+    const char *omp_threads = std::getenv("OMP_NUM_THREADS");
+    const bool multi_threaded = omp_threads != NULL && std::atoi(omp_threads) > 1;
+    if(bSaveBin || multi_threaded){
+        // Keep the byte-for-byte save-bin output on the original per-marker
+        // path. The model-based 2df path also falls back when several BLAS
+        // threads make the small block projections cost more than they save.
+        calculate_gwa_2df_marker(genobuf, markerIndex);
+        return;
+    }
+
+    static double iN = 1.0 /(num_indi - (covarFlag ? covar.cols() : 1.0) - 2.0);
+    static double SSy = phenoVec.dot(phenoVec);
+
+    int num_marker = markerIndex.size();
+    vector<uint8_t> isValids(num_marker);
+    const int batch_size = std::max(1, std::min(16, (int)(8 * 1024 * 1024 / (num_indi * sizeof(double)))));
+    const int block_cap = std::min(batch_size, num_marker);
+    MatrixXd X(num_indi, block_cap);
+    static thread_local VectorXd g_times_envir;
+
+    for(int start = 0; start < num_marker; start += batch_size){
+        int cur_size = std::min(batch_size, num_marker - start);
+        auto Xcur = X.leftCols(cur_size);
+
+        decodeGenoBlock(genobuf, markerIndex, start, cur_size, X, isValids);
+
+        if(covarFlag){
+            // Project once per block; the small H * X product lets the
+            // subtraction accumulate directly into X.
+            MatrixXd HX = H * Xcur;
+            Xcur.noalias() -= covar * HX;
+        }
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            if(!isValids[i]){
+                continue;
+            }
+
+            Map<const VectorXd> xMat(Xcur.col(j).data(), num_indi);
+            double x_x = xMat.dot(xMat);
+            double x_p = xMat.dot(phenoVec);
+
+            g_times_envir.resize(num_indi);
+            g_times_envir = xMat.cwiseProduct(envirVec_scaled);
+            const double g_mean = g_times_envir.mean();
+            g_times_envir.array() -= g_mean;
+
+            double xenvir_x = g_times_envir.dot(xMat);
+            double xenvir_xenvir = g_times_envir.dot(g_times_envir);
+            double xenvir_p = g_times_envir.dot(phenoVec);
+
+            Eigen::Matrix2d ngtv_2nd_deri;
+            ngtv_2nd_deri(0,0)=x_x;
+            ngtv_2nd_deri(0,1)=ngtv_2nd_deri(1,0)=xenvir_x;
+            ngtv_2nd_deri(1,1)=xenvir_xenvir;
+
+            Eigen::Matrix2d ngtv_2nd_deri_inv=ngtv_2nd_deri.inverse();
+
+            Eigen::Vector2d first_deri;
+            first_deri(0)=x_p;
+            first_deri(1)=xenvir_p;
+
+            Eigen::Vector2d temp_beta = ngtv_2nd_deri_inv * first_deri;
+            double sse = (SSy - temp_beta[0] * x_p - temp_beta[1] * xenvir_p) * iN;
+
+            double temp_se0 = sqrt(sse * ngtv_2nd_deri_inv(0,0));
+            double temp_se1 = sqrt(sse * ngtv_2nd_deri_inv(1,1));
+
+            double temp_chisq = first_deri.dot(ngtv_2nd_deri_inv * first_deri) / sse;
+            double temp_chisq_x = pow(temp_beta[0]/temp_se0, 2);
+            double temp_chisq_xenvir = pow(temp_beta[1]/temp_se1, 2);
+
+            beta_geno[i]=(float)temp_beta(0);
+            se_geno[i]=(float)temp_se0;
+            score_geno[i]=(float)temp_chisq_x;
+            p_geno[i] = temp_chisq_x > 0 ? StatLib::pchisqd1(temp_chisq_x) : 1;
+
+            beta_interaction[i]=(float)temp_beta[1];
+            se_interaction[i]=(float)temp_se1;
+            score_interaction[i]=(float)temp_chisq_xenvir;
+            p_interaction[i] = temp_chisq_xenvir > 0 ? StatLib::pchisqd1(temp_chisq_xenvir) : 1;
+
+            cov_geno_interaction[i] = (float)(sse * ngtv_2nd_deri_inv(0,1));
+
+            score[i] = (float)temp_chisq;
+            p[i] = temp_chisq > 0 ? StatLib::pchisqd2(temp_chisq) : 1;
+        }
+    }
+
+    output_res_2df(isValids, markerIndex);
+}
+
+void FastFAM::calculate_gwa_2df_marker(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
     static double iN = 1.0 /(num_indi - (covarFlag ? covar.cols() : 1.0) - 2.0);
     static double SSy = phenoVec.dot(phenoVec);
 
@@ -2615,6 +2733,128 @@ void FastFAM::calculate_gwa_2df(uintptr_t * genobuf, const vector<uint32_t> &mar
 }
 
 void FastFAM::calculate_gwa_2df_sandwich(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
+    if(bSaveBin){
+        // Keep the byte-for-byte save-bin output on the original per-marker path.
+        calculate_gwa_2df_sandwich_marker(genobuf, markerIndex);
+        return;
+    }
+
+    int num_marker = markerIndex.size();
+    vector<uint8_t> isValids(num_marker);
+    const int batch_size = std::max(1, std::min(64, (int)(8 * 1024 * 1024 / (num_indi * sizeof(double)))));
+    const int block_cap = std::min(batch_size, num_marker);
+    MatrixXd X(num_indi, block_cap);
+    MatrixXd projected(num_indi, block_cap);
+    const double *envir_ptr = envirVec_scaled.data();
+    const double *y_ptr = phenoVec.data();
+
+    for(int start = 0; start < num_marker; start += batch_size){
+        int cur_size = std::min(batch_size, num_marker - start);
+        auto Xcur = X.leftCols(cur_size);
+
+        decodeGenoBlock(genobuf, markerIndex, start, cur_size, X, isValids);
+
+        if(covarFlag){
+            auto projected_cur = projected.leftCols(cur_size);
+            projected_cur.noalias() = covar * (H * Xcur);
+            Xcur -= projected_cur;
+        }
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            if(!isValids[i]){
+                continue;
+            }
+
+            const double *x_col = Xcur.col(j).data();
+            double x_x = 0, x_p = 0, g_sum = 0;
+            for(uint32_t row = 0; row < num_indi; row++){
+                const double x_value = x_col[row];
+                x_x += x_value * x_value;
+                x_p += x_value * y_ptr[row];
+                g_sum += x_value * envir_ptr[row];
+            }
+            const double g_mean = g_sum / num_indi;
+
+            double xenvir_x = 0, xenvir_xenvir = 0, xenvir_p = 0;
+            for(uint32_t row = 0; row < num_indi; row++){
+                const double x_value = x_col[row];
+                const double g_value = x_value * envir_ptr[row] - g_mean;
+                xenvir_x += g_value * x_value;
+                xenvir_xenvir += g_value * g_value;
+                xenvir_p += g_value * y_ptr[row];
+            }
+
+            Eigen::Matrix2d ngtv_2nd_deri;
+            ngtv_2nd_deri(0,0)=x_x;
+            ngtv_2nd_deri(0,1)=ngtv_2nd_deri(1,0)=xenvir_x;
+            ngtv_2nd_deri(1,1)=xenvir_xenvir;
+
+            Eigen::Matrix2d ngtv_2nd_deri_inv=ngtv_2nd_deri.inverse();
+
+            Eigen::Vector2d first_deri;
+            first_deri(0)=x_p;
+            first_deri(1)=xenvir_p;
+
+            Eigen::Vector2d temp_beta = ngtv_2nd_deri_inv * first_deri;
+
+            const double a00 = ngtv_2nd_deri_inv(0,0);
+            const double a01 = ngtv_2nd_deri_inv(0,1);
+            const double a11 = ngtv_2nd_deri_inv(1,1);
+
+            double B00 = 0, B01 = 0, B11 = 0;
+            for(uint32_t row = 0; row < num_indi; row++){
+                const double x_value = x_col[row];
+                const double g_value = x_value * envir_ptr[row] - g_mean;
+                const double hat = a00 * x_value * x_value
+                    + 2.0 * a01 * x_value * g_value
+                    + a11 * g_value * g_value;
+                const double residual = y_ptr[row] - x_value * temp_beta[0] - g_value * temp_beta[1];
+                const double corrected = residual * residual / (1.0 - hat);
+                B00 += x_value * x_value * corrected;
+                B01 += x_value * g_value * corrected;
+                B11 += g_value * g_value * corrected;
+            }
+
+            // sandwich variance is (-A)^(-1) * B * (-A)^(-1)
+            const double s00 = a00 * a00 * B00 + 2.0 * a00 * a01 * B01 + a01 * a01 * B11;
+            const double s01 = a00 * a01 * B00 + (a00 * a11 + a01 * a01) * B01 + a01 * a11 * B11;
+            const double s11 = a01 * a01 * B00 + 2.0 * a01 * a11 * B01 + a11 * a11 * B11;
+
+            if(!std::isnan(s00 + s01 + s01 + s11)){
+                const double det = s00 * s11 - s01 * s01;
+                double temp_chisq = (temp_beta[0] * (s11 * temp_beta[0] - s01 * temp_beta[1])
+                    + temp_beta[1] * (s00 * temp_beta[1] - s01 * temp_beta[0])) / det;
+
+                double temp_se0 = sqrt(s00);
+                double temp_se1 = sqrt(s11);
+
+                double temp_chisq_x = pow(temp_beta[0]/temp_se0, 2);
+                double temp_chisq_xenvir = pow(temp_beta[1]/temp_se1, 2);
+
+                beta_geno[i]=(float)temp_beta(0);
+                se_geno[i]=(float)temp_se0;
+                score_geno[i]=(float)temp_chisq_x;
+                p_geno[i] = temp_chisq_x > 0 ? StatLib::pchisqd1(temp_chisq_x) : 1;
+
+                beta_interaction[i]=(float)temp_beta[1];
+                se_interaction[i]=(float)temp_se1;
+                score_interaction[i]=(float)temp_chisq_xenvir;
+                p_interaction[i] = temp_chisq_xenvir > 0 ? StatLib::pchisqd1(temp_chisq_xenvir) : 1;
+
+                cov_geno_interaction[i] = (float)s01;
+
+                score[i] = (float)temp_chisq;
+                p[i] = temp_chisq > 0 ? StatLib::pchisqd2(temp_chisq) : 1;
+            }
+        }
+    }
+
+    output_res_2df(isValids, markerIndex);
+}
+
+void FastFAM::calculate_gwa_2df_sandwich_marker(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
 
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
@@ -2741,6 +2981,11 @@ static void append_binary(vector<char> &buffer, size_t &offset, const T &value){
 }
 
 
+template<typename T>
+static void append_float(string &text, T value);
+template<typename T>
+static void append_integer(string &text, T value);
+
 void FastFAM::output_res_spa(const vector<uint8_t> &isValids, const vector<uint32_t> markerIndex){
     int numKept = 0;
     int num_marker = markerIndex.size();
@@ -2780,28 +3025,45 @@ void FastFAM::output_res_spa(const vector<uint8_t> &isValids, const vector<uint3
             }
         }
     }else{
+        string row;
+        row.reserve(256);
         for(int i = 0; i != num_marker; i++){
+            row.clear();
+            row.append(marker->getMarkerStrExtract(markerIndex[i]));
+            row.push_back('\t');
+            append_integer(row, countMarkers[i]);
+            row.push_back('\t');
             if(isValids[i]){
                 numKept++;
-                osOut << marker->getMarkerStrExtract(markerIndex[i]) << "\t" << countMarkers[i]
-                    << "\t" << af[i] << "\t" << Tscore[i] << "\t" << Tse[i] << "\t" << p[i] 
-                    << "\t" << beta[i] << "\t" << se[i] << "\t" << padj[i] << "\t" << ((int)rConverge[i]);
-                if(hasInfo){
-                    osOut << "\t" << info[i];
-                }
-                osOut << "\n";
+                append_float(row, af[i]);
+                row.push_back('\t');
+                append_float(row, Tscore[i]);
+                row.push_back('\t');
+                append_float(row, Tse[i]);
+                row.push_back('\t');
+                append_float(row, p[i]);
+                row.push_back('\t');
+                append_float(row, beta[i]);
+                row.push_back('\t');
+                append_float(row, se[i]);
+                row.push_back('\t');
+                append_float(row, padj[i]);
+                row.push_back('\t');
+                append_integer(row, (int)rConverge[i]);
             }else{
-                if(bOutResAll){
-                    numKept++;
-                osOut << marker->getMarkerStrExtract(markerIndex[i]) << "\t" << countMarkers[i]
-                    << "\t" << af[i] << "\tNA\tNA\tNA\tNA\tNA\tNA\tNA";
-                if(hasInfo){
-                    osOut << "\t" << info[i];
+                if(!bOutResAll){
+                    continue;
                 }
-                osOut << "\n";
- 
-                }
+                numKept++;
+                append_float(row, af[i]);
+                row.append("\tNA\tNA\tNA\tNA\tNA\tNA\tNA");
             }
+            if(hasInfo){
+                row.push_back('\t');
+                append_float(row, info[i]);
+            }
+            row.push_back('\n');
+            osOut << row;
         }
     }
 
@@ -4311,25 +4573,73 @@ void FastFAM::initBinary(const SpMat &fam){
 void FastFAM::binGrammar_func(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int nMarker = markerIndex.size();
     static thread_local GenoBufItem item;
-    #pragma omp parallel for schedule(dynamic)
-    for(int i = 0; i < nMarker; i++){
-        int index_cur_marker = num_grammar_markers + i;
-        item.valid = false;
-        item.extractedMarkerIndex = markerIndex[i];
-        geno->getGenoDouble(genobuf, i, &item);
-        bValids[index_cur_marker] = item.valid;
-        if(item.valid){
-            Map< VectorXd > curGeno(item.geno.data(), num_indi);
-            if(bPreciseCovar) conditionCovarBinReg(curGeno);
-            //VectorXd PY = solverV.solve(Y) - ViX * inv_XtVX_ViX * Y;
-            VectorXd PG = solverV.solve(curGeno) - ViX * (inv_XtVX_ViX * curGeno);
-            //VectorXd centerGeno = curGeno.array() - curGeno.mean();
-            //VectorXd WG = dWp.cwiseProduct(centerGeno);
-            //double temp_gamma = curGeno.dot(PG) / centerGeno.dot(WG);
-            VectorXd WG = dWp.cwiseProduct(curGeno);
-            double temp_gamma = curGeno.dot(PG) / curGeno.dot(WG);
 
-            v_c_infs[index_cur_marker] = temp_gamma;
+    if(options.find("save_bin") != options.end()){
+        #pragma omp parallel for schedule(dynamic)
+        for(int i = 0; i < nMarker; i++){
+            int index_cur_marker = num_grammar_markers + i;
+            item.valid = false;
+            item.extractedMarkerIndex = markerIndex[i];
+            geno->getGenoDouble(genobuf, i, &item);
+            bValids[index_cur_marker] = item.valid;
+            if(item.valid){
+                Map< VectorXd > curGeno(item.geno.data(), num_indi);
+                if(bPreciseCovar) conditionCovarBinReg(curGeno);
+                VectorXd PG = solverV.solve(curGeno) - ViX * (inv_XtVX_ViX * curGeno);
+                VectorXd WG = dWp.cwiseProduct(curGeno);
+                double temp_gamma = curGeno.dot(PG) / curGeno.dot(WG);
+                v_c_infs[index_cur_marker] = temp_gamma;
+            }
+        }
+        num_grammar_markers += nMarker;
+        return;
+    }
+
+    const int batch_size = std::max(1, std::min(64, (int)(8 * 1024 * 1024 / (num_indi * sizeof(double)))));
+    MatrixXd X(num_indi, std::min(batch_size, nMarker));
+    vector<uint8_t> isValids(nMarker);
+
+    for(int start = 0; start < nMarker; start += batch_size){
+        int cur_size = std::min(batch_size, nMarker - start);
+        auto Xcur = X.leftCols(cur_size);
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            item.valid = false;
+            item.extractedMarkerIndex = markerIndex[i];
+            geno->getGenoDouble(genobuf, i, &item);
+            isValids[i] = item.valid;
+            if(item.valid){
+                memcpy(Xcur.col(j).data(), item.geno.data(), num_indi * sizeof(double));
+            }else{
+                Xcur.col(j).setZero();
+            }
+        }
+
+        if(bPreciseCovar){
+            MatrixXd projected = covar * (H * Xcur);
+            Xcur -= projected;
+        }
+
+        MatrixXd correction = ViX * (inv_XtVX_ViX * Xcur);
+
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            int index_cur_marker = num_grammar_markers + i;
+            bValids[index_cur_marker] = isValids[i];
+            if(!isValids[i]){
+                continue;
+            }
+            VectorXd PG = solverV.solve(Xcur.col(j)) - correction.col(j);
+            const double *x_col = Xcur.col(j).data();
+            double numerator = 0, denominator = 0;
+            for(uint32_t row = 0; row < num_indi; row++){
+                const double x_value = x_col[row];
+                numerator += x_value * PG[row];
+                denominator += x_value * x_value * dWp[row];
+            }
+            v_c_infs[index_cur_marker] = numerator / denominator;
         }
     }
     num_grammar_markers += nMarker;
@@ -4459,6 +4769,142 @@ void FastFAM::estBinGamma(){
 }
 
 void FastFAM::calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
+    if(bSaveBin){
+        // Keep the byte-for-byte save-bin output on the original per-marker path.
+        calculate_spa_marker(genobuf, markerIndex);
+        return;
+    }
+
+    int num_marker = markerIndex.size();
+    vector<uint8_t> isValids(num_marker);
+    const int batch_size = std::max(1, std::min(64, (int)(8 * 1024 * 1024 / (num_indi * sizeof(double)))));
+    const int block_cap = std::min(batch_size, num_marker);
+    MatrixXd X(num_indi, block_cap);
+    MatrixXd X_raw;
+    if(bPreciseCovar){
+        X_raw.resize(num_indi, block_cap);
+    }
+    vector<double> means(block_cap);
+    static thread_local GenoBufItem item;
+    static thread_local VectorXd conditioned;
+
+    for(int start = 0; start < num_marker; start += batch_size){
+        int cur_size = std::min(batch_size, num_marker - start);
+        auto Xcur = X.leftCols(cur_size);
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            item.valid = false;
+            item.extractedMarkerIndex = markerIndex[i];
+            geno->getGenoDouble(genobuf, i, &item);
+
+            af[i] = (float)item.af;
+            countMarkers[i] = item.nValidN;
+            info[i] = item.info;
+            isValids[i] = item.valid;
+            means[j] = item.mean;
+            if(item.valid){
+                memcpy(Xcur.col(j).data(), item.geno.data(), num_indi * sizeof(double));
+            }else{
+                Xcur.col(j).setZero();
+            }
+        }
+
+        if(bPreciseCovar){
+            X_raw.leftCols(cur_size) = Xcur;
+            MatrixXd projected = covar * (H * Xcur);
+            Xcur -= projected;
+        }
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            if(!isValids[i]){
+                continue;
+            }
+
+            // One pass over the marker computes the score and the variance
+            // denominator used by the null and the saddlepoint paths.
+            const double *x_col = Xcur.col(j).data();
+            double score = 0, weighted = 0;
+            for(uint32_t row = 0; row < num_indi; row++){
+                const double x_value = x_col[row];
+                score += x_value * phenoVecMu[row];
+                weighted += x_value * x_value * dWp[row];
+            }
+            double varSNP = sqrt(weighted * c_inf);
+            double chisq = std::abs(score) / varSNP;
+            if(chisq < spaCutOff){
+                double p_value = StatLib::pchisqd1(chisq * chisq);
+                Tscore[i] = (float)score;
+                Tse[i] = (float)varSNP;
+                p[i] = p_value;
+                padj[i] = p_value;
+                rConverge[i] = 1;
+                double temp_beta = score / (varSNP * varSNP);
+                beta[i] = (float)temp_beta;
+                // qchisqd1(pchisqd1(chisq^2)) is chisq^2, so this is the
+                // same standard error without the inverse-CDF round trip.
+                // Keep the original expression at the distribution tails,
+                // where the round trip saturates (P = 0 or 1).
+                if(p_value > 0 && p_value < 1 && chisq > 0){
+                    se[i] = std::abs(temp_beta) / chisq;
+                }else{
+                    se[i] = std::abs(temp_beta) / sqrt(StatLib::qchisqd1(p_value));
+                }
+                continue;
+            }
+
+            // The score and variance are computed before the extra covariate
+            // conditioning that the saddlepoint approximation needs.
+            const double *raw_ptr = bPreciseCovar ? X_raw.col(j).data() : x_col;
+            Map<const VectorXd> xvec2(raw_ptr, num_indi);
+            Map<const VectorXd> xscore(x_col, num_indi);
+            if(!bPreciseCovar){
+                conditioned.resize(num_indi);
+                conditioned = xvec2;
+                conditionCovarBinReg(conditioned);
+                x_col = conditioned.data();
+            }
+            Map<const VectorXd> xvec(x_col, num_indi);
+
+            varSNP = std::sqrt(xscore.dot(dWp.cwiseProduct(xscore)) * c_inf);
+            SPARes res;
+            res.score = xscore.dot(phenoVecMu);
+            chisq = std::abs(res.score) / varSNP;
+            res.p = StatLib::pchisqd1(chisq * chisq);
+            res.bConverge = true;
+
+            vector<uint32_t> index0;
+            index0.reserve(num_indi);
+            double thresh = -means[j] + 1e-6;
+            for(uint32_t row = 0; row < num_indi; row++){
+                if(xvec2[row] > thresh){
+                    index0.push_back(row);
+                }
+            }
+
+            double q = xvec.dot(phenoVec);
+            double qinv = q - res.score - res.score;
+            SPA spa(q, qinv, xvec, index0);
+            spa.saddleProb(&res);
+
+            Tscore[i] = (float)res.score;
+            Tse[i] = (float)varSNP;
+            p[i] = res.p;
+            padj[i] = res.p_adj;
+            rConverge[i] = res.bConverge;
+            double temp_beta = res.score / (varSNP * varSNP);
+            beta[i] = (float)temp_beta;
+            se[i] = std::abs(temp_beta) / sqrt(StatLib::qchisqd1(res.p_adj));
+        }
+    }
+
+    output_res_spa(isValids, markerIndex);
+}
+
+void FastFAM::calculate_spa_marker(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
     static thread_local GenoBufItem item;

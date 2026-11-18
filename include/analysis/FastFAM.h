@@ -69,7 +69,9 @@ public:
     void calculate_gwa(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_gwa_marker(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_gwa_2df(uintptr_t * geno, const vector<uint32_t> &markerIndex);
+    void calculate_gwa_2df_marker(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_gwa_2df_sandwich(uintptr_t * geno, const vector<uint32_t> &markerIndex);
+    void calculate_gwa_2df_sandwich_marker(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_mixed_2df(uintptr_t *geno, const vector<uint32_t> &markerIndex);
     void calculate_mixed_2df_sandwich(uintptr_t *geno, const vector<uint32_t> &markerIndex);
     void output_res(const vector<uint8_t> &isValids, const vector<uint32_t> markerIndex);
@@ -143,6 +145,8 @@ private:
     uint64_t finished_rand_marker = 0;
     Eigen::ConjugateGradient<SpMat, Eigen::Lower|Eigen::Upper> solver;
     void grammar_func(uintptr_t *genobuf, const vector<uint32_t> &markerIndex);
+    void decodeGenoBlock(uintptr_t * geno, const vector<uint32_t> &markerIndex, int start, int count,
+                         MatrixXd &X, vector<uint8_t> &isValids);
     vector<double> v_chisq;
     vector<double> v_c_infs;
     vector<uint8_t> bValids;
@@ -221,6 +225,7 @@ private:
     void estBinGamma();
     void binGrammar_func(uintptr_t *genobuf, const vector<uint32_t> &markerIndex);
     void calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIndex);
+    void calculate_spa_marker(uintptr_t *genobuf, const vector<uint32_t> &markerIndex);
     void getX(uintptr_t *genobuf, const vector<uint32_t> &markerIndex);
     //void conditionCovarRegBin(Eigen::Ref<VectorXd> pheno);
     bool binGridREML(const SpMat& fam, Ref<VectorXd> est_a, int maxIter, double threshold);
