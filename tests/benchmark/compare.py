@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument("--repeat", type=int, default=5)
     parser.add_argument("--max-slowdown", type=float, default=0.10)
     parser.add_argument("--max-rss-increase", type=float, default=0.10)
+    parser.add_argument("--min-wall-seconds", type=float, default=0.25)
     parser.add_argument("--report-only", action="store_true")
     args = parser.parse_args()
     assert args.repeat > 0 and all(thread > 0 for thread in args.threads)
@@ -84,12 +85,24 @@ def compare_scenario(args, baseline, candidate, data, work, scenario):
 
         baseline_time = statistics.median(item["elapsed_seconds"] for item in baseline_runs)
         candidate_time = statistics.median(item["elapsed_seconds"] for item in candidate_runs)
+        baseline_cpu = statistics.median(
+            item["user_cpu_seconds"] + item["system_cpu_seconds"] for item in baseline_runs
+        )
+        candidate_cpu = statistics.median(
+            item["user_cpu_seconds"] + item["system_cpu_seconds"] for item in candidate_runs
+        )
         baseline_rss = statistics.median(item["max_rss_kb"] for item in baseline_runs)
         candidate_rss = statistics.median(item["max_rss_kb"] for item in candidate_runs)
         time_ratio = candidate_time / baseline_time if baseline_time > 0 else 1.0
+        cpu_ratio = candidate_cpu / baseline_cpu if baseline_cpu > 0 else 1.0
         rss_ratio = candidate_rss / baseline_rss if baseline_rss > 0 else 1.0
+        wall_regression = (
+            baseline_time >= args.min_wall_seconds
+            and time_ratio > 1.0 + args.max_slowdown
+        )
         failed = (
-            time_ratio > 1.0 + args.max_slowdown
+            cpu_ratio > 1.0 + args.max_slowdown
+            or wall_regression
             or rss_ratio > 1.0 + args.max_rss_increase
         )
         results.append({
@@ -97,6 +110,9 @@ def compare_scenario(args, baseline, candidate, data, work, scenario):
             "baseline_median_seconds": baseline_time,
             "candidate_median_seconds": candidate_time,
             "time_ratio": time_ratio,
+            "baseline_median_cpu_seconds": baseline_cpu,
+            "candidate_median_cpu_seconds": candidate_cpu,
+            "cpu_ratio": cpu_ratio,
             "baseline_median_rss_kb": baseline_rss,
             "candidate_median_rss_kb": candidate_rss,
             "rss_ratio": rss_ratio,
@@ -104,8 +120,9 @@ def compare_scenario(args, baseline, candidate, data, work, scenario):
         })
         print(
             f"{scenario}, threads={threads}: "
-            f"time {baseline_time:.6f}s -> {candidate_time:.6f}s "
-            f"(x{time_ratio:.3f}), RSS {baseline_rss:.0f} -> {candidate_rss:.0f} KiB "
+            f"wall {baseline_time:.6f}s -> {candidate_time:.6f}s "
+            f"(x{time_ratio:.3f}), CPU {baseline_cpu:.6f}s -> {candidate_cpu:.6f}s "
+            f"(x{cpu_ratio:.3f}), RSS {baseline_rss:.0f} -> {candidate_rss:.0f} KiB "
             f"(x{rss_ratio:.3f}) [{results[-1]['status']}]"
         )
     return {
@@ -136,6 +153,7 @@ def main():
         "repeat": args.repeat,
         "max_slowdown": args.max_slowdown,
         "max_rss_increase": args.max_rss_increase,
+        "min_wall_seconds": args.min_wall_seconds,
         "results": [],
     }
     for scenario in args.scenarios:
