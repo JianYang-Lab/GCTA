@@ -22,7 +22,6 @@
 #include "CommFunc.h"
 #include "StrFunc.h"
 #include "StatFunc.h"
-#include "eigen_func.h"
 #include <fstream>
 #include <iomanip>
 #include <bitset>

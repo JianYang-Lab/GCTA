@@ -57,7 +57,6 @@ endif
 HDR += CommFunc.h \
 	   $(DCDFLIB_DIR)/cdflib.h \
 	   $(DCDFLIB_DIR)/dcdflib.h \
-	   eigen_func.h \
            gcta.h \
 	   $(DCDFLIB_DIR)/ipmpar.h \
            StatFunc.h \
@@ -65,7 +64,6 @@ HDR += CommFunc.h \
            zfstream.h
 SRC = bivar_reml.cpp \
            CommFunc.cpp \
-	   eigen_func.cpp \
            data.cpp \
            edata.cpp \
            ejma.cpp \
