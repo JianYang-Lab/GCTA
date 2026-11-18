@@ -309,7 +309,7 @@ void Geno::setSexMode(){
     t_option["--filter-sex"] = {}; 
     Pheno::registerOption(t_option);
     Marker::registerOption(t_option);
-    Geno::registerOption(t_option);
+    options["sex"] = "yes";
 }
 
 
