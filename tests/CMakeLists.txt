@@ -48,6 +48,7 @@ gcta_add_regression_test(error.bivar_priors test_bivar.py bad_priors integration
 gcta_add_regression_test(workflow.cojo_joint test_summary.py cojo_joint integration)
 gcta_add_regression_test(workflow.fastbat test_summary.py fastbat integration)
 gcta_add_regression_test(workflow.mbat test_summary.py mbat integration)
+gcta_add_regression_test(workflow.gsmr test_gsmr.py output integration)
 gcta_add_regression_test(workflow.simu_qt test_simu.py qt integration)
 gcta_add_regression_test(workflow.simu_cc test_simu.py cc integration)
 gcta_add_regression_test(error.simu_seed test_simu.py bad_seed integration)
