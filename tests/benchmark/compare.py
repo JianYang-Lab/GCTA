@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "regression"))
-from run import cpu_model, measure, prepare_scenario, sha256, source_state
+from run import ALLOCATOR_ENVIRONMENT, cpu_model, measure, prepare_scenario, sha256, source_state
 
 DEFAULT_SCENARIOS = (
     "grm_legacy",
@@ -165,6 +165,7 @@ def main():
         "max_rss_increase": args.max_rss_increase,
         "min_wall_seconds": args.min_wall_seconds,
         "cpu_affinity": args.cpu_affinity,
+        "allocator_environment": ALLOCATOR_ENVIRONMENT,
         "results": [],
     }
     for scenario in args.scenarios:

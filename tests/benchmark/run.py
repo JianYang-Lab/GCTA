@@ -16,6 +16,12 @@ from gcta_runner import run_gcta
 from synthetic import family_markers, write_family_phenotypes
 
 
+ALLOCATOR_ENVIRONMENT = {
+    "MALLOC_TRIM_THRESHOLD_": "0",
+    "MALLOC_MMAP_THRESHOLD_": "131072",
+}
+
+
 def write_synthetic_plink(prefix, sample_count=2048, marker_count=8193, profile="regular"):
     prefix = Path(prefix)
     prefix.parent.mkdir(parents=True, exist_ok=True)
@@ -338,6 +344,9 @@ def measure(command, work_dir, name, threads, cpus=None):
     environment["OMP_DYNAMIC"] = "FALSE"
     environment["MKL_NUM_THREADS"] = str(threads)
     environment["MKL_DYNAMIC"] = "FALSE"
+    # glibc raises its mmap threshold after large frees, which makes peak RSS
+    # jump between two allocator modes on otherwise identical runs.
+    environment.update(ALLOCATOR_ENVIRONMENT)
     with console_path.open("w", encoding="utf-8") as console:
         subprocess.run(
             [
@@ -428,6 +437,7 @@ def main():
         "cpu": cpu_model(),
         "python": platform.python_version(),
         "cpu_affinity": args.cpu_affinity,
+        "allocator_environment": ALLOCATOR_ENVIRONMENT,
         "measurements": {},
     }
     for threads in args.threads:
