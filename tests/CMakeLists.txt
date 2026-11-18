@@ -111,6 +111,7 @@ gcta_add_regression_test(model.exact_roundtrip test_model.py model_exact integra
 gcta_add_regression_test(model.glmm_roundtrip test_model.py model_glmm integration)
 gcta_add_regression_test(format.bgen_subset test_formats.py bgen_subset integration)
 gcta_add_regression_test(format.make_bed test_make_bed.py plink integration)
+gcta_add_regression_test(format.make_bed_dense test_make_bed.py dense integration)
 gcta_add_regression_test(format.make_bed_bgen test_make_bed.py bgen integration)
 gcta_add_regression_test(format.pgen_hardcall test_pgen.py hardcall integration)
 gcta_add_regression_test(format.pgen_dosage test_pgen.py dosage integration)

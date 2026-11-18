@@ -3173,7 +3173,8 @@ void copy_quaterarr_nonempty_subset(uint64_t* raw_quaterarr[], const uint64_t* s
                         uint64_t raw_quaterarr_word[num_marker];
                         uint32_t temp_index = subset_mask_widx * 2 + wordhalf_idx;
                         for(int i = 0; i != num_marker; i++){
-                            raw_quaterarr_word[i] = raw_quaterarr[i][temp_index];
+                            const uint8_t *raw_data = reinterpret_cast<const uint8_t *>(raw_quaterarr[i]) + temp_index * sizeof(uint64_t);
+                            memcpy(&raw_quaterarr_word[i], raw_data, sizeof(uint64_t));
                         }
                         do {
                             uint32_t rqa_idx_lowbits = CTZ64U(cur_include_halfword);
@@ -3214,9 +3215,9 @@ void copy_quaterarr_nonempty_subset(uint64_t* raw_quaterarr[], const uint64_t* s
         }
     }
 
-    const uint64_t* raw_quaterarr_iter[num_marker];
+    const uint8_t* raw_quaterarr_iter[num_marker];
     for(int i = 0; i != num_marker; i++){
-        raw_quaterarr_iter[i] = raw_quaterarr[i];
+        raw_quaterarr_iter[i] = reinterpret_cast<const uint8_t *>(raw_quaterarr[i]);
     }
     //const uint64_t* raw_quaterarr_iter = raw_quaterarr;
     while (1) {
@@ -3227,7 +3228,8 @@ void copy_quaterarr_nonempty_subset(uint64_t* raw_quaterarr[], const uint64_t* s
            // uintptr_t raw_quaterarr_word = *raw_quaterarr_iter++;
             uint64_t raw_quaterarr_word[num_marker];
             for(int i = 0; i != num_marker; i++){
-                raw_quaterarr_word[i] = *(raw_quaterarr_iter[i]++);
+                memcpy(&raw_quaterarr_word[i], raw_quaterarr_iter[i], sizeof(uint64_t));
+                raw_quaterarr_iter[i] += sizeof(uint64_t);
             }
             while (cur_include_halfword) {
                 uint32_t rqa_idx_lowbits = CTZ64U(cur_include_halfword); // tailing zero

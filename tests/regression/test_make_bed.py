@@ -16,10 +16,11 @@ MARKERS = [
     [0, 0, 1, 1, 2, 2, 1, 0],
 ]
 KEEP_SAMPLES = (0, 2, 4, 5, 7)
+DENSE_KEEP_SAMPLES = (0, 1, 2, 3, 4, 5, 6)
 KEEP_MARKERS = (0, 2, 4)
 
 
-def make_fixture(work_dir, input_format):
+def make_fixture(work_dir, input_format, keep_samples):
     prefix = Path(work_dir) / "input" / "source"
     if input_format == "plink":
         write_plink(prefix, MARKERS)
@@ -29,13 +30,13 @@ def make_fixture(work_dir, input_format):
         arguments = ["--bgen", prefix.with_suffix(".bgen"), "--sample", prefix.with_suffix(".sample")]
 
     keep = Path(work_dir) / "input" / "keep.txt"
-    keep.write_text("".join(f"F1 I{index}\n" for index in KEEP_SAMPLES), encoding="utf-8")
+    keep.write_text("".join(f"F1 I{index}\n" for index in keep_samples), encoding="utf-8")
     exclude = Path(work_dir) / "input" / "exclude.txt"
     exclude.write_text("rs1\nrs3\n", encoding="utf-8")
     arguments.extend(("--keep", keep, "--exclude", exclude))
 
     expected_markers = [
-        [MARKERS[index][sample] for sample in KEEP_SAMPLES]
+        [MARKERS[index][sample] for sample in keep_samples]
         for index in KEEP_MARKERS
     ]
     expected_bed = Path(work_dir) / "input" / "expected"
@@ -43,8 +44,8 @@ def make_fixture(work_dir, input_format):
     return arguments, expected_bed.with_suffix(".bed"), expected_markers
 
 
-def check_conversion(gcta, work_dir, input_format, threads):
-    arguments, expected_bed, expected_markers = make_fixture(work_dir, input_format)
+def check_conversion(gcta, work_dir, input_format, keep_samples, threads):
+    arguments, expected_bed, expected_markers = make_fixture(work_dir, input_format, keep_samples)
     converted = run_gcta(
         gcta,
         work_dir,
@@ -57,7 +58,7 @@ def check_conversion(gcta, work_dir, input_format, threads):
     bim = read_table(converted.with_suffix(".bim"))
     assert bim == [["1", f"rs{index}", "0", str(1000 + index), "A", "G"] for index in KEEP_MARKERS]
     fam = read_table(converted.with_suffix(".fam"))
-    assert [fields[:5] for fields in fam] == [["F1", f"I{index}", "0", "0", "0"] for index in KEEP_SAMPLES]
+    assert [fields[:5] for fields in fam] == [["F1", f"I{index}", "0", "0", "0"] for index in keep_samples]
     assert all(math.isnan(float(fields[5])) for fields in fam)
 
     grm = run_gcta(
@@ -70,7 +71,7 @@ def check_conversion(gcta, work_dir, input_format, threads):
     expected_values, expected_counts = expected_grm(expected_markers, 0)
     assert_floats_close(read_floats(grm.with_suffix(".grm.bin")), expected_values, grm)
     assert read_floats(grm.with_suffix(".grm.N.bin")) == expected_counts
-    expected_ids = "".join(f"F1\tI{index}\n" for index in KEEP_SAMPLES)
+    expected_ids = "".join(f"F1\tI{index}\n" for index in keep_samples)
     assert grm.with_suffix(".grm.id").read_text(encoding="utf-8") == expected_ids
     return converted, grm
 
@@ -80,11 +81,13 @@ def main():
     parser.add_argument("--gcta", required=True)
     parser.add_argument("--data")
     parser.add_argument("--work", required=True)
-    parser.add_argument("--scenario", required=True, choices=("plink", "bgen"))
+    parser.add_argument("--scenario", required=True, choices=("plink", "bgen", "dense"))
     args = parser.parse_args()
+    input_format = "bgen" if args.scenario == "bgen" else "plink"
+    keep_samples = DENSE_KEEP_SAMPLES if args.scenario == "dense" else KEEP_SAMPLES
 
-    single = check_conversion(args.gcta, Path(args.work) / "single", args.scenario, 1)
-    multi = check_conversion(args.gcta, Path(args.work) / "multi", args.scenario, 4)
+    single = check_conversion(args.gcta, Path(args.work) / "single", input_format, keep_samples, 1)
+    multi = check_conversion(args.gcta, Path(args.work) / "multi", input_format, keep_samples, 4)
     for suffix in ("bed", "bim", "fam"):
         assert single[0].with_suffix(f".{suffix}").read_bytes() == multi[0].with_suffix(f".{suffix}").read_bytes()
     assert_grm_equal(single[1], multi[1])
