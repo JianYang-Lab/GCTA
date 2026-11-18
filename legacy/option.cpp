@@ -151,18 +151,9 @@ void option(int option_num, char* option_str[])
     int mbat_wind = 50000;
     bool mbat_print_all_p = false;
    
-    // mtCOJO
-    char chbuf = '\0';
-    string mtcojolist_file="", mtcojo_bxy_file="", ref_ld_dirt="", w_ld_dirt="";
-    int nsnp_gsmr=10, nsnp_read = 0;
-    double freq_thresh = 0.2, gwas_thresh=5e-8, global_heidi_thresh = 0.01, std_heidi_thresh = 0.01, ld_fdr_thresh=0.05, clump_wind_size=10000, clump_r2_thresh=0.05;
-    bool mtcojo_flag=false, ref_ld_flag=false, w_ld_flag=false, global_heidi_flag=false;
 
-    // GSMR
-    bool gsmr_flag = false, o_snp_instru_flag = false, gsmr_so_flag = false, gsmr_snp_update_flag = false;
-    int gsmr_beta_version = 0, gsmr_alg_flag = 0, gsmr_so_alg = -9;
-    string expo_file_list = "", outcome_file_list = "";
-    
+    double freq_thresh = 0.2;
+
     // Adjustment for PC
     bool gwas_data_flag = false, gwas_adj_pc_flag = false;
     int pc_adj_wind_size = 10000;
@@ -1002,142 +993,6 @@ void option(int option_num, char* option_str[])
             LOGGER << "--mBAT-wind " << mbat_wind << endl;
             if (mbat_wind < 0 || mbat_wind > 1000) LOGGER.e(0, "\n invalid value for --mBAT-wind. Valid range: 0 ~ 1000\n");
             mbat_wind *= 1000;
-        } 
-        else if (strcmp(argv[i], "--gsmr-file") == 0 ) {
-            gsmr_flag = true;
-
-            vector<string> gsmr_file_list;
-            while (1) {
-                i++;
-                if (strcmp(argv[i], "gcta") == 0 || strncmp(argv[i], "--", 2) == 0) break;
-                gsmr_file_list.push_back(argv[i]);
-            }
-            i--;
-            if (gsmr_file_list.size() != 2) 
-                LOGGER.e(0, "--gsmr-file, please specify the GWAS summary data for the exposure(s) and the outcome(s).");
-
-            expo_file_list = gsmr_file_list[0];
-            outcome_file_list = gsmr_file_list[1];
-            LOGGER << "--gsmr-file " << expo_file_list << " " << outcome_file_list << endl;
-            CommFunc::FileExist(expo_file_list);
-            CommFunc::FileExist(outcome_file_list);
-        } else if(strcmp(argv[i], "--gsmr2-beta") == 0) {
-            gsmr_beta_version = 1;
-            LOGGER << "--gsmr2-beta" << endl;
-        } else if (strcmp(argv[i], "--gsmr-direction") == 0) {
-            gsmr_alg_flag = atoi(argv[++i]);
-            if(gsmr_alg_flag < 0 || gsmr_alg_flag > 2) 
-               LOGGER.e(0, "--gsmr-direction should be 0 (forward-GSMR), 1 (reverse-GSMR) or 2 (bi-GSMR).");
-            LOGGER << "--gsmr-direction " << gsmr_alg_flag << endl;
-        } else if (strcmp(argv[i], "--gsmr-alg") == 0) {
-            LOGGER.e(0, "--gsmr-alg has been superseded by --gsmr-direction.");
-        } else if (strcmp(argv[i], "--gsmr-so") == 0) {
-            gsmr_so_flag = true;
-            gsmr_so_alg = atoi(argv[++i]);
-            if(gsmr_so_alg < 0 || gsmr_so_alg > 1) 
-                LOGGER.e(0, "--gsmr-so should be 0 (LD score regression) or 1 (correlation of SNP effects).");
-            LOGGER << "--gsmr-so " << gsmr_so_alg << endl;
-        } else if (strcmp(argv[i], "--effect-plot") == 0) {
-            o_snp_instru_flag = true;
-            LOGGER << "--effect-plot" << endl;
-        } else if (strcmp(argv[i], "--mtcojo-file") == 0) {
-            mtcojo_flag = true;
-            mtcojolist_file = argv[++i];
-            LOGGER << "--mtcojo-file " << mtcojolist_file << endl;
-            CommFunc::FileExist(mtcojolist_file);
-        } else if (strcmp(argv[i], "--mtcojo-bxy") == 0) {
-            mtcojo_bxy_file = argv[++i];
-            LOGGER << "--mtcojo-bxy " << mtcojo_bxy_file << endl;
-            CommFunc::FileExist(mtcojo_bxy_file);
-        } else if (strcmp(argv[i], "--ref-ld-chr") == 0) {
-            ref_ld_flag = true;
-            ref_ld_dirt = argv[++i];
-            chbuf = ref_ld_dirt.back();
-
-#ifdef _WIN32
-	    if(chbuf != '\\') ref_ld_dirt = ref_ld_dirt + '\\';
-#elif defined __linux__ || defined __APPLE__
-	    if(chbuf != '/') ref_ld_dirt = ref_ld_dirt + '/';
-#else
-#error Only Windows, Mac and Linux are supported.
-#endif
-            LOGGER << "--ref-ld-chr " << ref_ld_dirt << endl;
-        } else if (strcmp(argv[i], "--w-ld-chr") == 0) {
-            w_ld_flag = true;
-            w_ld_dirt = argv[++i];
-            chbuf = w_ld_dirt.back();
-#ifdef _WIN32
-            if(chbuf != '\\') w_ld_dirt = w_ld_dirt + '\\';
-#elif defined __linux__ || defined __APPLE__
-            if(chbuf != '/') w_ld_dirt = w_ld_dirt + '/';
-#else
-#error Only Windows, Mac and Linux are supported.
-#endif
-
-            LOGGER << "--w-ld-chr " << w_ld_dirt << endl;
-        } else if (strcmp(argv[i], "--diff-freq") == 0) {
-            freq_thresh = atof(argv[++i]);
-            if(freq_thresh <0 || freq_thresh >1)
-                LOGGER.e(0, "--diff-freq, Invalid threshold used to check allele frequency difference.");
-            LOGGER<<"--diff-freq "<<freq_thresh<<endl;
-        } else if (strcmp(argv[i], "--gwas-thresh") == 0) {
-            gwas_thresh = atof(argv[++i]);
-            if(gwas_thresh <0 || gwas_thresh >1)
-                LOGGER.e(0, "--gwas-thresh, Invalid GWAS p-value threshold.");
-            LOGGER<<"--gwas-thresh "<<gwas_thresh<<endl;
-        } else if (strcmp(argv[i], "--heidi-thresh") == 0) {
-            vector<string> thresh_list;
-            while (1) {
-                i++;
-                if (strcmp(argv[i], "gcta") == 0 || strncmp(argv[i], "--", 2) == 0) break;
-                thresh_list.push_back(argv[i]);
-            }
-            i--;
-            if (thresh_list.size() < 1 || thresh_list.size() > 2) 
-                LOGGER.e(0, "--heidi-thresh, please specify p-value threshold(s) for the HEIDI-outlier analysis.");
-            std_heidi_thresh = atof(thresh_list[0].c_str());
-            if(thresh_list.size() > 1) {
-                global_heidi_thresh = atof(thresh_list[1].c_str());
-                global_heidi_flag = true;
-            } else if(std_heidi_thresh == 0) {
-                // A single 0 means the user wants HEIDI off; zero the multi-SNP
-                // threshold too so heidi_flag downstream becomes false.
-                global_heidi_thresh = 0;
-                global_heidi_flag = true;
-            }
-            if(std_heidi_thresh <0 || std_heidi_thresh >1)
-                LOGGER.e(0, "--heidi-thresh, Invalid p-value threshold for single-SNP-based HEIDI-outlier test.");
-            if(global_heidi_thresh <0 || global_heidi_thresh >1)
-                LOGGER.e(0, "--heidi-thresh, Invalid p-value threshold for multi-SNP-based HEIDI-outlier test.");
-
-            LOGGER<<"--heidi-thresh "<<std_heidi_thresh; 
-            if(thresh_list.size() > 1) LOGGER<<" "<<global_heidi_thresh;
-            LOGGER<<endl;
-        } else if (strcmp(argv[i], "--heidi-snp") == 0) {
-            LOGGER.e(0, "--heidi-snp is discontinued. Please use --gsmr-snp-min to specify minimum number of SNP instruments for the HEIDI-outlier analysis.");
-        } else if ((strcmp(argv[i], "--gsmr-snp") == 0) || (strcmp(argv[i], "--gsmr-snp-min") == 0)) {
-            if(strcmp(argv[i], "--gsmr-snp") == 0) gsmr_snp_update_flag = true;
-            nsnp_gsmr = atoi(argv[++i]);
-            if(nsnp_gsmr < 0 || nsnp_gsmr > 1e6)
-                LOGGER.e(0, "--gsmr-snp-min, Invalid SNP number threshold for the GSMR analysis.");
-            LOGGER<<"--gsmr-snp-min "<<nsnp_gsmr<<endl;
-        } else if (strcmp(argv[i], "--gsmr-ld-fdr") == 0) {
-            ld_fdr_thresh = atoi(argv[++i]);
-            if(ld_fdr_thresh < 0 || ld_fdr_thresh > 1)
-                LOGGER.e(0, "--gsmr-ld-fdr, Invalid FDR threshold for LD correlation matrix.");
-            LOGGER<<"--gsmr-ld-fdr "<<ld_fdr_thresh<<endl;
-        } else if (strcmp(argv[i], "--clump-p1") == 0) {
-            LOGGER.e(0, "--clump-p1 is discontinued. Please use --gwas-thresh to specify a p-value threshold for index SNPs.");   
-        } else if (strcmp(argv[i], "--clump-kb") == 0) {
-            clump_wind_size = atof(argv[++i]);
-            if(clump_wind_size <0 || clump_wind_size >1e6)
-                LOGGER.e(0, "--clump-kb, Invalid window size for the clumping analysis.");
-            LOGGER<<"--clump-kb   "<<clump_wind_size<<endl;
-        } else if (strcmp(argv[i], "--clump-r2") == 0) {
-            clump_r2_thresh = atof(argv[++i]);
-            if(clump_r2_thresh <0 || clump_r2_thresh >1)
-                LOGGER.e(0, "--clump-r2, Invalid LD r2 threshold for the clumping analysis.");
-            LOGGER<<"--clump-r2 "<<clump_r2_thresh<<endl;
         } else if (strcmp(argv[i], "--gwas-adj-pc") == 0) {
             gwas_data_flag = true;
             pcadjust_list_file  = argv[++i];
@@ -1210,30 +1065,7 @@ void option(int option_num, char* option_str[])
         if (reml_lrt_flag) LOGGER << "Warning: the option --reml-lrt option is disabled in this analysis." << endl; 
     }
     if(bivar_reml_flag && prevalence_flag) LOGGER.e(0, "--prevalence option is not compatible with --reml-bivar option. Please check the --reml-bivar-prevalence option!");
-    if(gsmr_flag || mtcojo_flag){
-        if(ref_ld_flag && !w_ld_flag) LOGGER.e(0, "--ref-ld-chr, please specify the directory of the LD score files.");
-        if(!ref_ld_flag && w_ld_flag) LOGGER.e(0, "--w-ld-chr, please specify the directory of the LD scores for the regression weights.");
-        if(gsmr_snp_update_flag) LOGGER.w(0, "--gsmr-snp has been superseded by --gsmr-snp-min.");
-        if(nsnp_gsmr < 5) LOGGER.w(0, "The number of SNP instruments included in the analysis is too small. There might not be enough SNPs to perform the HEIDI-outlier analysis.");
-        // if(!gsmr_so_flag && ref_ld_flag && w_ld_flag) { gsmr_so_alg = 0; LOGGER.w(0, "--gsmr-so is not specified. The default value is 0. GSMR analysis will perform LD score regression to estimate sample overlap."); }
-        // if(gsmr_so_alg == 1 && ref_ld_flag && w_ld_flag) { gsmr_so_alg = 0; LOGGER.w(0, "The LD score regression instead of correlation method will be used to estimate sample overlap."); }
-        // if(gsmr_so_alg == 0 && !ref_ld_flag && !w_ld_flag) LOGGER.e(0, "Please specify the directory of LD score files to perform the LD score regression analysis.");
-        // if(!gsmr_so_flag && !ref_ld_flag && !w_ld_flag) LOGGER.w(0, "The GSMR analysis will be performed assuming no sample overlap between the GWAS data for exposure and outcome.");
-    }
-    if(gsmr_flag || mtcojo_flag) {
-        bool effective_heidi = CommFunc::FloatNotEqual(abs(global_heidi_thresh) + abs(std_heidi_thresh), 0);
-        if(effective_heidi) {
-            std::stringstream thresh_ss;
-            thresh_ss << std_heidi_thresh;
-            if(gsmr_beta_version) thresh_ss << " " << global_heidi_thresh;
-            LOGGER.i(0, "HEIDI is on, threshold = " + thresh_ss.str() + ".");
-        } else {
-            LOGGER.i(0, "HEIDI is turned off.");
-        }
-    }
-    if(!gsmr_beta_version && global_heidi_flag) {
-        LOGGER.w(0, "--gsmr2-beta is not specified. GCTA will perform single-SNP-based HEIDI-outlier analysis, which was published in Zhu et al. 2018 Nature Communications. The threshold of multi-SNP-based HEIDI-outlier analysis will not be accepted.");
-    }
+
     if(pcl_flag && gwas_data_flag) {
         pcl_flag = false; gwas_adj_pc_flag = true; thread_flag = false;
     }
@@ -1306,16 +1138,8 @@ void option(int option_num, char* option_str[])
             }
             if (!update_refA_file.empty()) pter_gcta->update_ref_A(update_refA_file);
             if (LD) pter_gcta->read_LD_target_SNPs(LD_file);
-            if(gsmr_flag) pter_gcta->read_gsmrfile(expo_file_list, outcome_file_list, gwas_thresh, nsnp_gsmr, gsmr_so_alg);
-            if(mtcojo_flag) nsnp_read = pter_gcta->read_mtcojofile(mtcojolist_file, gwas_thresh, nsnp_gsmr);
-            if(mtcojo_flag && nsnp_read>0) {
-                if(bfile_flag==1) pter_gcta->read_bedfile(bfile + ".bed");
-                else pter_gcta->read_multi_bedfiles(multi_bfiles);
-            }
-            if(!mtcojo_flag){
-                if(bfile_flag==1) pter_gcta->read_bedfile(bfile + ".bed");
-                else pter_gcta->read_multi_bedfiles(multi_bfiles);
-            }
+            if(bfile_flag==1) pter_gcta->read_bedfile(bfile + ".bed");
+            else pter_gcta->read_multi_bedfiles(multi_bfiles);
 
             if (!update_impRsq_file.empty()) pter_gcta->update_impRsq(update_impRsq_file);
             if (!update_freq_file.empty()) pter_gcta->update_freq(update_freq_file);
@@ -1341,8 +1165,7 @@ void option(int option_num, char* option_str[])
             else if (massoc_slct_flag | massoc_joint_flag) {pter_gcta->set_massoc_pC_thresh(massoc_out_pC_thresh); pter_gcta->run_massoc_slct(massoc_file, massoc_wind, massoc_p, massoc_collinear, massoc_top_SNPs, massoc_joint_flag, massoc_gc_flag, massoc_gc_val, massoc_actual_geno_flag, massoc_mld_slct_alg);}
             else if (!massoc_cond_snplist.empty()) {pter_gcta->set_massoc_pC_thresh(massoc_out_pC_thresh); pter_gcta->run_massoc_cond(massoc_file, massoc_cond_snplist, massoc_wind, massoc_collinear, massoc_gc_flag, massoc_gc_val, massoc_actual_geno_flag);}
             else if (massoc_sblup_flag) pter_gcta->run_massoc_sblup(massoc_file, massoc_wind, massoc_sblup_fac);
-            else if (gsmr_flag) pter_gcta->gsmr(gsmr_alg_flag, ref_ld_dirt, w_ld_dirt, freq_thresh, gwas_thresh, clump_wind_size, clump_r2_thresh, std_heidi_thresh, global_heidi_thresh, ld_fdr_thresh, nsnp_gsmr, o_snp_instru_flag, gsmr_so_alg, gsmr_beta_version);
-            else if (mtcojo_flag) pter_gcta->mtcojo(mtcojo_bxy_file, ref_ld_dirt, w_ld_dirt, freq_thresh, gwas_thresh, clump_wind_size, clump_r2_thresh, std_heidi_thresh, global_heidi_thresh, ld_fdr_thresh, nsnp_gsmr, gsmr_beta_version);
+
             else if (simu_qt_flag || simu_cc) pter_gcta->GWAS_simu(bfile, simu_rep, simu_causal, simu_case_num, simu_control_num, simu_h2, simu_K, simu_seed, simu_output_causal, simu_emb_flag, simu_eff_mod);
             else if (make_bed_flag) pter_gcta->save_plink();
             else if (fst_flag) pter_gcta->Fst(subpopu_file);

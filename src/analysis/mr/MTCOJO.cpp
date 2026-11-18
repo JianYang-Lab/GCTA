@@ -1,20 +1,10 @@
-/*
- * GCTA: a tool for Genome-wide Complex Trait Analysis
- *
- * Implementations of functions for mtcojo
- *
- * 2018 by Jian Yang <jian.yang.qt@gmail.com>
- *
- * This file is distributed under the GNU General Public
- * License, Version 3.  Please see the file LICENSE for more
- * details
- */
-
-
-#include "gcta.h"
+#include "analysis/mr/MTCOJO.h"
+#include "analysis/StatLib.h"
+#include "legacy/CommFunc.h"
+#include "legacy/StatFunc.h"
+#include "legacy/StrFunc.h"
+#include "legacy/zfstream.h"
 #include "infrastructure/Logger.h"
-#include "StatFunc.h"
-#include "zlib.h"
 #include <limits>
 #include <cmath>
 #include <iostream>
@@ -23,8 +13,9 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <iomanip>
 
-double eps = 1e-6;
+const double eps = 1e-6;
 
 bool file_exists(string filestr) {
     if(FILE *input_file = fopen(filestr.c_str(), "r")) {
@@ -133,404 +124,7 @@ vector<string> update_common_snps(const vector<string> snplist, vector<string> c
     
     return snpbuf;
 }
-
-void read_metafile_list(string mtcojolist_file, string &target_pheno, string &target_pheno_file, vector<string> &covar_pheno, vector<string> &covar_pheno_file, vector<double> &popu_prev, vector<double> &smpl_prev) {
-
-    ifstream meta_list(mtcojolist_file.c_str());
-    if (!meta_list)
-        LOGGER.e(0, "cannot open the file [" + mtcojolist_file + "] to read.");
-    
-    string strbuf="", prevbuf1="", prevbuf2="";
-    double d_prev1 = 0.0, d_prev2 = 0.0;
-    // Retrieve the GWAS summary data file
-    // The 1st row: the target trait
-    int line_number = 1;
-    std::getline(meta_list, strbuf);
-    std::istringstream linebuf(strbuf);
-    std::istream_iterator<string> begin_title(linebuf), end_title;
-    vector<string> line_elements(begin_title, end_title);
-    if(line_elements.size() != 2 && line_elements.size() != 4) {
-        LOGGER.e(0, "the format of file [" + mtcojolist_file + "] is incorrect, line " + to_string(line_number) + ".");
-    }
-    target_pheno=line_elements[0]; target_pheno_file=line_elements[1];
-    // prevelance
-    d_prev1 = nan(""); d_prev2 = nan("");
-    if(line_elements.size()==4) {
-        prevbuf1 = line_elements[2]; prevbuf2 = line_elements[3];
-        StrFunc::to_upper(prevbuf1); StrFunc::to_upper(prevbuf2);
-        // available, 1 - sample prevelance, 2 - population prevelance
-        if(prevbuf1 != "NA"  &&  prevbuf1!= "NAN" && prevbuf1!= ".") {
-            d_prev1 = atof(prevbuf1.c_str());
-            if(d_prev1 < 0 || d_prev1 > 1)
-                LOGGER.e(0, "invalid sample prevalence for trait [" + target_pheno + "].");
-        }
-        if(prevbuf2 != "NA"  &&  prevbuf2!= "NAN" && prevbuf2 != ".") {
-            d_prev2 = atof(prevbuf2.c_str());
-            if(d_prev2 < 0 || d_prev2 > 1)
-                LOGGER.e(0, "invalid population prevalence for trait [" + target_pheno + "].");
-        }
-    }
-    smpl_prev.push_back(d_prev1); popu_prev.push_back(d_prev2);
-    
-    // The rest rows: the covariate traits
-    while(std::getline(meta_list, strbuf)) {
-        line_number++;
-        //std::istringstream linebuf(strbuf);
-        linebuf.clear();
-        linebuf.str(strbuf);
-        std::istream_iterator<string> begin(linebuf), end;
-        vector<string> line_elements(begin, end);
-        if(line_elements.size() != 2 && line_elements.size() != 4) {
-            LOGGER.e(0, "the format of file [" + mtcojolist_file + "] is incorrect, line " + to_string(line_number) + ".");
-        }
-        covar_pheno.push_back(line_elements[0]);
-        covar_pheno_file.push_back(line_elements[1]);
-        // prevelance
-        d_prev1 = nan(""); d_prev2 = nan("");
-        if(line_elements.size()==4) {
-            prevbuf1 = line_elements[2]; prevbuf2 = line_elements[3];
-            StrFunc::to_upper(prevbuf1); StrFunc::to_upper(prevbuf2);
-            // available, 1 - sample prevelance, 2 - population prevelance
-            if(prevbuf1 != "NA"  &&  prevbuf1!= "NAN" && prevbuf1!= ".") {
-                d_prev1 = atof(prevbuf1.c_str());
-                if(d_prev1 < 0 || d_prev1 > 1)
-                    LOGGER.e(0, "invalid sample prevalence for trait [" + line_elements[0] + "].");
-            }
-            if(prevbuf2 != "NA"  &&  prevbuf2!= "NAN" && prevbuf2 != ".") {
-                d_prev2 = atof(prevbuf2.c_str());
-                if(d_prev2 < 0 || d_prev2 > 1)
-                    LOGGER.e(0, "invalid population prevalence for trait [" + line_elements[0] + "].");
-            }
-        }
-        smpl_prev.push_back(d_prev1); popu_prev.push_back(d_prev2);
-    }
-    meta_list.close();
-}
-
-void gcta::init_meta_snp_map(vector<string> snplist, map<string, int> &snp_name_map, vector<string> &snp_name, vector<int> &remain_snp) {
-    int i=0, size=0, nsnp = snplist.size();
-
-    snp_name_map.clear(); remain_snp.clear();
-    remain_snp.resize(nsnp); 
-    for(i=0; i<nsnp; i++) {
-        snp_name_map.insert( pair<string,int>(snplist[i], i) );
-        if(size==snp_name_map.size()) LOGGER.e(0, "Duplicated SNP ID found: " + snplist[i] + ".");
-        size = snp_name_map.size();
-        remain_snp[i] = i;
-    }
-
-    snp_name.clear(); snp_name = snplist;
-}
-
-void gcta::init_gwas_variable(vector<vector<string>> &snp_a1, vector<vector<string>> &snp_a2, eigenMatrix &snp_freq, eigenMatrix &snp_b, eigenMatrix &snp_se, eigenMatrix &snp_pval, eigenMatrix &n, int npheno, int nsnp) {
-    int i = 0;
-    // two alleles
-    snp_a1.clear(); snp_a2.clear();
-    snp_a1.resize(npheno); snp_a2.resize(npheno);
-    for( i=0; i<npheno; i++) {
-        snp_a1[i].resize(nsnp); snp_a2[i].resize(nsnp);
-    }
-    // allele frequency
-    snp_freq.resize(nsnp, npheno);
-    // effect size, se, p-value and sample size
-    snp_b.resize(nsnp, npheno); snp_se.resize(nsnp, npheno);
-    snp_pval.resize(nsnp, npheno); n.resize(nsnp, npheno);
-}
-
-void gcta::update_meta_snp_list(vector<string> &snplist, map<string, int> snp_id_map) {
-    int i = 0, nsnpbuf = 0;
-    vector<string> snpbuf(snplist);
-    nsnpbuf = snplist.size();
-
-    snplist.clear();
-    for(i=0; i<nsnpbuf; i++) {
-        if(snp_id_map.find(snpbuf[i]) == snp_id_map.end()) continue;
-        snplist.push_back(snpbuf[i]);
-    }
-}
-
-void gcta::update_meta_snp_map(vector<string> snplist, map<string, int> &snp_id_map, vector<string> &snp_id, vector<int> &snp_indx, bool indx_flag) {
-    int i = 0, j = 0, size = 0, nsnp = snplist.size();
-    map<string,int> snp_add_map;
-    
-    for(i=0, j=snp_id_map.size(); i<nsnp; i++) {
-        // Check duplicated SNP ID
-        snp_add_map.insert(pair<string,int>(snplist[i], i));
-        if(size==snp_add_map.size()) LOGGER.e(0, "Duplicated SNP ID found: " + snplist[i] + ".");
-        size = snp_add_map.size();
-
-        if(snp_id_map.find(snplist[i]) != snp_id_map.end()) continue;
-        snp_id_map.insert(pair<string, int>(snplist[i], j));
-        snp_id.push_back(snplist[i]);
-        if(indx_flag) snp_indx.push_back(j);
-        j++;
-    }
-}
-
-void gcta::update_meta_snp(map<string,int> &snp_name_map, vector<string> &snp_name, vector<int> &snp_remain) {
-    int i = 0, nsnp = snp_remain.size();
-    vector<int> snp_remain_buf;
-    vector<string> snp_name_buf;
-
-    snp_name_buf = snp_name;
-    snp_remain_buf = snp_remain;
-    // reset snp_name and snp_remain
-    snp_name.clear(); snp_name.resize(nsnp);
-    snp_remain.clear(); snp_remain.resize(nsnp);
-    for(i = 0; i<nsnp; i++) {
-        snp_name[i] = snp_name_buf[snp_remain_buf[i]];
-        snp_remain[i] = i;
-    }
-    // reset snp_name_map
-    snp_name_map.clear();
-    for(i=0; i<nsnp; i++) 
-        snp_name_map.insert(pair<string, int>(snp_name[i], i));
-}
-
-void update_mtcojo_snp_kp(const vector<string> adjsnps, map<string,int> &snp_id_map, vector<int> &remain_snp_indx) {
-    
-    int i=0, nsnpbuf = adjsnps.size();
-    map<string,int> snp_id_map_buf(snp_id_map);
-    for(i=0; i<nsnpbuf; i++) snp_id_map_buf.erase(adjsnps[i]);
-    
-    std::map<string,int>::iterator iter;
-    for(iter=snp_id_map_buf.begin(); iter!=snp_id_map_buf.end(); iter++)
-        snp_id_map.erase(iter->first);
-    
-    nsnpbuf = snp_id_map.size();
-    remain_snp_indx.clear(); remain_snp_indx.resize(nsnpbuf);
-    for(iter=snp_id_map.begin(), i=0; iter!=snp_id_map.end(); iter++, i++) remain_snp_indx[i] = iter->second;
-    
-    stable_sort(remain_snp_indx.begin(), remain_snp_indx.end());
-}
-
-void gcta::update_mtcojo_snp_rm(vector<string> adjsnps, map<string,int> &snp_id_map, vector<int> &remain_snp_indx) {
-    
-    int i=0, nsnpbuf=adjsnps.size();
-    std::map<string,int>::iterator iter;
-    
-    for(i=0; i<nsnpbuf; i++) snp_id_map.erase(adjsnps[i]);
-    
-    nsnpbuf = snp_id_map.size();
-    remain_snp_indx.clear(); remain_snp_indx.resize(nsnpbuf);
-    for(iter=snp_id_map.begin(), i=0; iter!=snp_id_map.end(); iter++, i++) remain_snp_indx[i] = iter->second;
-
-    stable_sort(remain_snp_indx.begin(), remain_snp_indx.end());
-}
-
-vector<string> gcta::read_snp_metafile_txt(string metafile, map<string,int> &gws_snp_name_map, double thresh) {
-    ifstream meta_snp(metafile.c_str());
-    if (!meta_snp)
-         LOGGER.e(0, "cannot open the file [" + metafile + "] to read.");
-    
-    string strbuf="", valbuf = "";
-    vector<string> snplist;
-    int line_number=0;
-
-    // Read the summary data
-    while(std::getline(meta_snp, strbuf)) {
-        line_number++;
-        std::istringstream linebuf(strbuf);
-        std::istream_iterator<string> begin(linebuf), end;
-        vector<string> line_elements(begin, end);
-        if(line_elements.size() != 8) {
-            LOGGER.e(0, "the GWAS summary data file [" + metafile + "] should be in GCTA-COJO format, line " + to_string(line_number) + ".");
-        }
-        if(line_number==1) continue;
-        // keep significant SNPs
-        snplist.push_back(line_elements[0]);
-        valbuf = line_elements[6];
-        double pval_buf = 1.0;
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") pval_buf = atof(valbuf.c_str());
-        if( pval_buf < thresh && (gws_snp_name_map.find(line_elements[0]) == gws_snp_name_map.end()) ) {
-            int size = gws_snp_name_map.size();
-            gws_snp_name_map.insert(pair<string,int>(line_elements[0], size));
-        }
-    }
-    meta_snp.close();
-    return snplist;
-}
-
-vector<string> gcta::read_snp_metafile_gz(string metafile, map<string,int> &gws_snp_name_map, double thresh) {
-    string strbuf="", snpbuf="";
-    vector<string> snplist;
-    int line_number=0;
-    const int MAX_LINE_LENGTH = 1024;
-    char buf[MAX_LINE_LENGTH];
-    
-    gzifstream meta_snp(metafile.c_str());
-    if (!meta_snp)
-         LOGGER.e(0, "cannot open the file [" + metafile + "] to read.");
-    
-    string err_msg = "Failed to read [" + metafile + "]. An error occurs in line ";
-
-    // Read the summary data
-    while(1) {
-        meta_snp.getline(buf, MAX_LINE_LENGTH, '\n');
-        if(meta_snp.fail() || !meta_snp.good()) break;
-        line_number ++;
-        if(line_number==1) continue;
-        stringstream ss(buf);
-        if (!(ss >> snpbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        // Save the SNPs
-        snplist.push_back(snpbuf);
-        int i = 0;
-        for( i=0; i<6; i++)
-            if (!(ss >> strbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        // Save the p-value
-        double pval_buf = 1.0;
-        if(strbuf!="." && strbuf!="NA" && strbuf!="NAN") pval_buf = atof(strbuf.c_str());
-        if( pval_buf < thresh && (gws_snp_name_map.find(snpbuf) == gws_snp_name_map.end()) ) {
-            int size = gws_snp_name_map.size();
-            gws_snp_name_map.insert(pair<string,int>(snpbuf, size));
-        }
-    }
-
-    meta_snp.close();
-    return snplist;
-}
-
-double gcta::read_single_metafile_txt(string metafile, map<string, int> id_map,
-                         vector<string> &snp_a1, vector<string> &snp_a2,
-                         eigenVector &snp_freq, eigenVector &snp_b,
-                         eigenVector &snp_se, eigenVector &snp_pval,
-                         eigenVector &snp_n, vector<bool> &snp_flag) {
-   
-    ifstream meta_raw(metafile.c_str());
-    if (!meta_raw)
-        LOGGER.e(0, "cannot open the file [" + metafile + "] to read.");
-    string strbuf="", valbuf="";
-    int line_number=0, snp_indx=0;
-    map<string, int>::iterator iter;
-    // Read the summary data
-    double pval_thresh = 0.5, h_buf = 0.0, vp_buf = 0.0, median_vp = 0.0;
-    bool missing_flag = false;
-    vector<double> vec_vp_buf;
-     
-    while(std::getline(meta_raw, strbuf)) {
-        missing_flag = false;
-        line_number++;
-        std::istringstream linebuf(strbuf);
-        std::istream_iterator<string> begin(linebuf), end;
-        vector<string> line_elements(begin, end);
-        if(line_elements.size() != 8) {
-            LOGGER.e(0, "the GWAS summary data file [" + metafile + "] should be in GCTA-COJO format, line " + to_string(line_number) + ".");
-        }        
-        // Read the summary data
-        if(line_number==1) continue;
-        iter = id_map.find(line_elements[0]);      
-        if(iter == id_map.end()) continue;     
-
-        snp_indx = iter->second;         
-        snp_a1[snp_indx] = line_elements[1]; snp_a2[snp_indx] = line_elements[2];
-        StrFunc::to_upper(snp_a1[snp_indx]); StrFunc::to_upper(snp_a2[snp_indx]);
-        valbuf =line_elements[3];
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_freq(snp_indx) = atof(valbuf.c_str());
-        else { snp_freq(snp_indx) = nan(""); missing_flag=true; }
-        valbuf = line_elements[4];
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_b(snp_indx) = atof(valbuf.c_str());
-        else { snp_b(snp_indx) = nan(""); missing_flag=true; }
-        valbuf = line_elements[5];
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_se(snp_indx) = atof(valbuf.c_str());
-        else { snp_se(snp_indx) = nan(""); missing_flag=true; }
-        valbuf = line_elements[6];
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_pval(snp_indx) = atof(valbuf.c_str());
-        else { snp_pval(snp_indx) = nan(""); missing_flag=true; }
-        valbuf = line_elements[7];
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_n(snp_indx) = atof(valbuf.c_str());
-        else { snp_n(snp_indx) = nan(""); missing_flag=true; }
-        snp_flag[snp_indx] = true;
-
-        if(!missing_flag) {
-            h_buf = 2 * snp_freq(snp_indx) * ( 1- snp_freq(snp_indx) );
-            vp_buf = h_buf * snp_b(snp_indx) * snp_b(snp_indx) + h_buf * snp_n(snp_indx) * snp_se(snp_indx) * snp_se(snp_indx);
-            vec_vp_buf.push_back(vp_buf);
-        }        
-    }
-    meta_raw.close();
-    if(vec_vp_buf.size()>0) median_vp = CommFunc::median(vec_vp_buf);
-
-    return median_vp;
-}
-
-double gcta::read_single_metafile_gz(string metafile, map<string, int> id_map,
-                         vector<string> &snp_a1, vector<string> &snp_a2,
-                         eigenVector &snp_freq, eigenVector &snp_b,
-                         eigenVector &snp_se, eigenVector &snp_pval,
-                         eigenVector &snp_n, vector<bool> &snp_flag) {
-   
-    const int MAX_LINE_LENGTH = 1024;
-    char buf[MAX_LINE_LENGTH];
-
-    gzifstream meta_raw(metafile.c_str());
-    if (!meta_raw)
-        LOGGER.e(0, "cannot open the file [" + metafile + "] to read.");
-    string err_msg = "Failed to read [" + metafile + "]. An error occurs in line ";
-
-    int line_number=0, snp_indx=0;
-    map<string, int>::iterator iter;
-    // Read the summary data
-    double pval_thresh = 0.5, h_buf = 0.0, vp_buf = 0.0, median_vp = 0.0;
-    bool missing_flag = false;
-    string strbuf = "";
-    vector<double> vec_vp_buf;
-    while(1) {
-        meta_raw.getline(buf, MAX_LINE_LENGTH, '\n');
-        if(meta_raw.fail() || !meta_raw.good()) break;
-        missing_flag = false;
-        line_number++;
-        if(line_number==1) continue;
-         
-        string snpbuf = "", strbuf = "", valbuf = "";
-        stringstream ss(buf);
-        // SNP
-        if (!(ss >> snpbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        iter = id_map.find(snpbuf);
-        if(iter == id_map.end()) continue;     
-        snp_indx = iter->second;
-        // a1 
-        if (!(ss >> strbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        StrFunc::to_upper(strbuf);
-        snp_a1[snp_indx] = strbuf;
-        // a2
-        if (!(ss >> strbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        StrFunc::to_upper(strbuf);
-        snp_a2[snp_indx] = strbuf;
-        // freq
-        if (!(ss >> valbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_freq(snp_indx) = atof(valbuf.c_str());
-        else { snp_freq(snp_indx) = nan(""); missing_flag=true; }
-        // b
-        if (!(ss >> valbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_b(snp_indx) = atof(valbuf.c_str());
-        else { snp_b(snp_indx) = nan(""); missing_flag=true; }
-        // se
-        if (!(ss >> valbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_se(snp_indx) = atof(valbuf.c_str());
-        else { snp_se(snp_indx) = nan(""); missing_flag=true; }
-        // p-value
-        if (!(ss >> valbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_pval(snp_indx) = atof(valbuf.c_str());
-        else { snp_pval(snp_indx) = nan(""); missing_flag=true; }
-        // n
-        if (!(ss >> valbuf)) LOGGER.e(0, err_msg + to_string(line_number) + "," + buf);
-        if(valbuf!="." && valbuf!="NA" && valbuf!="NAN") snp_n(snp_indx) = atof(valbuf.c_str());
-        else { snp_n(snp_indx) = nan(""); missing_flag=true; }
-        snp_flag[snp_indx] = true;
-
-        if(!missing_flag) {
-            h_buf = 2 * snp_freq(snp_indx) * ( 1- snp_freq(snp_indx) );
-            vp_buf = h_buf * snp_b(snp_indx) * snp_b(snp_indx) + h_buf * snp_n(snp_indx) * snp_se(snp_indx) * snp_se(snp_indx);
-            vec_vp_buf.push_back(vp_buf);
-        }        
-    }
-    meta_raw.close();
-    if(vec_vp_buf.size()>0) median_vp = CommFunc::median(vec_vp_buf);
-
-    return median_vp;
-}
-
-vector<string> gcta::remove_bad_snps(vector<string> snp_name, vector<int> snp_remain, vector<vector<bool>> snp_flag, vector<vector<string>> &snp_a1, vector<vector<string>> &snp_a2, eigenMatrix &snp_freq,  
+vector<string> MRAnalysis::remove_bad_snps(vector<string> snp_name, vector<int> snp_remain, vector<vector<bool>> snp_flag, vector<vector<string>> &snp_a1, vector<vector<string>> &snp_a2, eigenMatrix &snp_freq,  
                                     eigenMatrix &snp_b, eigenMatrix snp_se, eigenMatrix snp_pval, eigenMatrix snp_n, map<string,int> plink_snp_name_map, vector<string> snp_ref_a1, vector<string> snp_ref_a2, 
                                     int ntarget, int ncovar, string outfile_name) {
     int i=0, j=0, nsnp = snp_remain.size(), npheno = ntarget+ncovar;
@@ -622,7 +216,7 @@ vector<string> gcta::remove_bad_snps(vector<string> snp_name, vector<int> snp_re
     return badsnps;
 }
 
-vector<string> gcta::remove_freq_diff_snps(vector<string> meta_snp_name, vector<int> meta_snp_remain, map<string,int> snp_name_map, vector<double> ref_freq, eigenMatrix meta_freq, vector<vector<bool>> snp_flag, int ntrait, double freq_thresh, string outfile_name) {
+vector<string> MRAnalysis::remove_freq_diff_snps(vector<string> meta_snp_name, vector<int> meta_snp_remain, map<string,int> snp_name_map, vector<double> ref_freq, eigenMatrix meta_freq, vector<vector<bool>> snp_flag, int ntrait, double freq_thresh, string outfile_name) {
     int i = 0, nsnp = meta_snp_remain.size(), nsnp_ttl = meta_snp_remain.size();
     string snpbuf="";
     vector<string> afsnps;
@@ -674,7 +268,7 @@ vector<string> gcta::remove_freq_diff_snps(vector<string> meta_snp_name, vector<
     return(afsnps);
 }
 
-vector<string> gcta::remove_mono_snps(map<string,int> snp_name_map, vector<double> ref_snpfreq, string outfile_name) {
+vector<string> MRAnalysis::remove_mono_snps(map<string,int> snp_name_map, vector<double> ref_snpfreq, string outfile_name) {
     int i = 0, n_raresnp = 0;
     vector<string> afsnps;
     map<string,int>::iterator iter;
@@ -701,7 +295,7 @@ vector<string> gcta::remove_mono_snps(map<string,int> snp_name_map, vector<doubl
     return(afsnps);
 }
 
-vector<string> gcta::filter_meta_snp_pval(vector<string> snp_name, vector<int> remain_snp_indx,  eigenMatrix snp_pval, int start_indx, int end_indx, vector<vector<bool>> snp_flag, double pval_thresh) {
+vector<string> MRAnalysis::filter_meta_snp_pval(vector<string> snp_name, vector<int> remain_snp_indx,  eigenMatrix snp_pval, int start_indx, int end_indx, vector<vector<bool>> snp_flag, double pval_thresh) {
     
     int i=0, j=0, nsnpbuf = remain_snp_indx.size();
     vector<string> kpsnps;
@@ -717,7 +311,7 @@ vector<string> gcta::filter_meta_snp_pval(vector<string> snp_name, vector<int> r
     return kpsnps;
 }
 
-int gcta::read_mtcojofile(string mtcojolist_file, double gwas_thresh, int nsnp_gsmr) {
+int MRAnalysis::read_mtcojofile(string mtcojolist_file, double gwas_thresh, int nsnp_gsmr) {
 
     int ncovar=0, i=0, j=0;
     string target_pheno_file="";
@@ -749,7 +343,7 @@ int gcta::read_mtcojofile(string mtcojolist_file, double gwas_thresh, int nsnp_g
         snplist=read_snp_metafile_txt(target_pheno_file, gws_snp_name_map, -9);
     else 
         snplist=read_snp_metafile_gz(target_pheno_file, gws_snp_name_map, -9);
-    update_id_map_kp(snplist, _meta_snp_name_map, _meta_remain_snp);
+    MR::update_id_map_kp(snplist, _meta_snp_name_map, _meta_remain_snp);
 
     // Initialization of variables
     int nsnp = _meta_snp_name_map.size();
@@ -811,7 +405,7 @@ int gcta::read_mtcojofile(string mtcojolist_file, double gwas_thresh, int nsnp_g
                              _snp_name_map, _allele1, _allele2, 1, ncovar, _out);
                                 
     if(badsnps.size()>0) {
-        update_id_map_rm(badsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(badsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(badsnps, _meta_snp_name_map, _meta_remain_snp);
     }  
   
@@ -827,7 +421,7 @@ int gcta::read_mtcojofile(string mtcojolist_file, double gwas_thresh, int nsnp_g
     vector<string> keptsnps; 
     
     keptsnps = filter_meta_snp_pval(_meta_snp_name, _meta_remain_snp, _meta_snp_pval, 1, 1+ncovar, _snp_val_flag, pval_thresh);
-    update_id_map_kp(keptsnps, _snp_name_map, _include);
+    MR::update_id_map_kp(keptsnps, _snp_name_map, _include);
     std::stringstream ss;
     ss << std::scientific << std::setprecision(1) << gwas_thresh;
     LOGGER.i(0, "There are " + to_string(_include.size()) + " genome-wide significant SNPs with p < " + ss.str() + ".\n");
@@ -863,7 +457,7 @@ eigenVector read_external_bxy(string filestr, vector<string> covar_pheno_name) {
     return(bxy_est);
 }
 
-vector<string> gcta::clumping_meta(eigenVector snp_chival, vector<bool> snp_flag, double pval_thresh, int wind_size, double r2_thresh) {   
+vector<string> MRAnalysis::clumping_meta(eigenVector snp_chival, vector<bool> snp_flag, double pval_thresh, int wind_size, double r2_thresh) {   
     wind_size = wind_size*1e3;
     // Only select SNPs that are matched with plink binary file
     vector<pair<double, int>> snp_pvalbuf;
@@ -1508,7 +1102,7 @@ double global_heidi_outlier_topsnp_iter(eigenVector bxy, eigenMatrix &cov_bxy, e
     return(global_heidi_pvalue);
 }
 
-vector<double> gcta::gsmr_meta(vector<string> &snp_instru, eigenVector bzx, eigenVector bzx_se, eigenVector bzx_pval, eigenVector bzy, eigenVector bzy_se, eigenVector bzy_pval, double rho_pheno, vector<bool> snp_flag, double gwas_thresh, int wind_size, double r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, string &pleio_snps, string &err_msg) {
+vector<double> MRAnalysis::gsmr_meta(vector<string> &snp_instru, eigenVector bzx, eigenVector bzx_se, eigenVector bzx_pval, eigenVector bzy, eigenVector bzy_se, eigenVector bzy_pval, double rho_pheno, vector<bool> snp_flag, double gwas_thresh, int wind_size, double r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, string &pleio_snps, string &err_msg) {
 
     int i=0, j=0, nsnp = _include.size(), nindi=_keep.size();    
     vector<string> indices_snp;
@@ -2051,7 +1645,7 @@ double transform_hsq_L(double P, double K, double hsq) {
     return (hsq * C);
 }
 
-vector<string> gcta::read_snp_ldsc(map<string,int> ldsc_snp_name_map, vector<string> snp_name, vector<int> snp_remain, int &ttl_mk_num, 
+vector<string> MRAnalysis::read_snp_ldsc(map<string,int> ldsc_snp_name_map, vector<string> snp_name, vector<int> snp_remain, int &ttl_mk_num, 
                                    string ref_ld_dirt, string w_ld_dirt, vector<double> &ref_ld_vec, vector<double> &w_ld_vec) {
     int i=0, nsnp = snp_remain.size();
     vector<string> ref_ld_snps, w_ld_snps;
@@ -2078,7 +1672,7 @@ vector<string> gcta::read_snp_ldsc(map<string,int> ldsc_snp_name_map, vector<str
     return cm_ld_snps;
 }
 
-void gcta::reorder_snp_effect(vector<int> snp_remain, eigenMatrix &bhat_z, eigenMatrix &bhat_n, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, 
+void MRAnalysis::reorder_snp_effect(vector<int> snp_remain, eigenMatrix &bhat_z, eigenMatrix &bhat_n, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, 
                               vector<vector<bool>> &snp_flag, vector<vector<bool>> snp_val_flag, vector<int> &nsnp_cm_trait,
                               vector<string> cm_ld_snps, map<string,int> ldsc_snp_name_map,
                               eigenVector &ref_ld, eigenVector &w_ld, vector<double> ref_ld_vec, vector<double> w_ld_vec, int ntrait) {
@@ -2106,7 +1700,7 @@ void gcta::reorder_snp_effect(vector<int> snp_remain, eigenMatrix &bhat_z, eigen
     }
 }
 
-eigenMatrix gcta::ldsc_snp_h2(eigenMatrix bhat_z, eigenMatrix bhat_n, eigenVector ref_ld, eigenVector w_ld, vector<vector<bool>> snp_flag, vector<int> nsnp_cm_trait, int n_cm_ld_snps, int ttl_mk_num, vector<string> trait_name, int ntrait) {
+eigenMatrix MRAnalysis::ldsc_snp_h2(eigenMatrix bhat_z, eigenMatrix bhat_n, eigenVector ref_ld, eigenVector w_ld, vector<vector<bool>> snp_flag, vector<int> nsnp_cm_trait, int n_cm_ld_snps, int ttl_mk_num, vector<string> trait_name, int ntrait) {
     // Estimate SNP h2
     int i = 0, j = 0;
     vector<double> rst_ldsc(2);
@@ -2142,7 +1736,7 @@ eigenMatrix gcta::ldsc_snp_h2(eigenMatrix bhat_z, eigenMatrix bhat_n, eigenVecto
     return ldsc_var;
 }
 
-eigenMatrix gcta::ldsc_snp_rg(eigenMatrix ldsc_var_h2, eigenMatrix bhat_z, eigenMatrix bhat_n, eigenVector ref_ld, eigenVector w_ld, vector<vector<bool>> snp_flag, vector<int> trait_indx1, vector<int> trait_indx2, int n_cm_ld_snps, int ttl_mk_num, vector<string> trait_name) {
+eigenMatrix MRAnalysis::ldsc_snp_rg(eigenMatrix ldsc_var_h2, eigenMatrix bhat_z, eigenMatrix bhat_n, eigenVector ref_ld, eigenVector w_ld, vector<vector<bool>> snp_flag, vector<int> trait_indx1, vector<int> trait_indx2, int n_cm_ld_snps, int ttl_mk_num, vector<string> trait_name) {
     // Estimate SNP rg
     int i = 0, nproc = trait_indx1.size();
     eigenMatrix ldsc_var_rg(nproc, 2);
@@ -2180,7 +1774,7 @@ eigenMatrix gcta::ldsc_snp_rg(eigenMatrix ldsc_var_h2, eigenMatrix bhat_z, eigen
     return ldsc_var_rg;
 }
 
-bool gcta::mtcojo_ldsc(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, int ntrait, 
+bool MRAnalysis::mtcojo_ldsc(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, int ntrait, 
                 vector<string> snp_name, vector<int> snp_remain, string ref_ld_dirt, string w_ld_dirt, vector<string> trait_name,
                 eigenMatrix &ldsc_intercept, eigenMatrix &ldsc_slope) {
 
@@ -2339,7 +1933,7 @@ void mtcojo_cond_output(string output_file, vector<string> snp_name, vector<int>
     ofile.close();
 }
 
-void gcta::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, double freq_thresh, double gwas_thresh, int clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, int gsmr_beta_version) {
+void MRAnalysis::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, double freq_thresh, double gwas_thresh, int clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, int gsmr_beta_version) {
     if(gsmr_beta_version) { _n_gsmr_rst_item = 5; _gsmr_beta_version = 1; }
     else { _n_gsmr_rst_item = 4; _gsmr_beta_version = 0; }
 
@@ -2358,14 +1952,14 @@ void gcta::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, 
     afsnps = remove_freq_diff_snps(_meta_snp_name, _meta_remain_snp, _snp_name_map, _mu, _meta_snp_freq, _snp_val_flag, ncovar+1, freq_thresh, _out);
     // Update SNPs set
     if( afsnps.size()>0 ) {
-        update_id_map_rm(afsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(afsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(afsnps, _meta_snp_name_map, _meta_remain_snp);
     }
     // Remove monomorphic SNPs
     afsnps = remove_mono_snps(_snp_name_map, _mu, _out);
     // Update SNPs set
     if( afsnps.size()>0 ) {
-        update_id_map_rm(afsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(afsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(afsnps, _meta_snp_name_map, _meta_remain_snp);
     }
 
@@ -2437,7 +2031,7 @@ void gcta::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, 
         if(n_buf < ncovar+1) continue;
         snp_buf.push_back(_meta_snp_name[_meta_remain_snp[i]]);
     }
-    update_id_map_kp(snp_buf, _meta_snp_name_map, _meta_remain_snp);
+    MR::update_id_map_kp(snp_buf, _meta_snp_name_map, _meta_remain_snp);
 
     nsnp = _meta_remain_snp.size();
     eigenVector snp_bzy(nsnp), snp_bzy_se(nsnp);
@@ -2464,4 +2058,41 @@ void gcta::mtcojo(string mtcojo_bxy_file, string ref_ld_dirt, string w_ld_dirt, 
     LOGGER.i(0, "Saving the mtCOJO analysis results of " + to_string(nsnp) + " remaining SNPs to [" + output_filename + "] ...");
     LOGGER.i(0, "mtCOJO analysis completed.");
     mtcojo_cond_output(output_filename, _meta_snp_name, _meta_remain_snp, _meta_snp_a1, _meta_snp_a2, _meta_snp_freq, _meta_snp_b.col(0), _meta_snp_se.col(0), _meta_snp_pval.col(0), mtcojo_est, _meta_snp_n_o.col(0), nsnp);
+}
+
+static MROptions mtcojo_options;
+
+int MTCOJO::registerOption(map<string, vector<string>> &options_in) {
+    auto iter = options_in.find("--mtcojo-file");
+    if (iter == options_in.end()) return 0;
+    if (iter->second.size() != 1) LOGGER.e(0, "--mtcojo-file requires one trait-list file.");
+    string mtcojo_list = iter->second[0];
+    options_in.erase(iter);
+    mtcojo_options = consume_common_mr_options(options_in);
+    mtcojo_options.mtcojo_list = mtcojo_list;
+    iter = options_in.find("--mtcojo-bxy");
+    if (iter != options_in.end()) {
+        if (iter->second.size() == 1) mtcojo_options.mtcojo_bxy_file = iter->second[0];
+        options_in.erase(iter);
+    }
+    return 1;
+}
+
+void MTCOJO::processMain() {
+    MTCOJO analysis(mtcojo_options.out);
+    analysis.read_mtcojofile(mtcojo_options.mtcojo_list, mtcojo_options.gwas_thresh, mtcojo_options.nsnp_gsmr);
+    analysis.mtcojo(
+        mtcojo_options.mtcojo_bxy_file,
+        mtcojo_options.ref_ld_dir,
+        mtcojo_options.w_ld_dir,
+        mtcojo_options.freq_thresh,
+        mtcojo_options.gwas_thresh,
+        mtcojo_options.clump_wind_size,
+        mtcojo_options.clump_r2_thresh,
+        mtcojo_options.std_heidi_thresh,
+        mtcojo_options.global_heidi_thresh,
+        mtcojo_options.ld_fdr_thresh,
+        mtcojo_options.nsnp_gsmr,
+        mtcojo_options.gsmr_beta_version
+    );
 }

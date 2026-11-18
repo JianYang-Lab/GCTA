@@ -27,6 +27,8 @@
 #include "analysis/LD.h"
 #include "analysis/expression/ERM.h"
 #include "analysis/expression/ECOJO.h"
+#include "analysis/mr/GSMR.h"
+#include "analysis/mr/MTCOJO.h"
 #include "infrastructure/NumericBackend.h"
 #include <functional>
 #include <map>
@@ -99,6 +101,9 @@ int main(int argc, char *argv[]){
         "--envir", "--optimal-rho", "--noSandwich", "--grid-size",
         "--efile", "--make-erm", "--make-erm-gz", "--make-erm-alg",
         "--e-cor", "--ecojo", "--ecojo-slct", "--ecojo-p", "--ecojo-collinear", "--ecojo-blup",
+        "--gsmr-file", "--gsmr-direction", "--gsmr-alg", "--gsmr-so", "--effect-plot", "--gsmr2-beta",
+        "--mtcojo-file", "--mtcojo-bxy", "--ref-ld-chr", "--w-ld-chr", "--diff-freq", "--gwas-thresh",
+        "--heidi-thresh", "--heidi-snp", "--gsmr-snp", "--gsmr-snp-min", "--gsmr-ld-fdr", "--clump-p1", "--clump-kb", "--clump-r2",
     };
     map<string, vector<string>> options;
     vector<string> keys;
@@ -246,7 +251,7 @@ int main(int argc, char *argv[]){
 
     //start register the options
     // Please take care of the order, C++ has few reflation feature, I did in a ugly way.
-    vector<string> module_names = {"phenotype", "marker", "genotype", "covar", "GRM", "fastFAM", "LD", "ERM", "ECOJO"};
+    vector<string> module_names = {"phenotype", "marker", "genotype", "covar", "GRM", "fastFAM", "LD", "ERM", "ECOJO", "GSMR", "MTCOJO"};
     vector<int (*)(map<string, vector<string>>&)> registers = {
             Pheno::registerOption,
             Marker::registerOption,
@@ -256,7 +261,9 @@ int main(int argc, char *argv[]){
             FastFAM::registerOption,
             LD::registerOption,
             ERM::registerOption,
-            ECOJO::registerOption
+            ECOJO::registerOption,
+            GSMR::registerOption,
+            MTCOJO::registerOption
     };
     vector<void (*)()> processMains = {
             Pheno::processMain,
@@ -267,7 +274,9 @@ int main(int argc, char *argv[]){
             FastFAM::processMain,
             LD::processMain,
             ERM::processMain,
-            ECOJO::processMain
+            ECOJO::processMain,
+            GSMR::processMain,
+            MTCOJO::processMain
     };
 
     vector<int> mains;

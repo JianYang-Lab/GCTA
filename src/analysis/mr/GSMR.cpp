@@ -1,32 +1,12 @@
-#include "gcta.h"
+#include "analysis/mr/GSMR.h"
+#include "legacy/CommFunc.h"
+#include "legacy/StatFunc.h"
+#include "legacy/StrFunc.h"
+#include "legacy/zfstream.h"
 #include "infrastructure/Logger.h"
 #include <sstream>
 #include <iterator>
-
-bool determine_gwas_file(string input_file) {
-    int nelements = 0;
-    bool file_type = false;
-    string strbuf;
-
-    ifstream file_list(input_file);
-    if(!file_list) 
-        LOGGER.e(0, "cannot open file [" + input_file + "] to read.");
-
-    std::getline(file_list, strbuf);
-    std::istringstream linebuf(strbuf);
-    vector<string> line_elements((istream_iterator<string>(linebuf)), istream_iterator<string>());
-    nelements = line_elements.size();
-
-    if(nelements==1) {
-        file_type = true;
-    } else if(nelements==8) {
-        file_type = false;
-    } else {
-        LOGGER.e(0, "the GWAS summary data should be in GCTA-COJO format. Please check.");
-    }
-
-    return file_type;
-}
+#include <iomanip>
 
 void update_id_map_kp_by_map(map<string, int> &id_list_map, map<string, int> &id_map, vector<int> &keep) {
     int i = 0;
@@ -43,51 +23,7 @@ void update_id_map_kp_by_map(map<string, int> &id_list_map, map<string, int> &id
     for (iter = id_map.begin(); iter != id_map.end(); iter++) keep.push_back(iter->second);
     stable_sort(keep.begin(), keep.end());
 }
-
-void read_gsmr_file_list(string gsmr_file_list, vector<string> &pheno_name, vector<string> &pheno_file, vector<double> &popu_prev, vector<double> &smpl_prev) {
-
-    ifstream meta_list(gsmr_file_list.c_str());
-    if (!meta_list)
-        LOGGER.e(0, "cannot open the file [" + gsmr_file_list + "] to read.");
-    
-    string strbuf="", prevbuf1="", prevbuf2="";
-    // Retrieve the GWAS summary data file
-    // The 1st row: the target trait
-    int line_number = 1;
-    while(std::getline(meta_list, strbuf)) 
-    {
-        std::istringstream linebuf(strbuf);
-        vector<string> line_elements((istream_iterator<string>(linebuf)), istream_iterator<string>());
-        
-        if(line_elements.size() != 2 && line_elements.size() != 4)
-            LOGGER.e(0, "the format of file [" + gsmr_file_list + "] is incorrect, line " + to_string(line_number) + ".");
-        
-        pheno_name.push_back(line_elements[0]); pheno_file.push_back(line_elements[1]);
-        
-        // prevelance
-        double d_prev1 = nan(""), d_prev2 = nan("");
-        if(line_elements.size()==4) {
-            prevbuf1 = line_elements[2]; prevbuf2 = line_elements[3];
-            StrFunc::to_upper(prevbuf1); StrFunc::to_upper(prevbuf2);
-            // available, 1 - sample prevelance, 2 - population prevelance
-            if(prevbuf1 != "NA"  &&  prevbuf1!= "NAN" && prevbuf1!= ".") {
-                d_prev1 = atof(prevbuf1.c_str());
-                if(d_prev1 < 0 || d_prev1 > 1)
-                    LOGGER.e(0, "invalid sample prevalence for [" + pheno_name[line_number] + "].");
-            }
-            if(prevbuf2 != "NA"  &&  prevbuf2!= "NAN" && prevbuf2 != ".") {
-                d_prev2 = atof(prevbuf2.c_str());
-                if(d_prev2 < 0 || d_prev2 > 1)
-                    LOGGER.e(0, "invalid population prevalence for [" + pheno_name[line_number] + "].");
-            }
-        }
-        smpl_prev.push_back(d_prev1); popu_prev.push_back(d_prev2);
-        line_number++;
-    }
-    meta_list.close();
-}
-
-void gcta::read_gsmrfile(string expo_file_list, string outcome_file_list, double gwas_thresh, int nsnp_gsmr, int gsmr_so_alg) {
+void MRAnalysis::read_gsmrfile(string expo_file_list, string outcome_file_list, double gwas_thresh, int nsnp_gsmr, int gsmr_so_alg) {
     int i = 0, j = 0;
     double pval_thresh = gsmr_so_alg >= 0 ?  1.0 : gwas_thresh;
     vector<string> expo_gwas_file, outcome_gwas_file, gwas_data_file, pheno_name_buf;
@@ -139,7 +75,7 @@ void gcta::read_gsmrfile(string expo_file_list, string outcome_file_list, double
         else update_meta_snp_map(snplist, outcome_snp_name_map, outcome_snp_name, outcome_remain_snp, false);
     }  
     // SNPs in common between exposures and outcomes
-    update_id_map_kp(outcome_snp_name, _meta_snp_name_map, _meta_remain_snp); 
+    MR::update_id_map_kp(outcome_snp_name, _meta_snp_name_map, _meta_remain_snp); 
 
     // Keep significant SNPs
     update_id_map_kp_by_map(gws_snp_name_map, _meta_snp_name_map, _meta_remain_snp);
@@ -184,7 +120,7 @@ void gcta::read_gsmrfile(string expo_file_list, string outcome_file_list, double
     badsnps = remove_bad_snps(_meta_snp_name, _meta_remain_snp, _snp_val_flag, snp_a1, snp_a2, snp_freq,  _meta_snp_b, _meta_snp_se, _meta_snp_pval, _meta_snp_n_o, 
                               _snp_name_map, _allele1, _allele2, _outcome_num, _expo_num, _out);
     if(badsnps.size()>0) {
-        update_id_map_rm(badsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(badsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(badsnps, _meta_snp_name_map, _meta_remain_snp);
     }
 
@@ -200,7 +136,7 @@ void gcta::read_gsmrfile(string expo_file_list, string outcome_file_list, double
     vector<string> keptsnps;
     keptsnps = filter_meta_snp_pval(_meta_snp_name, _meta_remain_snp, _meta_snp_pval, 0, npheno, _snp_val_flag, gwas_thresh);
     if(keptsnps.size()>0) {
-        update_id_map_kp(keptsnps, _snp_name_map, _include);
+        MR::update_id_map_kp(keptsnps, _snp_name_map, _include);
     }
 
     std::stringstream ss;
@@ -208,7 +144,7 @@ void gcta::read_gsmrfile(string expo_file_list, string outcome_file_list, double
     LOGGER.i(0, to_string(_include.size()) + " genome-wide significant SNPs with p < " + ss.str() + " are in common among the exposure(s), the outcome(s) and the LD reference sample.\n");
 }
 
-eigenMatrix gcta::rho_sample_overlap(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_pval, eigenMatrix snp_n, int nexpo, int noutcome, 
+eigenMatrix MRAnalysis::rho_sample_overlap(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_pval, eigenMatrix snp_n, int nexpo, int noutcome, 
                 vector<string> snp_name, vector<int> snp_remain, string ref_ld_dirt, string w_ld_dirt, vector<string> trait_name, int gsmr_so_alg) {
 
     int i = 0, j = 0;
@@ -227,7 +163,7 @@ eigenMatrix gcta::rho_sample_overlap(vector<vector<bool>> snp_val_flag, eigenMat
     return ldsc_intercept;
 }
 
-eigenMatrix gcta::sample_overlap_ldsc(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, int nexpo, int noutcome, 
+eigenMatrix MRAnalysis::sample_overlap_ldsc(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_n, int nexpo, int noutcome, 
                 vector<string> snp_name, vector<int> snp_remain, string ref_ld_dirt, string w_ld_dirt, vector<string> trait_name) {
 
     int i = 0, j = 0, ttl_mk_num = 0.0, ntrait = nexpo + noutcome, nsnp = snp_remain.size();
@@ -291,7 +227,7 @@ eigenMatrix gcta::sample_overlap_ldsc(vector<vector<bool>> snp_val_flag, eigenMa
     return ldsc_intercept;
 }
 
-eigenMatrix gcta::sample_overlap_rb(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_pval, eigenMatrix snp_n, int nexpo, int noutcome, 
+eigenMatrix MRAnalysis::sample_overlap_rb(vector<vector<bool>> snp_val_flag, eigenMatrix snp_b, eigenMatrix snp_se, eigenMatrix snp_pval, eigenMatrix snp_n, int nexpo, int noutcome, 
                 vector<string> snp_name, vector<int> snp_remain, vector<string> trait_name) {
 
     int i = 0, j = 0, k = 0, nproc = nexpo * noutcome, nsnp = snp_remain.size();
@@ -445,7 +381,7 @@ void collect_snp_instru_effect(stringstream &ss, vector<vector<bool>> snp_flag, 
     ss << "#effect_end" << endl;
 }
 
-void gcta::gsmr(int gsmr_alg_flag, string ref_ld_dirt, string w_ld_dirt, double freq_thresh, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, bool o_snp_instru_flag, int gsmr_so_alg, int gsmr_beta_version) {
+void MRAnalysis::gsmr(int gsmr_alg_flag, string ref_ld_dirt, string w_ld_dirt, double freq_thresh, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, bool o_snp_instru_flag, int gsmr_so_alg, int gsmr_beta_version) {
     if(gsmr_beta_version) { _n_gsmr_rst_item = 5; _gsmr_beta_version = 1; }
     else { _n_gsmr_rst_item = 4; _gsmr_beta_version = 0; }
    
@@ -462,7 +398,7 @@ void gcta::gsmr(int gsmr_alg_flag, string ref_ld_dirt, string w_ld_dirt, double 
     afsnps = remove_freq_diff_snps(_meta_snp_name, _meta_remain_snp, _snp_name_map, _mu, _meta_snp_freq, _snp_val_flag, ntrait, freq_thresh, _out);
     // Update SNPs set
     if( afsnps.size()>0 ) {
-        update_id_map_rm(afsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(afsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(afsnps, _meta_snp_name_map, _meta_remain_snp);
     }
 
@@ -470,7 +406,7 @@ void gcta::gsmr(int gsmr_alg_flag, string ref_ld_dirt, string w_ld_dirt, double 
     afsnps = remove_mono_snps(_snp_name_map, _mu, _out);
     // Update SNPs set
     if( afsnps.size()>0 ) {
-        update_id_map_rm(afsnps, _snp_name_map, _include);
+        MR::update_id_map_rm(afsnps, _snp_name_map, _include);
         update_mtcojo_snp_rm(afsnps, _meta_snp_name_map, _meta_remain_snp);
     }
 
@@ -547,7 +483,7 @@ void gcta::gsmr(int gsmr_alg_flag, string ref_ld_dirt, string w_ld_dirt, double 
     LOGGER.i(0, "\nGSMR analyses completed.");
 }
 
-vector<vector<double>> gcta::forward_gsmr(stringstream &ss, map<string,int> &snp_instru_map, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, stringstream &ss_pleio) {
+vector<vector<double>> MRAnalysis::forward_gsmr(stringstream &ss, map<string,int> &snp_instru_map, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, stringstream &ss_pleio) {
     int i=0, j=0, k=0, t=0, m=_expo_num*_outcome_num, nsnp = _meta_remain_snp.size();
     vector<bool> snp_pair_flag(nsnp);
     vector<vector<double>> bxy_est;
@@ -584,7 +520,7 @@ vector<vector<double>> gcta::forward_gsmr(stringstream &ss, map<string,int> &snp
     return bxy_est;
 }
 
-vector<vector<double>> gcta::reverse_gsmr(stringstream &ss, map<string,int> &snp_instru_map, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, stringstream &ss_pleio) {
+vector<vector<double>> MRAnalysis::reverse_gsmr(stringstream &ss, map<string,int> &snp_instru_map, double gwas_thresh, double clump_wind_size, double clump_r2_thresh, double std_heidi_thresh, double global_heidi_thresh, double ld_fdr_thresh, int nsnp_gsmr, stringstream &ss_pleio) {
      int i=0, j=0, k=0, t=0, m=_expo_num*_outcome_num, nsnp = _meta_remain_snp.size();
      vector<bool> snp_pair_flag(nsnp);
      vector<vector<double>> bxy_est;
@@ -618,4 +554,45 @@ vector<vector<double>> gcta::reverse_gsmr(stringstream &ss, map<string,int> &snp
     }
 
     return bxy_est;
+}
+
+static MROptions gsmr_options;
+
+int GSMR::registerOption(map<string, vector<string>> &options_in) {
+    auto iter = options_in.find("--gsmr-file");
+    if (iter == options_in.end()) return 0;
+    vector<string> files = iter->second;
+    options_in.erase(iter);
+    if (files.size() != 2) LOGGER.e(0, "--gsmr-file, please specify the GWAS summary data for the exposure(s) and the outcome(s).");
+    gsmr_options = consume_common_mr_options(options_in);
+    gsmr_options.exposure_list = files[0];
+    gsmr_options.outcome_list = files[1];
+    return 1;
+}
+
+void GSMR::processMain() {
+    GSMR analysis(gsmr_options.out);
+    analysis.read_gsmrfile(
+        gsmr_options.exposure_list,
+        gsmr_options.outcome_list,
+        gsmr_options.gwas_thresh,
+        gsmr_options.nsnp_gsmr,
+        gsmr_options.gsmr_so_alg
+    );
+    analysis.gsmr(
+        gsmr_options.gsmr_direction,
+        gsmr_options.ref_ld_dir,
+        gsmr_options.w_ld_dir,
+        gsmr_options.freq_thresh,
+        gsmr_options.gwas_thresh,
+        gsmr_options.clump_wind_size,
+        gsmr_options.clump_r2_thresh,
+        gsmr_options.std_heidi_thresh,
+        gsmr_options.global_heidi_thresh,
+        gsmr_options.ld_fdr_thresh,
+        gsmr_options.nsnp_gsmr,
+        gsmr_options.effect_plot,
+        gsmr_options.gsmr_so_alg,
+        gsmr_options.gsmr_beta_version
+    );
 }

@@ -143,6 +143,7 @@ def run_output(gcta, work_dir, threads, compressed_flip=False):
         threads=threads,
     )
     result = output.with_suffix(".gsmr")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     assert len(rows) == 3
     assert [row[:2] for row in rows[1:]] == [["EXP", "OUT"], ["OUT", "EXP"]]
@@ -222,6 +223,7 @@ def run_multi_trait(gcta, work_dir, threads):
         threads=threads,
     )
     result = output.with_suffix(".gsmr")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     assert len(rows) == 5
     expected = {
@@ -262,6 +264,7 @@ def run_correlated(gcta, work_dir, threads):
         threads=threads,
     )
     result = output.with_suffix(".gsmr")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     expected_b, expected_se, expected_p = expected_result(indices=range(MARKER_COUNT - 1))
     assert math.isclose(float(rows[1][2]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
@@ -299,6 +302,7 @@ def run_heidi(gcta, work_dir, threads):
         threads=threads,
     )
     result = output.with_suffix(".gsmr")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     retained = [index for index in range(MARKER_COUNT) if index != outlier]
     expected_b, expected_se, expected_p = expected_result(indices=retained)
@@ -383,6 +387,7 @@ def run_overlap(gcta, work_dir, algorithm, threads):
         threads=threads,
     )
     result = output.with_suffix(".gsmr")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     assert len(rows) == 2
     expected_b, expected_se, expected_p = expected_overlap_result()

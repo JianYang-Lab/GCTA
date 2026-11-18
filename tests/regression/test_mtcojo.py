@@ -145,6 +145,7 @@ def run_output(gcta, work_dir, threads, compressed_flip=False):
     )
     check_zero_cross_intercept(output)
     result = Path(f"{output}.mtcojo.cma")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     assert rows[0] == ["SNP", "A1", "A2", "freq", "b", "se", "p", "N", "bC", "bC_se", "bC_pval"]
     assert len(rows) == MARKER_COUNT + 1
@@ -227,6 +228,7 @@ def run_internal_bxy(gcta, work_dir, threads):
     )
     check_zero_cross_intercept(output)
     result = Path(f"{output}.mtcojo.cma")
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
     rows = read_table(result)
     assert len(rows) == INTERNAL_COUNT + 1
     expected_bxy = expected_internal_bxy()
