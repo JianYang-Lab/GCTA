@@ -76,16 +76,52 @@ def make_fixture(work_dir):
     return prefix, exposure_list, outcome_list
 
 
-def expected_result(reverse=False):
+def expected_pair(exposure, outcome, ratio):
+    variances = [
+        (outcome[index]["se"] / exposure[index]["b"]) ** 2
+        + ratio**2 * (exposure[index]["se"] / exposure[index]["b"]) ** 2
+        + 1e-6
+        for index in range(len(exposure))
+    ]
+    precision = sum(1.0 / variance for variance in variances)
+    se = math.sqrt(1.0 / precision)
+    p = math.erfc(abs(ratio / se) / math.sqrt(2.0))
+    return ratio, se, p
+
+
+def expected_result(reverse=False, indices=None):
     ratio = 2.0 / 3.0 if reverse else 1.5
     statistics = summary_statistics(reverse)
+    if indices is not None:
+        statistics = [statistics[index] for index in indices]
     se = math.sqrt(1.0 / sum(1.0 / stat["variance"] for stat in statistics))
     p = math.erfc(abs(ratio / se) / math.sqrt(2.0))
     return ratio, se, p
 
 
-def run_output(gcta, work_dir, threads):
+def compress_summary(source, destination, flip_index=None):
+    lines = Path(source).read_text(encoding="utf-8").splitlines()
+    if flip_index is not None:
+        fields = lines[flip_index + 1].split()
+        fields[1], fields[2] = fields[2], fields[1]
+        fields[3] = str(1.0 - float(fields[3]))
+        fields[4] = str(-float(fields[4]))
+        lines[flip_index + 1] = " ".join(fields)
+    with gzip.open(destination, "wt", encoding="utf-8") as stream:
+        stream.write("\n".join(lines) + "\n")
+
+
+def run_output(gcta, work_dir, threads, compressed_flip=False):
     prefix, exposures, outcomes = make_fixture(work_dir)
+    if compressed_flip:
+        exposure = Path(exposures.read_text(encoding="utf-8").split()[1])
+        outcome = Path(outcomes.read_text(encoding="utf-8").split()[1])
+        exposure_gz = exposure.with_suffix(".ma.gz")
+        outcome_gz = outcome.with_suffix(".ma.gz")
+        compress_summary(exposure, exposure_gz)
+        compress_summary(outcome, outcome_gz, flip_index=3)
+        exposures.write_text(f"EXP {exposure_gz}\n", encoding="utf-8")
+        outcomes.write_text(f"OUT {outcome_gz}\n", encoding="utf-8")
     output = run_gcta(
         gcta,
         work_dir,
@@ -137,6 +173,141 @@ def run_output(gcta, work_dir, threads):
             outcome_stats[index]["se"],
         ]
         assert all(math.isclose(value, reference, abs_tol=1e-12) for value, reference in zip(observed, expected))
+    return result
+
+
+def write_custom_summary(path, statistics):
+    Path(path).write_text(
+        "SNP A1 A2 freq b se p N\n"
+        + "".join(
+            f"rs{index} A G 0.5 {stat['b']} {stat['se']} {stat['p']} 1000\n"
+            for index, stat in enumerate(statistics)
+        ),
+        encoding="utf-8",
+    )
+
+
+def scaled_statistics(beta_scale, se_scale):
+    base = summary_statistics(reverse=True)
+    statistics = []
+    for stat in base:
+        b = stat["b"] * beta_scale
+        se = stat["se"] * se_scale
+        statistics.append({"b": b, "se": se, "p": math.erfc(abs(b / se) / math.sqrt(2.0))})
+    return statistics
+
+
+def run_multi_trait(gcta, work_dir, threads):
+    work_dir = Path(work_dir)
+    prefix = work_dir / "input" / "reference"
+    write_plink(prefix, hadamard_markers())
+    exposure1 = scaled_statistics(1.0, 1.0)
+    exposure2 = scaled_statistics(2.0, 1.0)
+    outcome1 = scaled_statistics(1.5, 1.5)
+    outcome2 = scaled_statistics(-1.0, 1.25)
+    paths = {}
+    for name, statistics in (("E1", exposure1), ("E2", exposure2), ("O1", outcome1), ("O2", outcome2)):
+        path = work_dir / f"{name}.ma"
+        write_custom_summary(path, statistics)
+        paths[name] = path
+    exposures = work_dir / "exposures.txt"
+    outcomes = work_dir / "outcomes.txt"
+    exposures.write_text(f"E1 {paths['E1']}\nE2 {paths['E2']}\n", encoding="utf-8")
+    outcomes.write_text(f"O1 {paths['O1']}\nO2 {paths['O2']}\n", encoding="utf-8")
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "multi",
+        ["--bfile", prefix, "--gsmr-file", exposures, outcomes, "--gsmr-snp-min", 5, "--heidi-thresh", 0],
+        threads=threads,
+    )
+    result = output.with_suffix(".gsmr")
+    rows = read_table(result)
+    assert len(rows) == 5
+    expected = {
+        ("E1", "O1"): (exposure1, outcome1, 1.5),
+        ("E1", "O2"): (exposure1, outcome2, -1.0),
+        ("E2", "O1"): (exposure2, outcome1, 0.75),
+        ("E2", "O2"): (exposure2, outcome2, -0.5),
+    }
+    for row in rows[1:]:
+        exposure, outcome, ratio = expected[tuple(row[:2])]
+        expected_b, expected_se, expected_p = expected_pair(exposure, outcome, ratio)
+        assert math.isclose(float(row[2]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
+        assert math.isclose(float(row[3]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
+        assert math.isclose(float(row[4]), expected_p, rel_tol=2e-5, abs_tol=1e-100)
+        assert row[5] == str(MARKER_COUNT)
+    return result
+
+
+def run_correlated(gcta, work_dir, threads):
+    work_dir = Path(work_dir)
+    markers = hadamard_markers()
+    markers[-1] = list(markers[-2])
+    prefix = work_dir / "input" / "reference"
+    write_plink(prefix, markers)
+    exposure = work_dir / "exposure.ma"
+    outcome = work_dir / "outcome.ma"
+    write_summary(exposure, reverse=True)
+    write_summary(outcome)
+    exposures = work_dir / "exposures.txt"
+    outcomes = work_dir / "outcomes.txt"
+    exposures.write_text(f"EXP {exposure}\n", encoding="utf-8")
+    outcomes.write_text(f"OUT {outcome}\n", encoding="utf-8")
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "correlated",
+        ["--bfile", prefix, "--gsmr-file", exposures, outcomes, "--gsmr-snp-min", 5, "--heidi-thresh", 0],
+        threads=threads,
+    )
+    result = output.with_suffix(".gsmr")
+    rows = read_table(result)
+    expected_b, expected_se, expected_p = expected_result(indices=range(MARKER_COUNT - 1))
+    assert math.isclose(float(rows[1][2]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][3]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][4]), expected_p, rel_tol=2e-5, abs_tol=1e-100)
+    assert rows[1][5] == str(MARKER_COUNT - 1)
+    return result
+
+
+def run_heidi(gcta, work_dir, threads):
+    work_dir = Path(work_dir)
+    prefix = work_dir / "input" / "reference"
+    write_plink(prefix, hadamard_markers())
+    exposure_stats = summary_statistics(reverse=True)
+    outcome_stats = summary_statistics()
+    outlier = 5
+    outcome_stats[outlier]["b"] = 10.0 * exposure_stats[outlier]["b"]
+    outcome_stats[outlier]["se"] = 0.0001
+    outcome_stats[outlier]["p"] = math.erfc(
+        abs(outcome_stats[outlier]["b"] / outcome_stats[outlier]["se"]) / math.sqrt(2.0)
+    )
+    exposure = work_dir / "exposure.ma"
+    outcome = work_dir / "outcome.ma"
+    write_custom_summary(exposure, exposure_stats)
+    write_custom_summary(outcome, outcome_stats)
+    exposures = work_dir / "exposures.txt"
+    outcomes = work_dir / "outcomes.txt"
+    exposures.write_text(f"EXP {exposure}\n", encoding="utf-8")
+    outcomes.write_text(f"OUT {outcome}\n", encoding="utf-8")
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "heidi",
+        ["--bfile", prefix, "--gsmr-file", exposures, outcomes, "--gsmr-snp-min", 10],
+        threads=threads,
+    )
+    result = output.with_suffix(".gsmr")
+    rows = read_table(result)
+    retained = [index for index in range(MARKER_COUNT) if index != outlier]
+    expected_b, expected_se, expected_p = expected_result(indices=retained)
+    assert math.isclose(float(rows[1][2]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][3]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][4]), expected_p, rel_tol=2e-5, abs_tol=1e-100)
+    assert rows[1][5] == str(MARKER_COUNT - 1)
+    pleio = Path(f"{output}.pleio_snps").read_text(encoding="utf-8")
+    assert pleio == f"EXP OUT rs{outlier}\n"
     return result
 
 
@@ -279,19 +450,33 @@ def main():
     parser.add_argument(
         "--scenario",
         default="output",
-        choices=("output", "overlap_ldsc", "overlap_correlation", "invalid_overlap"),
+        choices=(
+            "output",
+            "compressed_flip",
+            "multi_trait",
+            "correlated",
+            "heidi",
+            "overlap_ldsc",
+            "overlap_correlation",
+            "invalid_overlap",
+        ),
     )
     args = parser.parse_args()
     if args.scenario == "invalid_overlap":
         expect_invalid_overlap(args.gcta, args.work)
+    elif args.scenario in ("multi_trait", "correlated", "heidi"):
+        runner = {"multi_trait": run_multi_trait, "correlated": run_correlated, "heidi": run_heidi}[args.scenario]
+        single = runner(args.gcta, Path(args.work) / "single", 1)
+        multi = runner(args.gcta, Path(args.work) / "multi", 4)
+        assert_tables_close(single, multi)
     elif args.scenario.startswith("overlap_"):
         algorithm = 0 if args.scenario == "overlap_ldsc" else 1
         single = run_overlap(args.gcta, Path(args.work) / "single", algorithm, 1)
         multi = run_overlap(args.gcta, Path(args.work) / "multi", algorithm, 4)
         assert_tables_close(single, multi)
     else:
-        single = run_output(args.gcta, Path(args.work) / "single", 1)
-        multi = run_output(args.gcta, Path(args.work) / "multi", 4)
+        single = run_output(args.gcta, Path(args.work) / "single", 1, args.scenario == "compressed_flip")
+        multi = run_output(args.gcta, Path(args.work) / "multi", 4, args.scenario == "compressed_flip")
         assert_tables_close(single, multi)
     print(f"Passed GSMR regression scenario: {args.scenario}")
 

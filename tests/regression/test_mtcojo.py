@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import gzip
 import math
 import os
 from pathlib import Path
@@ -15,17 +16,17 @@ LD_SCORES = (1, 2, 4, 7, 11, 16)
 BXY = 0.4
 
 
-def orthogonal_markers():
+def orthogonal_markers(sample_count=SAMPLE_COUNT, marker_count=MARKER_COUNT):
     matrix = [[1]]
-    while len(matrix) < SAMPLE_COUNT:
+    while len(matrix) < sample_count:
         size = len(matrix)
         matrix = (
             [matrix[row] + matrix[row] for row in range(size)]
             + [matrix[row] + [-value for value in matrix[row]] for row in range(size)]
         )
     return [
-        [0 if matrix[sample][marker] < 0 else 2 for sample in range(SAMPLE_COUNT)]
-        for marker in range(1, MARKER_COUNT + 1)
+        [0 if matrix[sample][marker] < 0 else 2 for sample in range(sample_count)]
+        for marker in range(1, marker_count + 1)
     ]
 
 
@@ -54,7 +55,7 @@ def write_summary(path, trait):
     )
 
 
-def write_ld_scores(work_dir):
+def write_ld_scores(work_dir, scores=LD_SCORES, marker_count=MARKER_COUNT):
     reference = Path(work_dir) / "reference_ld"
     weights = Path(work_dir) / "regression_weights"
     for directory in (reference, weights):
@@ -64,8 +65,8 @@ def write_ld_scores(work_dir):
             weighted = directory == weights
             lines = ["CHR SNP BP CM MAF L2" if weighted else "CHR SNP BP L2"]
             if chromosome == 1:
-                for index in range(MARKER_COUNT):
-                    ld_score = LD_SCORES[index // 2]
+                for index in range(marker_count):
+                    ld_score = scores[index // 2]
                     if weighted:
                         lines.append(f"1 rs{index} {1000 + index} 0 0.5 {1.0 + 0.1 * ld_score}")
                     else:
@@ -113,8 +114,28 @@ def check_zero_cross_intercept(output):
     assert values[0][1] == 0.0 and values[1][0] == 0.0
 
 
-def run_output(gcta, work_dir, threads):
+def compress_summary(source, destination, flip_index=None):
+    lines = Path(source).read_text(encoding="utf-8").splitlines()
+    if flip_index is not None:
+        fields = lines[flip_index + 1].split()
+        fields[1], fields[2] = fields[2], fields[1]
+        fields[3] = str(1.0 - float(fields[3]))
+        fields[4] = str(-float(fields[4]))
+        lines[flip_index + 1] = " ".join(fields)
+    with gzip.open(destination, "wt", encoding="utf-8") as stream:
+        stream.write("\n".join(lines) + "\n")
+
+
+def run_output(gcta, work_dir, threads, compressed_flip=False):
     prefix, trait_list, bxy, reference, weights = make_fixture(work_dir)
+    if compressed_flip:
+        target = Path(trait_list.read_text(encoding="utf-8").splitlines()[0].split()[1])
+        covariate = Path(trait_list.read_text(encoding="utf-8").splitlines()[1].split()[1])
+        target_gz = target.with_suffix(".ma.gz")
+        covariate_gz = covariate.with_suffix(".ma.gz")
+        compress_summary(target, target_gz)
+        compress_summary(covariate, covariate_gz, flip_index=4)
+        trait_list.write_text(f"Y {target_gz}\nX {covariate_gz}\n", encoding="utf-8")
     output = run_gcta(
         gcta,
         work_dir,
@@ -136,6 +157,84 @@ def run_output(gcta, work_dir, threads):
         assert math.isclose(float(row[5]), target[index]["se"], rel_tol=2e-5, abs_tol=1e-6)
         expected_b = target[index]["b"] - BXY * covariate[index]["b"]
         expected_se = math.sqrt(target[index]["se"] ** 2 + BXY**2 * covariate[index]["se"] ** 2)
+        expected_p = math.erfc(abs(expected_b / expected_se) / math.sqrt(2.0))
+        assert math.isclose(float(row[8]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
+        assert math.isclose(float(row[9]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
+        assert math.isclose(float(row[10]), expected_p, rel_tol=2e-5, abs_tol=1e-100)
+    return result
+
+
+INTERNAL_COUNT = 40
+INTERNAL_LD_SCORES = tuple(1 + (index * 7 % 20) for index in range(INTERNAL_COUNT // 2))
+
+
+def internal_statistics(trait):
+    statistics = []
+    for index in range(INTERNAL_COUNT):
+        ld_score = INTERNAL_LD_SCORES[index // 2]
+        z_magnitude = 5.5 if index < 10 else math.sqrt(1.0 + (0.08 if trait == "Y" else 0.1) * ld_score)
+        z_value = z_magnitude if trait == "Y" or index % 2 == 0 else -z_magnitude
+        se = 0.04 + 0.001 * (index % 12) if trait == "Y" else 0.05 + 0.002 * (index % 12)
+        b = z_value * se
+        statistics.append({"b": b, "se": se, "p": math.erfc(abs(z_value) / math.sqrt(2.0)), "z": z_value})
+    return statistics
+
+
+def write_internal_summary(path, trait):
+    Path(path).write_text(
+        "SNP A1 A2 freq b se p N\n"
+        + "".join(
+            f"rs{index} A G 0.5 {stat['b']} {stat['se']} {stat['p']} 1000\n"
+            for index, stat in enumerate(internal_statistics(trait))
+        ),
+        encoding="utf-8",
+    )
+
+
+def expected_internal_bxy():
+    exposure = internal_statistics("X")[:10]
+    outcome = internal_statistics("Y")[:10]
+    ratios = [outcome[index]["b"] / exposure[index]["b"] for index in range(10)]
+    ordered = sorted(ratios)
+    median = (ordered[4] + ordered[5]) / 2.0
+    variances = [
+        (outcome[index]["se"] / exposure[index]["b"]) ** 2
+        + median**2 * (exposure[index]["se"] / exposure[index]["b"]) ** 2
+        + 1e-6
+        for index in range(10)
+    ]
+    precision = sum(1.0 / variance for variance in variances)
+    return sum(ratio / variance for ratio, variance in zip(ratios, variances)) / precision
+
+
+def run_internal_bxy(gcta, work_dir, threads):
+    work_dir = Path(work_dir)
+    prefix = work_dir / "input" / "reference"
+    write_plink(prefix, orthogonal_markers(64, INTERNAL_COUNT))
+    target = work_dir / "target.ma"
+    covariate = work_dir / "covariate.ma"
+    write_internal_summary(target, "Y")
+    write_internal_summary(covariate, "X")
+    trait_list = work_dir / "traits.txt"
+    trait_list.write_text(f"Y {target}\nX {covariate}\n", encoding="utf-8")
+    reference, weights = write_ld_scores(work_dir, INTERNAL_LD_SCORES, INTERNAL_COUNT)
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "internal",
+        ["--bfile", prefix, "--mtcojo-file", trait_list, "--ref-ld-chr", reference, "--w-ld-chr", weights, "--heidi-thresh", 0],
+        threads=threads,
+    )
+    check_zero_cross_intercept(output)
+    result = Path(f"{output}.mtcojo.cma")
+    rows = read_table(result)
+    assert len(rows) == INTERNAL_COUNT + 1
+    expected_bxy = expected_internal_bxy()
+    target_stats = internal_statistics("Y")
+    covariate_stats = internal_statistics("X")
+    for index, row in enumerate(rows[1:]):
+        expected_b = target_stats[index]["b"] - expected_bxy * covariate_stats[index]["b"]
+        expected_se = math.sqrt(target_stats[index]["se"] ** 2 + expected_bxy**2 * covariate_stats[index]["se"] ** 2)
         expected_p = math.erfc(abs(expected_b / expected_se) / math.sqrt(2.0))
         assert math.isclose(float(row[8]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
         assert math.isclose(float(row[9]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
@@ -186,13 +285,17 @@ def main():
     parser.add_argument("--gcta", required=True)
     parser.add_argument("--data")
     parser.add_argument("--work", required=True)
-    parser.add_argument("--scenario", required=True, choices=("output", "missing_ld"))
+    parser.add_argument("--scenario", required=True, choices=("output", "compressed_flip", "internal_bxy", "missing_ld"))
     args = parser.parse_args()
     if args.scenario == "missing_ld":
         expect_missing_ld(args.gcta, args.work)
+    elif args.scenario == "internal_bxy":
+        single = run_internal_bxy(args.gcta, Path(args.work) / "single", 1)
+        multi = run_internal_bxy(args.gcta, Path(args.work) / "multi", 4)
+        assert_tables_close(single, multi)
     else:
-        single = run_output(args.gcta, Path(args.work) / "single", 1)
-        multi = run_output(args.gcta, Path(args.work) / "multi", 4)
+        single = run_output(args.gcta, Path(args.work) / "single", 1, args.scenario == "compressed_flip")
+        multi = run_output(args.gcta, Path(args.work) / "multi", 4, args.scenario == "compressed_flip")
         assert_tables_close(single, multi)
     print(f"Passed mtCOJO regression scenario: {args.scenario}")
 
