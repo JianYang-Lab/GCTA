@@ -4157,22 +4157,13 @@ void Geno::processMain() {
             geno.processRecodet();
         }
 
-/*
         if(process_function == "freqx"){
             Geno::setSexMode();
-
             Pheno pheno;
             Marker marker;
             Geno geno(&pheno, &marker);
-            if(!geno.filterMAF()){
-                LOGGER.i(0, "Computing allele frequencies...");
-                callBacks.push_back(bind(&Geno::freq64, &geno, _1, _2));
-                geno.loop_64block(marker.get_extract_index(), callBacks);
-            }
-            geno.out_freq(options["out"]);
-            callBacks.clear();
+            geno.processFreq();
         }
-        */
 
         if(process_function == "make_bed"){
             Pheno pheno;
