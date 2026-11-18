@@ -164,11 +164,6 @@ int ERM::registerOption(map<string, vector<string>> &options_in) {
     int result = 0;
     options["out"] = options_in["out"][0];
     const string expression_flag = "--efile";
-    if (options_in.find(expression_flag) != options_in.end()) {
-        options["efile"] = options_in[expression_flag][0];
-        options_in.erase(expression_flag);
-    }
-
     const string erm_flag = "--make-erm";
     if (options_in.find(erm_flag) != options_in.end()) {
         options["algorithm"] = "1";
@@ -188,6 +183,10 @@ int ERM::registerOption(map<string, vector<string>> &options_in) {
         if (options_in[algorithm_flag].size() == 1) options["algorithm"] = options_in[algorithm_flag][0];
         result++;
         options_in.erase(algorithm_flag);
+    }
+    if (result > 0 && options_in.find(expression_flag) != options_in.end()) {
+        options["efile"] = options_in[expression_flag][0];
+        options_in.erase(expression_flag);
     }
     return result;
 }

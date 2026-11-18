@@ -218,7 +218,11 @@ def run_ecojo_select(gcta, work_dir, threads, collinear=None):
     if collinear is not None:
         arguments.extend(("--ecojo-collinear", collinear))
     output = run_gcta(gcta, work_dir, "select", arguments, threads=threads)
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
+    legacy = run_gcta(gcta, work_dir, "select_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
+    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     result = Path(f"{output}.slct.ecojo")
+    assert_tables_close(result, Path(f"{legacy}.slct.ecojo"))
     rows = read_table(result)
     assert len(rows) == (2 if collinear is not None else 3)
     b, se = ecojo_marginals()
@@ -246,13 +250,12 @@ def run_ecojo_blup(gcta, work_dir, threads):
         ("blup_file", "--efile", expression),
         ("blup_cor", "--e-cor", correlation),
     ):
-        output = run_gcta(
-            gcta,
-            work_dir,
-            name,
-            [option, data, "--ecojo", summary, "--ecojo-blup", ECOJO_LAMBDA],
-            threads=threads,
-        )
+        arguments = [option, data, "--ecojo", summary, "--ecojo-blup", ECOJO_LAMBDA]
+        output = run_gcta(gcta, work_dir, name, arguments, threads=threads)
+        assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
+        legacy = run_gcta(gcta, work_dir, f"{name}_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
+        assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
+        assert_tables_close(Path(f"{output}.blup.ecojo"), Path(f"{legacy}.blup.ecojo"))
         outputs.append(Path(f"{output}.blup.ecojo"))
     b, se = ecojo_marginals()
     r_value = ecojo_correlation()
@@ -267,14 +270,13 @@ def run_ecojo_blup(gcta, work_dir, threads):
 def run_ecojo_no_signal(gcta, work_dir, threads):
     expression, summary, _ = write_ecojo_fixture(work_dir)
     summary.write_text("Probe z N\nP0 0 100\nP1 0 100\n", encoding="utf-8")
-    output = run_gcta(
-        gcta,
-        work_dir,
-        "no_signal",
-        ["--efile", expression, "--ecojo", summary, "--ecojo-slct"],
-        threads=threads,
-    )
+    arguments = ["--efile", expression, "--ecojo", summary, "--ecojo-slct"]
+    output = run_gcta(gcta, work_dir, "no_signal", arguments, threads=threads)
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
+    legacy = run_gcta(gcta, work_dir, "no_signal_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
+    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     assert not Path(f"{output}.slct.ecojo").exists()
+    assert not Path(f"{legacy}.slct.ecojo").exists()
     console = Path(f"{output}.console").read_text(encoding="utf-8")
     assert "No probe has been selected." in console
 

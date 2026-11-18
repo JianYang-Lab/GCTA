@@ -163,7 +163,9 @@ target_link_libraries(fastfam covar geno marker pheno logger optionio statlib ut
 target_link_libraries(ld geno logger statlib utils)
 target_link_libraries(expressiondata logger)
 target_link_libraries(relationshipio logger zlib)
+target_link_libraries(matrixoperations logger)
 target_link_libraries(erm expressiondata relationshipio)
+target_link_libraries(ecojo expressiondata matrixoperations statlib)
 
 add_executable(gcta64 ${MAIN_SOURCE})
 

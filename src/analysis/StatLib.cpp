@@ -46,6 +46,14 @@ namespace StatLib{
         }
     }
 
+    double pchisq(double x, int df){
+        if(x >= 0 && std::isfinite(x)){
+            chi_squared distribution(df);
+            return cdf(complement(distribution, x));
+        }
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
     double qchisqd1(double x){
         if(x > 0 && x <= 1){
             return quantile(complement(dist1, x));

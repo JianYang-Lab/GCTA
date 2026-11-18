@@ -26,6 +26,7 @@
 #include "analysis/FastFAM.h"
 #include "analysis/LD.h"
 #include "analysis/expression/ERM.h"
+#include "analysis/expression/ECOJO.h"
 #include "infrastructure/NumericBackend.h"
 #include <functional>
 #include <map>
@@ -97,6 +98,7 @@ int main(int argc, char *argv[]){
         "--acat", "--gene-list", "--snp-list", "--min-mac", "--max-maf", "--wind",
         "--envir", "--optimal-rho", "--noSandwich", "--grid-size",
         "--efile", "--make-erm", "--make-erm-gz", "--make-erm-alg",
+        "--e-cor", "--ecojo", "--ecojo-slct", "--ecojo-p", "--ecojo-collinear", "--ecojo-blup",
     };
     map<string, vector<string>> options;
     vector<string> keys;
@@ -244,7 +246,7 @@ int main(int argc, char *argv[]){
 
     //start register the options
     // Please take care of the order, C++ has few reflation feature, I did in a ugly way.
-    vector<string> module_names = {"phenotype", "marker", "genotype", "covar", "GRM", "fastFAM", "LD", "ERM"};
+    vector<string> module_names = {"phenotype", "marker", "genotype", "covar", "GRM", "fastFAM", "LD", "ERM", "ECOJO"};
     vector<int (*)(map<string, vector<string>>&)> registers = {
             Pheno::registerOption,
             Marker::registerOption,
@@ -253,7 +255,8 @@ int main(int argc, char *argv[]){
             GRM::registerOption,
             FastFAM::registerOption,
             LD::registerOption,
-            ERM::registerOption
+            ERM::registerOption,
+            ECOJO::registerOption
     };
     vector<void (*)()> processMains = {
             Pheno::processMain,
@@ -263,7 +266,8 @@ int main(int argc, char *argv[]){
             GRM::processMain,
             FastFAM::processMain,
             LD::processMain,
-            ERM::processMain
+            ERM::processMain,
+            ECOJO::processMain
     };
 
     vector<int> mains;
