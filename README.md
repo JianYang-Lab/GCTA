@@ -96,20 +96,24 @@ GCTA provides an MCP (Model Context Protocol) server that exposes all GCTA funct
 ### Quick Start
 
 ```bash
-pip3 install mcp                    # install dependency
-python3 gcta-mcp/server.py          # start MCP server
+python3 -m pip install -r .opencode/gcta-mcp/requirements.txt
+python3 .opencode/gcta-mcp/server.py
 ```
+
+In a source checkout, the server defaults to `build/Release/gcta64` and the
+source root. Release-package layouts and custom paths are described in the
+MCP README; `GCTA_BINARY_PATH` and `GCTA_WORK_DIR` override the defaults.
 
 ### Configuration
 
-Add the following to your AI tool's MCP configuration, replacing `<GCTA_DIR>` with the full path to the `gcta-1.95.3-linux-x86_64` folder:
+Add the following to your AI tool's MCP configuration, replacing `<GCTA_DIR>` with the full path to the GCTA source checkout:
 
 ```json
 {
   "mcpServers": {
     "gcta": {
       "command": "python3",
-      "args": ["<GCTA_DIR>/gcta-mcp/server.py"]
+      "args": ["<GCTA_DIR>/.opencode/gcta-mcp/server.py"]
     }
   }
 }
@@ -143,5 +147,5 @@ Add the following to your AI tool's MCP configuration, replacing `<GCTA_DIR>` wi
 | `gcta_list_files` | List files in working directory |
 | `gcta_read_file` | Read file content |
 
-See `gcta-mcp/README.md` for detailed documentation.
+See `.opencode/gcta-mcp/README.md` for detailed documentation.
 

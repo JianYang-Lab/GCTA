@@ -9,10 +9,11 @@ Usage:
     python server.py
 
 Configuration via environment variables:
-    GCTA_BINARY_PATH  Path to the GCTA binary
-                      (default: ../gcta relative to this script)
+    GCTA_BINARY_PATH  Path to the GCTA binary. Defaults to
+                      build/Release/gcta64 in the source tree, or ../gcta
+                      relative to this script in a release package.
     GCTA_WORK_DIR     Working directory for GCTA data files
-                      (default: parent directory of this script)
+                      (default: source or release package root)
     GCTA_TIMEOUT      Execution timeout in seconds (default: 3600)
 """
 
@@ -31,15 +32,16 @@ from mcp.server.fastmcp import FastMCP
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _PKG_ROOT = os.path.dirname(_SCRIPT_DIR)
+_IS_SOURCE_TREE = os.path.basename(_PKG_ROOT) == ".opencode"
+_SOURCE_ROOT = os.path.dirname(_PKG_ROOT) if _IS_SOURCE_TREE else _PKG_ROOT
+_DEFAULT_BINARY = (
+    os.path.join(_SOURCE_ROOT, "build", "Release", "gcta64")
+    if _IS_SOURCE_TREE
+    else os.path.join(_PKG_ROOT, "gcta")
+)
 
-GCTA_BINARY_PATH = os.environ.get(
-    "GCTA_BINARY_PATH",
-    os.path.join(_PKG_ROOT, "gcta"),
-)
-GCTA_WORK_DIR = os.environ.get(
-    "GCTA_WORK_DIR",
-    _PKG_ROOT,
-)
+GCTA_BINARY_PATH = os.environ.get("GCTA_BINARY_PATH", _DEFAULT_BINARY)
+GCTA_WORK_DIR = os.environ.get("GCTA_WORK_DIR", _SOURCE_ROOT)
 GCTA_TIMEOUT = int(os.environ.get("GCTA_TIMEOUT", "3600"))
 
 
@@ -2147,9 +2149,13 @@ OUTPUT:
 # Main entry point
 # ============================================================================
 
-if __name__ == "__main__":
-    print(f"GCTA MCP Server starting...", file=sys.stderr)
+def main():
+    print("GCTA MCP Server starting...", file=sys.stderr)
     print(f"  Binary path:    {GCTA_BINARY_PATH}", file=sys.stderr)
     print(f"  Work directory: {GCTA_WORK_DIR}", file=sys.stderr)
     print(f"  Timeout:        {GCTA_TIMEOUT}s", file=sys.stderr)
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()

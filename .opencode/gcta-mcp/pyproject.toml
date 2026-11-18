@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "MCP server for GCTA (Genome-wide Complex Trait Analysis)"
 requires-python = ">=3.10"
 dependencies = [
-    "mcp>=1.0.0",
+    "mcp>=1.0.0,<2.0.0",
 ]
 
 [project.scripts]
@@ -12,4 +12,4 @@ gcta-mcp = "server:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
