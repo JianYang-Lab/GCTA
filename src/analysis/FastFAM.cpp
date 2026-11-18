@@ -129,12 +129,18 @@ private:
 
     double K2(double t1){
         if(bFast){
-            ArrayXd genot1exp = (-gNZ * t1).exp();
-            ArrayXd div21 = (mu1muNZG * genot1exp) / ((1.0 - muNZ) * genot1exp + muNZ).square();
+            static thread_local ArrayXd genot1exp, div21;
+            genot1exp.resize(gNZ.size());
+            div21.resize(gNZ.size());
+            genot1exp = (-gNZ * t1).exp();
+            div21 = (mu1muNZG * genot1exp) / ((1.0 - muNZ) * genot1exp + muNZ).square();
             return ((!div21.isNaN()).select(div21, 0)).sum() + NAsigma;
         }else{
-            ArrayXd genot1exp = (-geno * t1).exp();
-            ArrayXd div21 = (mu1muG * genot1exp) / ((1.0 - mu) * genot1exp + mu).square();
+            static thread_local ArrayXd genot1exp, div21;
+            genot1exp.resize(geno.size());
+            div21.resize(geno.size());
+            genot1exp = (-geno * t1).exp();
+            div21 = (mu1muG * genot1exp) / ((1.0 - mu) * genot1exp + mu).square();
             return ((!div21.isNaN()).select(div21, 0)).sum();
         }
     }
@@ -147,13 +153,19 @@ private:
 
     inline void KorgK2(double t1, KS *ks){
         if(bFast){
-            ArrayXd genot1exp = (-gNZ * t1).exp();
-            ArrayXd div21 = (mu1muNZG * genot1exp) / ((1.0 - muNZ) * genot1exp + muNZ).square();
+            static thread_local ArrayXd genot1exp, div21;
+            genot1exp.resize(gNZ.size());
+            div21.resize(gNZ.size());
+            genot1exp = (-gNZ * t1).exp();
+            div21 = (mu1muNZG * genot1exp) / ((1.0 - muNZ) * genot1exp + muNZ).square();
             ks->k2 = ((!div21.isNaN()).select(div21, 0)).sum() + NAsigma;
             ks->k1 = (1.0 - muNZ + muNZ / genot1exp).log().sum() + NAmu * t1 + 0.5 * NAsigma * t1 * t1;
         }else{
-            ArrayXd genot1exp = (-geno * t1).exp();
-            ArrayXd div21 = (mu1muG * genot1exp) / ((1.0 - mu) * genot1exp + mu).square();
+            static thread_local ArrayXd genot1exp, div21;
+            genot1exp.resize(geno.size());
+            div21.resize(geno.size());
+            genot1exp = (-geno * t1).exp();
+            div21 = (mu1muG * genot1exp) / ((1.0 - mu) * genot1exp + mu).square();
             ks->k2 = ((!div21.isNaN()).select(div21, 0)).sum();
             ks->k1 = (1.0 - mu + mu / genot1exp).log().sum();
         }
@@ -4787,6 +4799,7 @@ void FastFAM::calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIn
     vector<double> means(block_cap);
     static thread_local GenoBufItem item;
     static thread_local VectorXd conditioned;
+    static thread_local vector<uint32_t> index0;
 
     for(int start = 0; start < num_marker; start += batch_size){
         int cur_size = std::min(batch_size, num_marker - start);
@@ -4844,8 +4857,8 @@ void FastFAM::calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIn
                 rConverge[i] = 1;
                 double temp_beta = score / (varSNP * varSNP);
                 beta[i] = (float)temp_beta;
-                // qchisqd1(pchisqd1(chisq^2)) is chisq^2, so this is the
-                // same standard error without the inverse-CDF round trip.
+                // qchisqd1(pchisqd1(chisq^2)) is chisq^2, so the standard
+                // error is the same without the inverse-CDF round trip.
                 // Keep the original expression at the distribution tails,
                 // where the round trip saturates (P = 0 or 1).
                 if(p_value > 0 && p_value < 1 && chisq > 0){
@@ -4876,8 +4889,7 @@ void FastFAM::calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIn
             res.p = StatLib::pchisqd1(chisq * chisq);
             res.bConverge = true;
 
-            vector<uint32_t> index0;
-            index0.reserve(num_indi);
+            index0.clear();
             double thresh = -means[j] + 1e-6;
             for(uint32_t row = 0; row < num_indi; row++){
                 if(xvec2[row] > thresh){
