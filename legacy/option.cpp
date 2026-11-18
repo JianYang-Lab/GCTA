@@ -1093,7 +1093,7 @@ void option(int option_num, char* option_str[])
             LOGGER.e(0, "--gsmr-alg has been superseded by --gsmr-direction.");
         } else if (strcmp(argv[i], "--gsmr-so") == 0) {
             gsmr_so_flag = true;
-            //gsmr_so_alg = atoi(argv[++i]);
+            gsmr_so_alg = atoi(argv[++i]);
             if(gsmr_so_alg < 0 || gsmr_so_alg > 1) 
                 LOGGER.e(0, "--gsmr-so should be 0 (LD score regression) or 1 (correlation of SNP effects).");
             LOGGER << "--gsmr-so " << gsmr_so_alg << endl;

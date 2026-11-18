@@ -7,6 +7,8 @@ from pathlib import Path
 
 from gcta_runner import assert_tables_close, read_table, run_gcta
 from plink import write_plink
+from test_errors import expect_error
+from test_mtcojo import summary_statistics as overlap_summary_statistics, write_ld_scores
 
 SAMPLE_COUNT = 16
 MARKER_COUNT = 12
@@ -138,17 +140,159 @@ def run_output(gcta, work_dir, threads):
     return result
 
 
+def write_overlap_summary(path, trait):
+    Path(path).write_text(
+        "SNP A1 A2 freq b se p N\n"
+        + "".join(
+            f"rs{index} A G 0.5 {stat['b']} {stat['se']} {stat['p']} 1000\n"
+            for index, stat in enumerate(overlap_summary_statistics(trait))
+        ),
+        encoding="utf-8",
+    )
+
+
+def make_overlap_fixture(work_dir):
+    work_dir = Path(work_dir)
+    prefix = work_dir / "input" / "reference"
+    write_plink(prefix, hadamard_markers())
+    exposure = work_dir / "exposure.ma"
+    outcome = work_dir / "outcome.ma"
+    write_overlap_summary(exposure, "X")
+    write_overlap_summary(outcome, "Y")
+    exposures = work_dir / "exposures.txt"
+    outcomes = work_dir / "outcomes.txt"
+    exposures.write_text(f"EXP {exposure}\n", encoding="utf-8")
+    outcomes.write_text(f"OUT {outcome}\n", encoding="utf-8")
+    reference, weights = write_ld_scores(work_dir)
+    return prefix, exposures, outcomes, reference, weights
+
+
+def expected_overlap_result():
+    exposure = overlap_summary_statistics("X")[:2]
+    outcome = overlap_summary_statistics("Y")[:2]
+    ratios = [outcome[index]["b"] / exposure[index]["b"] for index in range(2)]
+    ordered = sorted(ratios)
+    median = (ordered[0] + ordered[1]) / 2.0
+    variances = [
+        (outcome[index]["se"] / exposure[index]["b"]) ** 2
+        + median**2 * (exposure[index]["se"] / exposure[index]["b"]) ** 2
+        + 1e-6
+        for index in range(2)
+    ]
+    precision = sum(1.0 / variance for variance in variances)
+    estimate = sum(ratio / variance for ratio, variance in zip(ratios, variances)) / precision
+    se = math.sqrt(1.0 / precision)
+    p = math.erfc(abs(estimate / se) / math.sqrt(2.0))
+    return estimate, se, p
+
+
+def run_overlap(gcta, work_dir, algorithm, threads):
+    prefix, exposures, outcomes, reference, weights = make_overlap_fixture(work_dir)
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "overlap",
+        [
+            "--bfile",
+            prefix,
+            "--gsmr-file",
+            exposures,
+            outcomes,
+            "--gsmr-so",
+            algorithm,
+            "--ref-ld-chr",
+            reference,
+            "--w-ld-chr",
+            weights,
+            "--gsmr-snp-min",
+            2,
+            "--heidi-thresh",
+            0,
+        ],
+        threads=threads,
+    )
+    result = output.with_suffix(".gsmr")
+    rows = read_table(result)
+    assert len(rows) == 2
+    expected_b, expected_se, expected_p = expected_overlap_result()
+    assert math.isclose(float(rows[1][2]), expected_b, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][3]), expected_se, rel_tol=2e-5, abs_tol=1e-6)
+    assert math.isclose(float(rows[1][4]), expected_p, rel_tol=2e-5, abs_tol=1e-100)
+    assert rows[1][5] == "2"
+    log = output.with_suffix(".log").read_text(encoding="utf-8")
+    if algorithm == 0:
+        assert "LD score regression analysis completed." in log
+    else:
+        exposure = overlap_summary_statistics("X")
+        outcome = overlap_summary_statistics("Y")
+        null_indices = [
+            index for index in range(MARKER_COUNT)
+            if exposure[index]["p"] >= 0.01 and outcome[index]["p"] >= 0.01
+        ]
+        assert len(null_indices) == MARKER_COUNT - 2
+        x_values = [exposure[index]["z"] for index in null_indices]
+        y_values = [outcome[index]["z"] for index in null_indices]
+        x_mean = sum(x_values) / len(x_values)
+        y_mean = sum(y_values) / len(y_values)
+        x_centered = [value - x_mean for value in x_values]
+        y_centered = [value - y_mean for value in y_values]
+        expected_correlation = sum(x * y for x, y in zip(x_centered, y_centered)) / math.sqrt(
+            sum(value * value for value in x_centered)
+            * sum(value * value for value in y_centered)
+        )
+        lines = log.splitlines()
+        correlation_line = lines[lines.index("Correlation:") + 1]
+        observed_correlation = float(correlation_line.split()[1])
+        assert math.isclose(observed_correlation, expected_correlation, rel_tol=2e-5, abs_tol=1e-6)
+    return result
+
+
+def expect_invalid_overlap(gcta, work_dir):
+    work_dir = Path(work_dir)
+    prefix, exposures, outcomes = make_fixture(work_dir)
+    output = work_dir / "invalid"
+    expect_error(
+        gcta,
+        work_dir,
+        "invalid",
+        [
+            "--bfile",
+            prefix,
+            "--gsmr-file",
+            exposures,
+            outcomes,
+            "--gsmr-so",
+            2,
+            "--out",
+            output,
+        ],
+    )
+    console = (work_dir / "invalid.console").read_text(encoding="utf-8")
+    assert "--gsmr-so should be 0 (LD score regression) or 1" in console
+
 
 def main():
     parser = argparse.ArgumentParser(description="GCTA GSMR regression tests")
     parser.add_argument("--gcta", required=True)
     parser.add_argument("--data")
     parser.add_argument("--work", required=True)
-    parser.add_argument("--scenario", default="output", choices=("output",))
+    parser.add_argument(
+        "--scenario",
+        default="output",
+        choices=("output", "overlap_ldsc", "overlap_correlation", "invalid_overlap"),
+    )
     args = parser.parse_args()
-    single = run_output(args.gcta, Path(args.work) / "single", 1)
-    multi = run_output(args.gcta, Path(args.work) / "multi", 4)
-    assert_tables_close(single, multi)
+    if args.scenario == "invalid_overlap":
+        expect_invalid_overlap(args.gcta, args.work)
+    elif args.scenario.startswith("overlap_"):
+        algorithm = 0 if args.scenario == "overlap_ldsc" else 1
+        single = run_overlap(args.gcta, Path(args.work) / "single", algorithm, 1)
+        multi = run_overlap(args.gcta, Path(args.work) / "multi", algorithm, 4)
+        assert_tables_close(single, multi)
+    else:
+        single = run_output(args.gcta, Path(args.work) / "single", 1)
+        multi = run_output(args.gcta, Path(args.work) / "multi", 4)
+        assert_tables_close(single, multi)
     print(f"Passed GSMR regression scenario: {args.scenario}")
 
 
