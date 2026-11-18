@@ -786,7 +786,7 @@ void gcta::read_imp_info_mach(string infofile)
         _allele1.push_back(c_buf);
         if (!(ss >> c_buf)) LOGGER.e(0, nerr);
         _allele2.push_back(c_buf);
-        for (i = 0; i < 3; i++) if (!(ss >> f_buf)) LOGGER.e(0, nerr);
+        for (i = 0; i < 4; i++) if (!(ss >> f_buf)) LOGGER.e(0, nerr);
         _impRsq.push_back(f_buf);
     }
     inf.close();

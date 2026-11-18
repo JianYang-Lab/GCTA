@@ -86,6 +86,20 @@ def main():
         ids = output.with_suffix(".grm.id").read_text(encoding="utf-8").splitlines()
         if args.scenario == "mach":
             assert ids == [f"F1:I{index}\tF1:I{index}" for index in range(8)]
+            info_lines = Path(info).read_text(encoding="utf-8").splitlines()
+            fields = info_lines[1].split()
+            fields[-1] = "0.5"
+            info_lines[1] = " ".join(fields)
+            filtered_info = Path(work) / "filtered.info"
+            filtered_info.write_text("\n".join(info_lines) + "\n", encoding="utf-8")
+            filtered = run_gcta(
+                args.gcta,
+                work,
+                "filtered",
+                ["--dosage-mach", dose, filtered_info, "--imput-rsq", 0.8, "--make-grm"],
+                threads=threads,
+            )
+            assert "there are 3 SNPs" in filtered.with_suffix(".log").read_text(encoding="utf-8")
         else:
             assert ids == [f"I{index}\tI{index}" for index in range(8)]
     print(f"Passed {args.scenario} dosage GRM, ID, and 1/4-thread regression checks")
