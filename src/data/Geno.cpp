@@ -3234,52 +3234,53 @@ void copy_quaterarr_nonempty_subset(uint64_t* raw_quaterarr[], const uint64_t* s
         uint32_t wordhalf_idx = 0;
         uint64_t cur_include_halfword = (halfword_t)cur_include_word;
         while (1) {
-           // uintptr_t raw_quaterarr_word = *raw_quaterarr_iter++;
-            uint64_t raw_quaterarr_word[num_marker];
-            for(int i = 0; i != num_marker; i++){
-                memcpy(&raw_quaterarr_word[i], raw_quaterarr_iter[i], sizeof(uint64_t));
-                raw_quaterarr_iter[i] += sizeof(uint64_t);
-            }
-            while (cur_include_halfword) {
-                uint32_t rqa_idx_lowbits = CTZ64U(cur_include_halfword); // tailing zero
-                uint64_t halfword_invshifted = (~cur_include_halfword) >> rqa_idx_lowbits;
-                uint64_t raw_quaterarr_curblock_unmasked[num_marker];
-                int m_bit = rqa_idx_lowbits * 2;
+            if (cur_include_halfword) {
+                uint64_t raw_quaterarr_word[num_marker];
                 for(int i = 0; i != num_marker; i++){
-                    raw_quaterarr_curblock_unmasked[i] = raw_quaterarr_word[i] >> m_bit; 
+                    memcpy(&raw_quaterarr_word[i], raw_quaterarr_iter[i], sizeof(uint64_t));
+                    raw_quaterarr_iter[i] += sizeof(uint64_t);
                 }
-                //uintptr_t raw_quaterarr_curblock_unmasked = raw_quaterarr_word >> (rqa_idx_lowbits * 2); // remove mask bit tailing zero, not to keep
-                uint32_t rqa_block_len = CTZ64U(halfword_invshifted);  // find another keep
-                uint32_t block_len_limit = kBitsPerWordD2 - word_write_halfshift;
-                m_bit = 2 * word_write_halfshift;
-                for(int i = 0; i != num_marker; i++){
-                    cur_output_word[i] |= raw_quaterarr_curblock_unmasked[i] << m_bit; // avoid overwrite current saved bits
-                }
-                if (rqa_block_len < block_len_limit) { //2  16
-                    word_write_halfshift += rqa_block_len; // 0 2
+                while (cur_include_halfword) {
+                    uint32_t rqa_idx_lowbits = CTZ64U(cur_include_halfword); // tailing zero
+                    uint64_t halfword_invshifted = (~cur_include_halfword) >> rqa_idx_lowbits;
+                    uint64_t raw_quaterarr_curblock_unmasked[num_marker];
+                    int m_bit = rqa_idx_lowbits * 2;
+                    for(int i = 0; i != num_marker; i++){
+                        raw_quaterarr_curblock_unmasked[i] = raw_quaterarr_word[i] >> m_bit; 
+                    }
+                    //uintptr_t raw_quaterarr_curblock_unmasked = raw_quaterarr_word >> (rqa_idx_lowbits * 2); // remove mask bit tailing zero, not to keep
+                    uint32_t rqa_block_len = CTZ64U(halfword_invshifted);  // find another keep
+                    uint32_t block_len_limit = kBitsPerWordD2 - word_write_halfshift;
                     m_bit = 2 * word_write_halfshift;
-                    uint64_t temp_mask = (k1LU << m_bit) - k1LU;
                     for(int i = 0; i != num_marker; i++){
-                        cur_output_word[i] &= temp_mask; // mask high end, and keep low needed bits
+                        cur_output_word[i] |= raw_quaterarr_curblock_unmasked[i] << m_bit; // avoid overwrite current saved bits
                     }
-                } else {
-                    // no need to mask, extra bits vanish off the high end
-                    for(int i = 0; i != num_marker; i++){
-                        *(output_quaterarr_iter[i]++) = cur_output_word[i];
-                    }
-                    word_write_halfshift = rqa_block_len - block_len_limit;
-                    if (word_write_halfshift) {
-                        uint64_t t_mask = ((k1LU << (2 * word_write_halfshift)) - k1LU), mi_bit = 2 * block_len_limit;
+                    if (rqa_block_len < block_len_limit) { //2  16
+                        word_write_halfshift += rqa_block_len; // 0 2
+                        m_bit = 2 * word_write_halfshift;
+                        uint64_t temp_mask = (k1LU << m_bit) - k1LU;
                         for(int i = 0; i != num_marker; i++){
-                            cur_output_word[i] = (raw_quaterarr_curblock_unmasked[i] >> mi_bit) & t_mask;
+                            cur_output_word[i] &= temp_mask; // mask high end, and keep low needed bits
                         }
                     } else {
-                        // avoid potential right-shift-[word length]
-                        //cur_output_word = 0;
-                        memset(cur_output_word, 0, num_marker * 8);
+                        // no need to mask, extra bits vanish off the high end
+                        for(int i = 0; i != num_marker; i++){
+                            *(output_quaterarr_iter[i]++) = cur_output_word[i];
+                        }
+                        word_write_halfshift = rqa_block_len - block_len_limit;
+                        if (word_write_halfshift) {
+                            uint64_t t_mask = ((k1LU << (2 * word_write_halfshift)) - k1LU), mi_bit = 2 * block_len_limit;
+                            for(int i = 0; i != num_marker; i++){
+                                cur_output_word[i] = (raw_quaterarr_curblock_unmasked[i] >> mi_bit) & t_mask;
+                            }
+                        } else {
+                            // avoid potential right-shift-[word length]
+                            //cur_output_word = 0;
+                            memset(cur_output_word, 0, num_marker * 8);
+                        }
                     }
+                    cur_include_halfword &= (~(k1LU << (rqa_block_len + rqa_idx_lowbits))) + k1LU;
                 }
-                cur_include_halfword &= (~(k1LU << (rqa_block_len + rqa_idx_lowbits))) + k1LU;
             }
             if (wordhalf_idx) {
                 break;
@@ -3313,17 +3314,30 @@ void Geno::move_geno(uint8_t *buf, uint64_t *keep_list, uint32_t num_raw_sample,
     const uint32_t num_byte_keep_geno = (num_keep_sample + 3) / 4;
     const uint32_t num_byte_per_marker = (num_raw_sample + 3) / 4;
     const uint32_t num_qword_per_marker = (num_byte_keep_geno + 7) / 8;
+    const uint32_t padded_bytes = ((num_byte_per_marker + 7) / 8) * 8;
+    const uint32_t padded_words = padded_bytes / 8;
+    const bool needs_padding = (num_byte_per_marker % 8) != 0;
+    static thread_local std::vector<uint64_t> padded;
 
     const int move_markers = 4;
-
     #pragma omp parallel for schedule(dynamic) 
     for(uint32_t index = 0; index < num_marker; index += move_markers){
+        if(needs_padding && padded.size() != move_markers * padded_words){
+            padded.resize(move_markers * padded_words);
+        }
         uint64_t *pbuf[move_markers], *gbuf[move_markers];
         int num_marker_move = 0;
         for(uint32_t i = 0; i < move_markers; i++){
             uint32_t startIndex = index + i;
             if(startIndex < num_marker){ 
-                pbuf[i] = (uint64_t *) (buf + startIndex * num_byte_per_marker);
+                if(needs_padding){
+                    uint64_t *slot = padded.data() + i * padded_words;
+                    memset(slot, 0, padded_bytes);
+                    memcpy(slot, buf + startIndex * num_byte_per_marker, num_byte_per_marker);
+                    pbuf[i] = slot;
+                }else{
+                    pbuf[i] = (uint64_t *) (buf + startIndex * num_byte_per_marker);
+                }
                 gbuf[i] = geno_buf + startIndex * num_qword_per_marker; 
                 num_marker_move++;
             }
