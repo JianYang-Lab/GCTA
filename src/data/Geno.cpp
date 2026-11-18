@@ -3327,6 +3327,8 @@ void Geno::move_geno(uint8_t *buf, uint64_t *keep_list, uint32_t num_raw_sample,
 }
 
 void Geno::loop_64block(const vector<uint32_t> &raw_marker_index, vector<function<void (uint64_t *buf, int num_marker)>> callbacks, bool showLog) {
+    init_keep();
+    init_AsyncBuffer();
     // show log also act as function that 
     if(showLog){
         LOGGER.i(0, "Reading PLINK BED file(s) in SNP-major format...");
