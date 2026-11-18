@@ -163,7 +163,6 @@ public:
 
     // mkl
     void make_grm_mkl(bool grm_d_flag, bool grm_xchr_flag, bool inbred, bool output_bin, int grm_mtd, bool mlmassoc, bool diag_f3_flag = false);
-    void calcu_mean_rsq_mkl(int wind_size, double rsq_cutoff);
     void LD_pruning_mkl(double rsq_cutoff, int wind_size);
     //void make_grm_wt_mkl(string i_ld_file, int wind_m, double wt_ld_cut, bool grm_xchr_flag, bool inbred, bool output_bin, int grm_mtd=0, int wt_mtd=0, bool mlmassoc=false, bool impData_flag=false, int ttl_snp_num=-1);
 
@@ -386,9 +385,6 @@ private:
     bool comput_inverse_logdet_LU_mkl(eigenMatrix &Vi, double &logdet);
     bool comput_inverse_logdet_LU_mkl_array(int n, float *Vi, double &logdet);
     void LD_pruning_blk_mkl(float *X, vector<int> &brk_pnt, double rsq_cutoff, vector<int> &rm_snp_ID1);
-    void calcu_ssx_sqrt_i_mkl(float *X_std, vector<double> &ssx);
-    void calcu_ld_blk_mkl(float *X, vector<double> &ssx, vector<int> &brk_pnt, vector<int> &brk_pnt3, eigenVector &mean_rsq, eigenVector &snp_num, eigenVector &max_rsq, bool second, double rsq_cutoff);
-    void calcu_ld_blk_split_mkl(int size, int size_limit, float *X_sub, vector<double> &ssx_sub, double rsq_cutoff, vector<double> &rsq_size, vector<double> &mean_rsq_sub, vector<double> &max_rsq_sub, int s1, int s2, bool second);
     
 
     // mlma
