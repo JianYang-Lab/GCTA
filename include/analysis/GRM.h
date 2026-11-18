@@ -19,12 +19,14 @@
 #ifndef GCTA2_GRM_H
 #define GCTA2_GRM_H
 #include "data/Geno.h"
-#include <string>
-#include <vector>
-#include <utility>
-#include <cmath>
+
 #include "infra/constants.hpp"
 #include "infra/mem.hpp"
+
+#include <cmath>
+#include <string>
+#include <utility>
+#include <vector>
 
 using std::string;
 using std::vector;

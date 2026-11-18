@@ -17,6 +17,30 @@
 */
 #include "infra/cpu.h"
 
+#include "analysis/FastFAM.h"
+#include "analysis/StatLib.h"
+
+#include "data/Covar.h"
+#include "data/Geno.h"
+#include "data/Marker.h"
+#include "data/Pheno.h"
+
+#include "infra/Logger.h"
+#include "infra/Matrix.hpp"
+#include "infra/OptionIO.h"
+#include "infra/utils.hpp"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <Eigen/Core>
+#include <Eigen/IterativeLinearSolvers>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
+#include <Eigen/SparseCore>
+#include <omp.h>
+
 #include <algorithm>
 #include <charconv>
 #include <chrono>
@@ -27,28 +51,6 @@
 #include <iterator>
 #include <random>
 #include <sstream>
-#include <omp.h>
-
-#include <Eigen/Core>
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/Sparse>
-#include <Eigen/SparseCholesky>
-#include <Eigen/SparseCore>
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
-
-#include "analysis/FastFAM.h"
-#include "data/Covar.h"
-#include "data/Geno.h"
-#include "infra/Logger.h"
-#include "data/Marker.h"
-#include "infra/Matrix.hpp"
-#include "infra/OptionIO.h"
-#include "data/Pheno.h"
-#include "analysis/StatLib.h"
-#include "infra/utils.hpp"
 
 struct InvItem{
     int32_t row;

@@ -17,10 +17,12 @@
 #ifndef GCTA2_MARKER_H
 #define GCTA2_MARKER_H
 #include <string>
-#include <vector>
+
+#include <cstdint>
 #include <map>
 #include <utility>
-#include <cstdint>
+#include <vector>
+
 using std::vector;
 using std::string;
 using std::to_string;

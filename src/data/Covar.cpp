@@ -15,15 +15,19 @@
 */
 
 #include "data/Covar.h"
+
+#include "analysis/StatLib.h"
+
 #include "infra/Logger.h"
 #include "infra/OptionIO.h"
-#include <fstream>
+#include "infra/utils.hpp"
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+
 #include <algorithm>
+#include <fstream>
 #include <numeric>
-#include "infra/utils.hpp"
-#include "analysis/StatLib.h"
 
 map<string, string> Covar::options;
 using std::to_string;

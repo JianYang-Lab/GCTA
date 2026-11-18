@@ -16,15 +16,18 @@
 
 
 #include <infra/utils.hpp>
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <chrono>
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <chrono>
 
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
+
 #endif
 
 std::string getHostName(){

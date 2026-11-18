@@ -15,21 +15,24 @@
 */
 
 #include "data/Pheno.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iterator>
+
 #include "infra/constants.hpp"
 #include "infra/Logger.h"
-#include <algorithm>
-#include <numeric>
-#include <cmath>
+#include "infra/OptionIO.h"
 #include "infra/utils.hpp"
-#include <cstring>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/crc.hpp>
+
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <numeric>
 #include <set>
-#include "infra/OptionIO.h"
+#include <sstream>
 
 using std::to_string;
 

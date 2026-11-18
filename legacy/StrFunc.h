@@ -12,10 +12,12 @@
 #define _STRFUNC_H
 
 #include <string>
-#include <vector>
+
 #include <algorithm>
-#include <map>
 #include <iostream>
+#include <map>
+#include <vector>
+
 using namespace std;
 
 namespace StrFunc

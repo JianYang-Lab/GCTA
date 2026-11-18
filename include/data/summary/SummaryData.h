@@ -2,6 +2,7 @@
 #define GCTA2_SUMMARY_DATA_H
 
 #include <Eigen/Dense>
+
 #include <map>
 #include <string>
 #include <vector>

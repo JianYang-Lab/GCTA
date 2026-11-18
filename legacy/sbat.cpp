@@ -11,6 +11,7 @@
  */
 
 #include "gcta.h"
+
 #include <set>
 
 void gcta::sbat_read_snpAssoc(string snpAssoc_file, vector<string> &snp_name, vector<int> &snp_chr, vector<int> &snp_bp, vector<double> &snp_pval)

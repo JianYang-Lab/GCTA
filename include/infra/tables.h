@@ -18,6 +18,7 @@
 #define TABLES_H
 #define GENO_TABLE_COUNT 65536
 #include <stdint.h>
+
 #include <cstddef>
 #include <vector>
 

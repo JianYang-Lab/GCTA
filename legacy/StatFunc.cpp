@@ -9,9 +9,11 @@
  */
 
 #include "StatFunc.h"
+
+#include "infra/Logger.h"
+
 #include "numeric"
 #include <random>
-#include "infra/Logger.h"
 
 ////////// P-value Calculatiion Functions Start ////////////////
 

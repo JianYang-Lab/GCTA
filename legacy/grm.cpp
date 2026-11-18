@@ -11,6 +11,7 @@
  */
 
 #include "gcta.h"
+
 #include <iterator>
 #include <unordered_set>
 

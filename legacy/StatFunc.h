@@ -12,15 +12,18 @@
 #define _STATFUNC_H
 
 #include <cstdio>
-#include <cstdlib>
-#include <vector>
-#include <algorithm>
-#include <iostream>
+
 #include "CommFunc.h"
+
 #include <dcdflib.h>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <unsupported/Eigen/SparseExtra>
+
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
+#include <vector>
 
 using namespace Eigen;
 using namespace std;

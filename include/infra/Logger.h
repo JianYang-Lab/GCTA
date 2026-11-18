@@ -30,12 +30,14 @@
 #define NDEBUG
 #endif
 #include <mutex>
-#include <string>
-#include <map>
+
+#include <chrono>
 #include <fstream>
 #include <ios>
-#include <chrono>
 #include <iostream>
+#include <map>
+#include <string>
+
 #define LOGGER (*Logger::GetLogger())
 #define LOGGER_P Logger::GetLogger()
 using std::string;

@@ -2,7 +2,9 @@
 #define GCTA2_REFERENCE_DATA_H
 
 #include "data/Geno.h"
+
 #include <Eigen/Dense>
+
 #include <map>
 #include <memory>
 #include <string>

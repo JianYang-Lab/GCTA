@@ -2,10 +2,11 @@
 #ifndef GCTA_LD_H
 #define GCTA_LD_H
 #include "data/Geno.h"
-#include <string>
-#include <vector>
+
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 using std::map;
 using std::string;

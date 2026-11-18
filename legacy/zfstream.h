@@ -11,8 +11,10 @@
 #define ZFSTREAM_H
 
 #include <istream>  // not iostream, since we don't need cin/cout
-#include <ostream>
+
 #include "zlib.h"
+
+#include <ostream>
 
 /*****************************************************************************/
 

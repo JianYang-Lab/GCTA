@@ -1,5 +1,7 @@
 #include "gcta.h"
+
 #include "infra/Logger.h"
+
 #include <algorithm>
 #include <iterator>
 

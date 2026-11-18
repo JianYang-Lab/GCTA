@@ -2,7 +2,9 @@
 #define GCTA2_ECOJO_H
 
 #include "data/expression/ExpressionData.h"
+
 #include <Eigen/Dense>
+
 #include <map>
 #include <string>
 #include <vector>

@@ -14,10 +14,12 @@
 #ifndef GCTA2_ASYNCBUFFER_H
 #define GCTA2_ASYNCBUFFER_H
 #include <mutex>
+
+#include "infra/mem.hpp"
+
+#include <chrono>
 #include <condition_variable>
 #include <tuple>
-#include <chrono>
-#include "infra/mem.hpp"
 
 using std::mutex;
 using std::lock_guard;

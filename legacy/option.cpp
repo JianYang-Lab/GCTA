@@ -17,9 +17,11 @@
  */
 
 #include <cstdio>
-#include <stdlib.h>
-#include "gcta.h"
+
 #include "infra/Logger.h"
+
+#include "gcta.h"
+#include <stdlib.h>
 
 void option(int option_num, char* option_str[]);
 

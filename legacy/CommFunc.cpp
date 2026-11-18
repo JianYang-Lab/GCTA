@@ -9,6 +9,7 @@
  */
 
 #include "CommFunc.h"
+
 #include "infra/Logger.h"
 
 double CommFunc::Abs(const double &x)

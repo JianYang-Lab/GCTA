@@ -20,10 +20,12 @@
 #define GCTA2_THREADPOOL_H
 
 #include <thread>
+
+#include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <queue>
-#include <functional>
-#include <condition_variable>
+
 #define THREADS (*ThreadPool::GetPool())
 #define THREADS_P ThreadPool::GetPool()
 

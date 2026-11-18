@@ -2,6 +2,7 @@
 #define GCTA2_EXPRESSIONDATA_H
 
 #include <Eigen/Dense>
+
 #include <string>
 #include <vector>
 

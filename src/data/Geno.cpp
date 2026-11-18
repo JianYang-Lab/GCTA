@@ -18,31 +18,34 @@
 
 #define NOMINMAX
 #include "data/Geno.h"
+
 #include "infra/constants.hpp"
+#include "infra/cpu.h"
+#include "infra/OptionIO.h"
+#include "infra/ThreadPool.h"
+#include "infra/utils.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <thread>
-#include <chrono>
-#include <ctime>
-#include <iostream>
-#include <iterator>
-#include <cmath>
-#include <sstream>
-#include <iomanip>
-#include "infra/utils.hpp"
+
 #include "omp.h"
-#include "infra/ThreadPool.h"
-#include <cstring>
-#include <boost/algorithm/string.hpp>
-#include "infra/OptionIO.h"
+#include "third_party/Pgenlib/PgenReader.h"
 #include "zlib.h"
 #include "zstd.h"
-#include <cstring>
-#include "infra/cpu.h"
+#include <boost/algorithm/string.hpp>
 #include <Eigen/Eigen>
+
 #include <algorithm>
-#include "third_party/Pgenlib/PgenReader.h"
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
 #include <numeric>
+#include <sstream>
+#include <thread>
 
 #ifdef _WIN64
   #include <intrin.h>
@@ -94,6 +97,7 @@ uint64_t fill_inter_zero(uint64_t x) {
 }
 #if defined(__linux__) && GCTA_CPU_x86
 #include <x86intrin.h>
+
 __attribute__((target("bmi2")))
 uint64_t fill_inter_zero(uint64_t x) {
     return _pdep_u64(x, 0x5555555555555555U);

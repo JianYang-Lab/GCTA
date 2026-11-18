@@ -19,15 +19,18 @@
 #ifndef GCTA2_GENO_H
 #define GCTA2_GENO_H
 #include <string>
-#include <map>
-#include <vector>
-#include "data/Pheno.h"
+
 #include "data/Marker.h"
-#include "infra/Logger.h"
+#include "data/Pheno.h"
+
 #include "infra/AsyncBuffer.hpp"
-#include <functional>
+#include "infra/Logger.h"
 #include "infra/tables.h"
+
+#include <functional>
+#include <map>
 #include <unordered_map>
+#include <vector>
 
 using std::function;
 using std::string;

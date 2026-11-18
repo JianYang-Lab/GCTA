@@ -2,9 +2,12 @@
 #define GCTA2_MATRIX_H
 
 #include "infra/cpu.h"
-#include <Eigen/Eigen>
-#include <iostream>
+
 #include <infra/Logger.h>
+
+#include <Eigen/Eigen>
+
+#include <iostream>
 
 static_assert(std::numeric_limits<double>::is_iec559, "Not a supported compiler");
 

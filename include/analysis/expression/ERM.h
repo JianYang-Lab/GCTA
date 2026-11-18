@@ -2,7 +2,9 @@
 #define GCTA2_ERM_H
 
 #include "data/expression/ExpressionData.h"
+
 #include <Eigen/Dense>
+
 #include <map>
 #include <string>
 #include <vector>

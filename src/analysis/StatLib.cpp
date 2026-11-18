@@ -14,13 +14,16 @@
    If not, see <http://www.gnu.org/licenses/>.
 */
 #include "analysis/StatLib.h"
+
+#include "infra/cpu.h"
+
+#include <boost/math/distributions/beta.hpp>
+#include <boost/math/distributions/chi_squared.hpp>
+#include <boost/math/distributions/normal.hpp>
+
 #include <cmath>
 #include <cstdio>
 #include <limits>
-#include <boost/math/distributions/chi_squared.hpp>
-#include <boost/math/distributions/normal.hpp>
-#include <boost/math/distributions/beta.hpp>
-#include "infra/cpu.h"
 
 using namespace boost::math;
 

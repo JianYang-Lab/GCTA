@@ -1,10 +1,12 @@
 #include "infra/io/RelationshipIO.h"
 
 #include "infra/Logger.h"
+
+#include <zlib.h>
+
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-#include <zlib.h>
 
 using std::string;
 using std::vector;

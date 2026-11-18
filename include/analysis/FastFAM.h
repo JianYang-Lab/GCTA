@@ -21,6 +21,11 @@
 
 #include "infra/cpu.h"
 
+#include <Eigen/Dense>
+#include <Eigen/IterativeLinearSolvers>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCholesky>
+
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
@@ -28,11 +33,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-#include <Eigen/Dense>
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/Sparse>
-#include <Eigen/SparseCholesky>
 
 using Eigen::Map;
 using Eigen::MatrixXd;

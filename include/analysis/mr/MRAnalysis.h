@@ -2,8 +2,11 @@
 #define GCTA2_MR_ANALYSIS_H
 
 #include "data/summary/ReferenceData.h"
+
 #include "data/summary/SummaryData.h"
+
 #include <Eigen/Dense>
+
 #include <sstream>
 
 using eigenMatrix = Eigen::MatrixXd;

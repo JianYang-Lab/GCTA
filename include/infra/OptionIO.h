@@ -17,10 +17,13 @@
 #ifndef gcta2_optionio_h
 #define gcta2_optionio_h
 #include <vector>
-#include <string>
-#include <map>
-#include <cstdio>
+
 #include "infra/Logger.h"
+
+#include <cstdio>
+#include <map>
+#include <string>
+
 using std::map;
 using std::vector;
 using std::string;

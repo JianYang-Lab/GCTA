@@ -18,23 +18,27 @@
 #endif
 
 #include "infra/cpu.h"
-#include <cstdio>
-#include "CommFunc.h"
-#include "StrFunc.h"
-#include "StatFunc.h"
-#include <fstream>
-#include <iomanip>
-#include <bitset>
-#include <map>
-#include <Eigen/StdVector>
-#include "zfstream.h"
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
-#include <unsupported/Eigen/SparseExtra>
-#include <unsupported/Eigen/IterativeSolvers>
-#include <omp.h>
+
 #include "infra/Logger.h"
 #include "infra/Matrix.hpp"
+
+#include "CommFunc.h"
+#include "StatFunc.h"
+#include "StrFunc.h"
+#include "zfstream.h"
+
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <Eigen/StdVector>
+#include <omp.h>
+#include <unsupported/Eigen/IterativeSolvers>
+#include <unsupported/Eigen/SparseExtra>
+
+#include <bitset>
+#include <cstdio>
+#include <fstream>
+#include <iomanip>
+#include <map>
 
 #ifdef SINGLE_PRECISION
 typedef Eigen::SparseMatrix<float, Eigen::ColMajor, long long> eigenSparseMat;

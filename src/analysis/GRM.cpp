@@ -18,6 +18,18 @@
 
 #include "infra/cpu_f77blas.h"
 
+#include "analysis/GRM.h"
+
+#include "infra/AsyncBuffer.hpp"
+#include "infra/Logger.h"
+#include "infra/NumericBackend.h"
+#include "infra/OptionIO.h"
+#include "infra/utils.hpp"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <omp.h>
+
 #include <algorithm>
 #include <cstring>
 #include <iomanip>
@@ -25,17 +37,6 @@
 #include <numeric>
 #include <sstream>
 #include <unordered_set>
-#include <omp.h>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/join.hpp>
-
-#include "infra/AsyncBuffer.hpp"
-#include "analysis/GRM.h"
-#include "infra/Logger.h"
-#include "infra/NumericBackend.h"
-#include "infra/OptionIO.h"
-#include "infra/utils.hpp"
 
 using std::to_string;
 

@@ -2,6 +2,7 @@
 
 #include "infra/cpu_f77blas.h"
 #include "infra/Logger.h"
+
 #include <vector>
 
 namespace MatrixOperations {

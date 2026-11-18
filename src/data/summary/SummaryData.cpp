@@ -1,12 +1,14 @@
 #include "data/summary/SummaryData.h"
 
 #include "infra/Logger.h"
+
+#include <zlib.h>
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <functional>
 #include <sstream>
-#include <zlib.h>
 
 using std::map;
 using std::string;

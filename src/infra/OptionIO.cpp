@@ -1,10 +1,13 @@
 #include "infra/OptionIO.h"
+
 #include "infra/Logger.h"
-#include <iostream>
-#include <sstream>
-#include <set>
-#include <boost/algorithm/string/join.hpp>
+
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+
+#include <iostream>
+#include <set>
+#include <sstream>
 #include <string>
 
 using std::to_string;

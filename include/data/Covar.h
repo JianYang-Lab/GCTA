@@ -18,9 +18,11 @@
 #ifndef gcta2_covar_h
 #define gcta2_covar_h
 #include <vector>
-#include <string>
-#include <map>
+
 #include "data/Pheno.h"
+
+#include <map>
+#include <string>
 
 using std::map;
 using std::vector;

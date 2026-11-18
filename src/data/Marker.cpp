@@ -15,19 +15,24 @@
 */
 
 #include <sstream>
+
 #include "data/Marker.h"
-#include "infra/Logger.h"
+
 #include "infra/constants.hpp"
-#include <iterator>
-#include <algorithm>
-#include <numeric>
+#include "infra/Logger.h"
+#include "infra/OptionIO.h"
+#include "infra/utils.hpp"
+
+#include <sqlite3.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include "infra/utils.hpp"
-#include "infra/OptionIO.h"
+
+#include <algorithm>
+#include <iterator>
 #include <memory>
+#include <numeric>
 #include <utility>
-#include <sqlite3.h>
 
 using std::to_string;
 using std::unique_ptr;

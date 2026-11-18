@@ -16,8 +16,9 @@
 
 
 #include "infra/mem.hpp"
-#include <cstdlib>
+
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 int parseLine(char* line){

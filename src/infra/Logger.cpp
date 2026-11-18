@@ -23,15 +23,19 @@
 */
 
 #include "infra/Logger.h"
-#include <iostream>
+
 #include <cstdlib>
+#include <iostream>
 
 #ifdef _WIN32
 #include <io.h>
+
 #include <stdio.h>
+
 #define ISATTY(x) _isatty(_fileno(x))
 #else 
 #include <unistd.h>
+
 #define ISATTY(x) isatty(fileno(x))
 #endif
 

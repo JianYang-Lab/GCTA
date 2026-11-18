@@ -11,11 +11,14 @@
  */
 
 #include <sstream>
+
+#include "infra/Logger.h"
+
+#include "gcta.h"
+#include "StrFunc.h"
+
 #include <iterator>
 #include <set>
-#include "gcta.h"
-#include "infra/Logger.h"
-#include "StrFunc.h"
 
 gcta::gcta(int autosome_num, double rm_ld_cutoff, string out)
 {

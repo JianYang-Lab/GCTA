@@ -8,8 +8,9 @@
  */
 
 #include "zfstream.h"
-#include <cstring>          // for strcpy, strcat, strlen (mode strings)
+
 #include <cstdio>           // for BUFSIZ
+#include <cstring>          // for strcpy, strcat, strlen (mode strings)
 
 // Internal buffer sizes (default and "unbuffered" versions)
 #define BIGBUFSIZE BUFSIZ

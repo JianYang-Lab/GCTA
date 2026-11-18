@@ -1,13 +1,17 @@
 #include "infra/NumericBackend.h"
+
 #include "infra/cpu_f77blas.h"
 #include "infra/Logger.h"
+
 #include <cstring>
 
 using std::string;
 
 #if defined(__linux__) && GCTA_CPU_x86
 #include <cpuid.h>
+
 #include <dlfcn.h>
+
 #endif
 
 namespace NumericBackend {

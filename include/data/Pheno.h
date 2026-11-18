@@ -17,9 +17,11 @@
 #ifndef gcta2_pheno_h
 #define gcta2_pheno_h
 #include <vector>
-#include <string>
-#include <map>
+
 #include <cstdint>
+#include <map>
+#include <string>
+
 using std::map;
 using std::vector;
 using std::string;

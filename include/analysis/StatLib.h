@@ -17,6 +17,7 @@
 #ifndef STAT_LIB_H
 #define STAT_LIB_H
 #include <Eigen/Eigen>
+
 using Eigen::VectorXd;
 
 namespace StatLib{

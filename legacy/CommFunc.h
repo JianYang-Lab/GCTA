@@ -12,14 +12,17 @@
 #define _COMMFUNC_H
 
 #include <cstdio>
-#include <cstdlib>
-#include <limits>
-#include <complex>
-#include <vector>
+
+#include <Eigen/StdVector>
+
 #include <algorithm>
+#include <complex>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
-#include <Eigen/StdVector>
+#include <limits>
+#include <vector>
+
 using namespace std;
 
 namespace CommFunc

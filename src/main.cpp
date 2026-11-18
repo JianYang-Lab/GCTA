@@ -17,33 +17,39 @@
  * If not, see <http://www.gnu.org/licenses/>.
 */
 #include <iostream>
-#include "infra/Logger.h"
+
+#include "analysis/acat.hpp" //add by fanghl 20210303
+#include "analysis/expression/ECOJO.h"
+#include "analysis/expression/ERM.h"
+#include "analysis/FastFAM.h"
+#include "analysis/GRM.h"
+#include "analysis/LD.h"
+#include "analysis/mr/GSMR.h"
+#include "analysis/mr/MTCOJO.h"
+
+#include "data/Covar.h"
 #include "data/Geno.h"
 #include "data/Marker.h"
 #include "data/Pheno.h"
-#include "analysis/GRM.h"
-#include "data/Covar.h"
-#include "analysis/FastFAM.h"
-#include "analysis/LD.h"
-#include "analysis/expression/ERM.h"
-#include "analysis/expression/ECOJO.h"
-#include "analysis/mr/GSMR.h"
-#include "analysis/mr/MTCOJO.h"
+
+#include "infra/config.h"
+#include "infra/Logger.h"
+#include "infra/mem.hpp"
 #include "infra/NumericBackend.h"
+#include "infra/utils.hpp"
+
+#include "legacy/option.h"
+
+#include <omp.h>
+
+#include <algorithm>
+#include <chrono>
+#include <cstdlib>
 #include <functional>
 #include <map>
-#include <vector>
 #include <string>
-#include <chrono>
-#include <algorithm>
-#include "legacy/option.h"
-#include "infra/utils.hpp"
-#include <omp.h>
-#include <cstdlib>
-#include "infra/mem.hpp"
-#include "infra/config.h"
+#include <vector>
 
-#include "analysis/acat.hpp" //add by fanghl 20210303
 #define ACAT_MODULE
 
 using std::bind;

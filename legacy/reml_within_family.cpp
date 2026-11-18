@@ -11,6 +11,7 @@
  */
 
 #include "gcta.h"
+
 #include <Eigen/SparseCholesky>
 
 void gcta::detect_family()

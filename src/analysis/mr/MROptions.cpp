@@ -1,6 +1,7 @@
 #include "analysis/mr/MRAnalysis.h"
 
 #include "infra/Logger.h"
+
 #include <algorithm>
 #include <cstdlib>
 

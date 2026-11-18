@@ -19,6 +19,7 @@
 #define UTILS_H
 #if defined(_MSC_VER)
 #include <intrin.h>
+
 #define popcount __popcnt64
 #elif defined(__GNUC__) || defined(__GNUG__)
 #define popcount __builtin_popcountll 
@@ -27,11 +28,12 @@
 #endif
 
 #include <string>
-#include <vector>
-#include <numeric>
+
 #include <algorithm>
-#include <sstream>
 #include <cstdint>
+#include <numeric>
+#include <sstream>
+#include <vector>
 
 std::string getHostName();
 std::string getLocalTime();

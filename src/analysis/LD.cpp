@@ -1,15 +1,19 @@
 #include "analysis/LD.h"
-#include "infra/Logger.h"
-#include "infra/constants.hpp"
-#include "infra/utils.hpp"
+
 #include "analysis/StatLib.h"
+
+#include "infra/constants.hpp"
+#include "infra/cpu_f77blas.h"
+#include "infra/Logger.h"
+#include "infra/utils.hpp"
+
+#include <omp.h>
+
+#include <algorithm>
+#include <cstdio>
+#include <functional>
 #include <numeric>
 #include <string>
-#include <functional>
-#include <omp.h>
-#include "infra/cpu_f77blas.h"
-#include <cstdio>
-#include <algorithm>
 
 map<string, string> LD::options;
 map<string, int> LD::options_i;
