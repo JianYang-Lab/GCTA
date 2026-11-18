@@ -57,3 +57,26 @@ When migrating a workflow:
 5. Delete the legacy implementation in a separate commit only after compatibility is established. Do not rewrite baselines to hide differences.
 
 Deterministic binary outputs should match byte-for-byte. Text results should be compared at their written precision, with documented handling for known nondeterministic fields.
+
+## Deferred known issues
+
+### PgenReader 64-byte leak
+
+Deferred by the user on 2026-11-18; do not suppress the leak report or patch `third_party/` without permission.
+
+LeakSanitizer reports a 64-byte allocation from `third_party/Pgenlib/PgenReader.cpp:131` in `PgenReader::Load()`. The allocation is held by the local `pgfi_alloc` pointer, while `PgenReader::Close()` has no access to that pointer and cannot release it safely through the existing public interface. Resolving the issue requires permission to patch or update the third-party reader, or approval to redesign the first-party genotype reader.
+
+The current reproduction log is `/tmp/opencode/pgenreader-current-lsan.log`. To reproduce in the configured Linux sanitizer environment:
+
+```sh
+cmake --build build/Sanitizer --target gcta64
+env LD_PRELOAD="$(gcc -print-file-name=libasan.so.8)" \
+    ASAN_OPTIONS='detect_leaks=1:halt_on_error=1' \
+    build/Sanitizer/gcta64 \
+    --bfile tests/data/gcta_legacy/toy \
+    --freq \
+    --out /tmp/gcta-pgenreader-leak \
+    --thread-num 1
+```
+
+The analysis itself completes, after which LeakSanitizer reports `64 byte(s) leaked in 1 allocation(s)` with `PgenReader::Load()` in the allocation stack.
