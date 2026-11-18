@@ -67,6 +67,7 @@ public:
     void calculate_fam(uintptr_t *buf, const vector<uint32_t> &markerIndex);
     void calculate_grammar(uintptr_t *buf, const vector<uint32_t> &markerIndex);
     void calculate_gwa(uintptr_t * geno, const vector<uint32_t> &markerIndex);
+    void calculate_gwa_marker(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_gwa_2df(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_gwa_2df_sandwich(uintptr_t * geno, const vector<uint32_t> &markerIndex);
     void calculate_mixed_2df(uintptr_t *geno, const vector<uint32_t> &markerIndex);

@@ -2406,7 +2406,7 @@ void FastFAM::inverseFAM(SpMat& fam, double VG, double VR){
     LOGGER.i(0, "The V matrix inverted in " + to_string(LOGGER.tp("INVERSE_FAM")) + " sec.");
 }
 
-void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
+void FastFAM::calculate_gwa_marker(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
 
     static double iN = 1.0 /(num_indi - (covarFlag ? covar.cols() : 1.0) - 1.0);
     static double SSy = phenoVec.dot(phenoVec);
@@ -2417,52 +2417,101 @@ void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerI
 
     #pragma omp parallel for schedule(static)
     for(int i = 0; i < num_marker; i++){
-        uint32_t cur_marker = markerIndex[i];
         item.valid = false;
-        item.extractedMarkerIndex = cur_marker;
-
+        item.extractedMarkerIndex = markerIndex[i];
         geno->getGenoDouble(genobuf, i, &item);
 
         af[i] = (float)item.af;
         countMarkers[i] = item.nValidN;
         info[i] = item.info;
         isValids[i] = item.valid;
-        if(!item.valid) {
+        if(!item.valid){
             continue;
         }
 
         Map< VectorXd > xMat(item.geno.data(), num_indi);
-
         conditionCovarReg(xMat);
-
 
         double xMat_V_x = 1.0 / xMat.dot(xMat);
         double xMat_V_p = xMat.dot(phenoVec);
-
-        double temp_beta =  xMat_V_x * xMat_V_p;
+        double temp_beta = xMat_V_x * xMat_V_p;
         double sse = (SSy - temp_beta * xMat_V_p) * iN;
         double temp_se = sqrt(sse * xMat_V_x);
-
-
         double temp_z = temp_beta / temp_se;
 
-        beta[i] = (float)temp_beta; //* geno->RDev[cur_raw_marker]; 
+        beta[i] = (float)temp_beta;
         se[i] = (float)temp_se;
-        p[i] = StatLib::pchisqd1(temp_z * temp_z); 
-
-        //}else{
-            //beta[index] = nan;
-            //se[index] = nan;
-            //p[index] = nan;
-        //}
+        p[i] = StatLib::pchisqd1(temp_z * temp_z);
     }
 
     output_res(isValids, markerIndex);
-   /*
-        std::ofstream o_geno(options["out"] + "_geno.txt");
-        o_geno << dealGeno << std::endl;
-        o_geno.close();
-    */
+}
+
+void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
+
+    if(bSaveBin){
+        // Keep the byte-for-byte save-bin output on the original per-marker path.
+        calculate_gwa_marker(genobuf, markerIndex);
+        return;
+    }
+
+    static double iN = 1.0 /(num_indi - (covarFlag ? covar.cols() : 1.0) - 1.0);
+    static double SSy = phenoVec.dot(phenoVec);
+
+    int num_marker = markerIndex.size();
+    vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
+    // Bound the decoded genotype block to roughly 8 MB.
+    const int batch_size = std::max(1, std::min(64, (int)(8 * 1024 * 1024 / (num_indi * sizeof(double)))));
+    MatrixXd X(num_indi, std::min(batch_size, num_marker));
+
+    for(int start = 0; start < num_marker; start += batch_size){
+        int cur_size = std::min(batch_size, num_marker - start);
+        auto Xcur = X.leftCols(cur_size);
+
+        #pragma omp parallel for schedule(static)
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            item.valid = false;
+            item.extractedMarkerIndex = markerIndex[i];
+            geno->getGenoDouble(genobuf, i, &item);
+
+            af[i] = (float)item.af;
+            countMarkers[i] = item.nValidN;
+            info[i] = item.info;
+            isValids[i] = item.valid;
+            if(item.valid){
+                memcpy(Xcur.col(j).data(), item.geno.data(), num_indi * sizeof(double));
+            }else{
+                Xcur.col(j).setZero();
+            }
+        }
+
+        if(covarFlag){
+            MatrixXd projected = covar * (H * Xcur);
+            Xcur -= projected;
+        }
+
+        VectorXd x2 = Xcur.colwise().squaredNorm();
+        VectorXd xp = Xcur.transpose() * phenoVec;
+        for(int j = 0; j < cur_size; j++){
+            int i = start + j;
+            if(!isValids[i]){
+                continue;
+            }
+            double xMat_V_x = 1.0 / x2[j];
+            double temp_beta = xMat_V_x * xp[j];
+            double sse = (SSy - temp_beta * xp[j]) * iN;
+            double temp_se = sqrt(sse * xMat_V_x);
+            double temp_z = temp_beta / temp_se;
+
+            beta[i] = (float)temp_beta;
+            se[i] = (float)temp_se;
+            p[i] = StatLib::pchisqd1(temp_z * temp_z);
+        }
+    }
+
+    output_res(isValids, markerIndex);
 }
 
 void FastFAM::calculate_gwa_2df(uintptr_t * genobuf, const vector<uint32_t> &markerIndex){
