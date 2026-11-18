@@ -5,7 +5,7 @@ import struct
 import subprocess
 
 
-def run_gcta(gcta, work_dir, name, arguments, threads=1, timeout=120):
+def run_gcta(gcta, work_dir, name, arguments, threads=1, timeout=120, thread_flag="--thread-num"):
     work_dir = Path(work_dir).resolve()
     work_dir.mkdir(parents=True, exist_ok=True)
     output = work_dir / name
@@ -18,7 +18,7 @@ def run_gcta(gcta, work_dir, name, arguments, threads=1, timeout=120):
         str(Path(gcta).resolve()),
         *(str(argument.resolve() if isinstance(argument, Path) else argument) for argument in arguments),
         "--out", str(output),
-        "--thread-num", str(threads),
+        thread_flag, str(threads),
     ]
     result = subprocess.run(
         command,
