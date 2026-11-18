@@ -106,6 +106,7 @@ gcta_add_regression_test(legacy.ld_pruning test_ld_legacy.py pruning integration
 gcta_add_regression_test(analysis.acat test_acat.py output integration)
 gcta_add_regression_test(error.acat_missing_input test_acat.py missing_input integration)
 gcta_add_regression_test(model.lr_roundtrip test_model.py model_lr integration)
+gcta_add_regression_test(model.lr_reordered_roundtrip test_model.py model_lr_reordered integration)
 gcta_add_regression_test(model.mlm_roundtrip test_model.py model_mlm integration)
 gcta_add_regression_test(model.exact_roundtrip test_model.py model_exact integration)
 gcta_add_regression_test(model.glmm_roundtrip test_model.py model_glmm integration)
