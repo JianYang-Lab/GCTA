@@ -1075,15 +1075,15 @@ void gcta::read_imp_dose_beagle(string zdosefile, string kp_indi_file, string rm
     get_rsnp(rsnp);
 
     const int MAX_LINE_LENGTH = 10000000;
-    char buf[MAX_LINE_LENGTH];
+    vector<char> buf(MAX_LINE_LENGTH);
     string str_buf;
 
     gzifstream zinf;
     zinf.open(zdosefile.c_str());
     if (!zinf.is_open()) LOGGER.e(0, "cannot open the file [" + zdosefile + "] to read.");
     LOGGER << "Reading imputed dosage scores (BEAGLE output) ..." << endl;
-    zinf.getline(buf, MAX_LINE_LENGTH, '\n');
-    stringstream ss(buf);
+    zinf.getline(buf.data(), MAX_LINE_LENGTH, '\n');
+    stringstream ss(buf.data());
     for (i = 0; i < 3; i++) ss >> str_buf;
     while (ss >> str_buf) {
         _fid.push_back(str_buf);
@@ -1110,10 +1110,10 @@ void gcta::read_imp_dose_beagle(string zdosefile, string kp_indi_file, string rm
     int k = 0;
     double d_buf = 0.0;
     while (1) {
-        zinf.getline(buf, MAX_LINE_LENGTH, '\n');
+        zinf.getline(buf.data(), MAX_LINE_LENGTH, '\n');
         if (zinf.fail() || !zinf.good()) break;
         if (!rsnp[line++]) continue;
-        stringstream ss(buf);
+        stringstream ss(buf.data());
         ss >> str_buf;
         if (str_buf != _snp_name[line - 1]) {
             stringstream errmsg;
