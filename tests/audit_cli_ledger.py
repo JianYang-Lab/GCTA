@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from collections import Counter
 import json
 from pathlib import Path
 import re
@@ -11,6 +12,7 @@ import sys
 V2_PATTERN = re.compile(r"vector<string> supported_flagsV2\s*=\s*\{(.*?)\};", re.DOTALL)
 LEGACY_PATTERN = re.compile(r'strcmp\(argv\[i\],\s*"(--[^"]+)"\)')
 COVERED_EVIDENCE = {"independent_oracle", "format_decode", "error_path", "characterization"}
+IMPLEMENTATION_STATUSES = {"noop", "unsupported"}
 
 
 def parsed_flags(source):
@@ -80,6 +82,23 @@ def audit(source, build):
                 errors.append(f"{flag}: missing threading evidence")
         if status == "excluded" and not entry.get("details"):
             errors.append(f"{flag}: exclusion lacks attempted paths and required conditions")
+        implementation = entry.get("implementation_status")
+        if implementation is not None:
+            if implementation not in IMPLEMENTATION_STATUSES:
+                errors.append(f"{flag}: unknown implementation status {implementation}")
+            if status != "covered":
+                errors.append(f"{flag}: implementation status requires covered status")
+            details = entry.get("details", "").lower()
+            if implementation == "noop":
+                if entry.get("evidence") != "characterization":
+                    errors.append(f"{flag}: no-op must use characterization evidence")
+                if not any(marker in details for marker in ("no-op", "noop", "consume", "not implemented")):
+                    errors.append(f"{flag}: no-op details must state the missing effect")
+            elif implementation == "unsupported":
+                if entry.get("evidence") not in ("error_path", "characterization"):
+                    errors.append(f"{flag}: unsupported must use error_path or characterization evidence")
+                if "unsupported" not in details and "no active" not in details:
+                    errors.append(f"{flag}: unsupported details must state the limitation")
         if build:
             for test in entry.get("tests", []):
                 if test not in tests:
@@ -123,7 +142,13 @@ def main():
     counts = {status: 0 for status in ("covered", "deferred", "excluded")}
     for entry in ledger["flags"].values():
         counts[entry["status"]] += 1
-    print(f"CLI ledger passed: {len(ledger['flags'])} flags; {counts}")
+    implementation = Counter(
+        entry.get("implementation_status", "verified") for entry in ledger["flags"].values()
+    )
+    print(
+        f"CLI ledger passed: {len(ledger['flags'])} flags; {counts}; "
+        f"implementation={dict(implementation)}"
+    )
 
 
 if __name__ == "__main__":

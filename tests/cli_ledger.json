@@ -175,13 +175,14 @@
       "tests": [
         "cli.v2_flags.allowlisted_noops"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "error_path",
+      "details": "v2 accepts --bed in the supported flag list but has no active BED loader; the scenario asserts the exact 'no genotype file is specified' diagnostic.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "unsupported"
     },
     "--bfile": {
       "scope": "M1",
@@ -711,13 +712,14 @@
       "tests": [
         "cli.v2_flags.multifile"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "v2 has no dosage reader; with PLINK input the flag is a no-op and the scenario asserts the expected GRM rather than a dosage effect.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--dosage-beagle": {
       "scope": "M2",
@@ -3085,13 +3087,14 @@
       "tests": [
         "cli.v2_flags.fastgwa_exact"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "Accepted and listed by FastFAM but not consumed; the scenario asserts v2 dispatch and model output, not a functional marker effect.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--noSandwich": {
       "scope": "M1",
@@ -3113,13 +3116,14 @@
       "tests": [
         "cli.v2_flags.allowlisted_noops"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "Accepted and listed v2 flag, but no v2 code consumes it; the scenario asserts GRM equivalence with and without the flag.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--nofilter": {
       "scope": "M1",
@@ -3149,13 +3153,14 @@
       "tests": [
         "cli.v2_flags.allowlisted_noops"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "Accepted and listed v2 flag, but no v2 code consumes it; the scenario asserts GRM equivalence with and without the flag.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--optimal-rho": {
       "scope": "M1",
@@ -3355,13 +3360,14 @@
       "tests": [
         "cli.v2_flags.ld"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "LD.cpp selects the r2 method flag but does not consume it; the scenario records exact output equivalence to --r.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--raw-files": {
       "scope": "M1",
@@ -4430,13 +4436,14 @@
       "tests": [
         "cli.v2_flags.allowlisted_noops"
       ],
-      "evidence": "independent_oracle",
-      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "evidence": "characterization",
+      "details": "Accepted and listed v2 flag, but no v2 code consumes it; the scenario asserts GRM equivalence with and without the flag.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ]
+      ],
+      "implementation_status": "noop"
     },
     "--unify-grm": {
       "scope": "M1",
