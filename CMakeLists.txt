@@ -32,6 +32,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(GCTA_BUILD_TESTING "Build GCTA regression tests" ON)
+set(GCTA_SANITIZE "" CACHE STRING "Enable sanitizers, e.g. address,undefined")
+if(GCTA_SANITIZE)
+    add_compile_options(-fsanitize=${GCTA_SANITIZE} -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=${GCTA_SANITIZE})
+endif()
 # Dependency projects share BUILD_TESTING; keep their test suites disabled.
 set(BUILD_TESTING OFF CACHE BOOL "Build dependency tests" FORCE)
 
