@@ -2833,6 +2833,7 @@ union Geno_prob{
 
 
 void Geno::bgen2bed(const vector<uint32_t> &raw_marker_index){
+    init_keep();
     LOGGER << "Old bgen 2 bed" << std::endl;
     LOGGER.ts("LOOP_BGEN_BED");
     LOGGER.ts("LOOP_BGEN_TOT");
@@ -2871,7 +2872,7 @@ void Geno::bgen2bed(const vector<uint32_t> &raw_marker_index){
 
         #pragma omp ordered
         {
-            fseek(h_bgen, byte_pos, SEEK_SET);
+            Marker::extractBgenMarkerInfo(h_bgen, byte_pos);
             len_comp = read1Byte<uint32_t>(h_bgen) - 4;
             len_decomp = read1Byte<uint32_t>(h_bgen);
             snp_data = new char[len_comp];
@@ -3021,12 +3022,10 @@ void Geno::bgen2bed(const vector<uint32_t> &raw_marker_index){
         }
         //LOGGER.i(0, "MIDDLE: " + to_string(index) + "NUM_thread: " + to_string(omp_get_max_threads()));
 
-        // exactly one 'ordered' directive must appear in the loop body of an enclosing directive
-        // #pragma omp ordered
+        #pragma omp ordered
         save_bed(buf, num_marker);
         delete[] buf;
         delete[] dec_data;
-        //#pragma omp ordered
         //LOGGER.i(0, "Finished " + to_string(index) + "NUM_thread: " + to_string(omp_get_max_threads()));
         if(index % 10000 == 0){
             float time_p = LOGGER.tp("LOOP_BGEN_BED");
