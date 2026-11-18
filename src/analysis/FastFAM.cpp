@@ -2187,10 +2187,11 @@ void FastFAM::readFAM(string filename, SpMat& fam, const vector<string> &ids, ve
 
 void FastFAM::grammar_func(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int nMarker = markerIndex.size();
+    static thread_local GenoBufItem item;
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < nMarker; i++){
         int index_cur_marker = num_grammar_markers + i;
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = markerIndex[i];
         geno->getGenoDouble(genobuf, i, &item);
         bValids[index_cur_marker] = item.valid;
@@ -2412,11 +2413,12 @@ void FastFAM::calculate_gwa(uintptr_t * genobuf, const vector<uint32_t> &markerI
 
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
 
     #pragma omp parallel for schedule(static)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
 
         geno->getGenoDouble(genobuf, i, &item);
@@ -2469,11 +2471,12 @@ void FastFAM::calculate_gwa_2df(uintptr_t * genobuf, const vector<uint32_t> &mar
 
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
 
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
 
         geno->getGenoDouble(genobuf, i, &item);
@@ -2566,11 +2569,12 @@ void FastFAM::calculate_gwa_2df_sandwich(uintptr_t * genobuf, const vector<uint3
 
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
 
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
 
         geno->getGenoDouble(genobuf, i, &item);
@@ -2936,11 +2940,12 @@ void FastFAM::calculate_fam(uintptr_t *genobuf, const vector<uint32_t> &markerIn
 
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
 
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
 
         geno->getGenoDouble(genobuf, i, &item);
@@ -2976,10 +2981,11 @@ void FastFAM::calculate_fam(uintptr_t *genobuf, const vector<uint32_t> &markerIn
 void FastFAM::calculate_grammar(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
         geno->getGenoDouble(genobuf, i, &item);
         
@@ -3766,10 +3772,11 @@ void FastFAM::processFAMreg(){
 void FastFAM::getX(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    GenoBufItem item{};
     for(int i = 0; i < num_marker; i++){
         int index_cur_marker = num_gene_index + i;
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
         geno->getGenoDouble(genobuf, i, &item);
         
@@ -4254,10 +4261,11 @@ void FastFAM::initBinary(const SpMat &fam){
 
 void FastFAM::binGrammar_func(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int nMarker = markerIndex.size();
+    static thread_local GenoBufItem item;
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < nMarker; i++){
         int index_cur_marker = num_grammar_markers + i;
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = markerIndex[i];
         geno->getGenoDouble(genobuf, i, &item);
         bValids[index_cur_marker] = item.valid;
@@ -4404,10 +4412,11 @@ void FastFAM::estBinGamma(){
 void FastFAM::calculate_spa(uintptr_t *genobuf, const vector<uint32_t> &markerIndex){
     int num_marker = markerIndex.size();
     vector<uint8_t> isValids(num_marker);
+    static thread_local GenoBufItem item;
     #pragma omp parallel for schedule(dynamic)
     for(int i = 0; i < num_marker; i++){
         uint32_t cur_marker = markerIndex[i];
-        GenoBufItem item{};
+        item.valid = false;
         item.extractedMarkerIndex = cur_marker;
         geno->getGenoDouble(genobuf, i, &item);
         
