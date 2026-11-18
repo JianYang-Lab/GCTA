@@ -19,6 +19,12 @@ DEFAULT_SCENARIOS = (
     "fastgwa_mlm",
     "fastgwa_exact",
     "fastgwa_glmm",
+    "fastgwa_2df",
+    "fastgwa_2df_nosandwich",
+    "fastgwa_2df_mixed",
+    "fastgwa_2df_mixed_nosandwich",
+    "fastgwa_glmm_large",
+    "ld_matrix",
 )
 
 
@@ -35,12 +41,16 @@ def parse_args():
     parser.add_argument("--max-rss-increase", type=float, default=0.10)
     parser.add_argument("--min-wall-seconds", type=float, default=0.25)
     parser.add_argument("--report-only", action="store_true")
+    parser.add_argument("--cpu-affinity", default=None)
     args = parser.parse_args()
     assert args.repeat > 0 and all(thread > 0 for thread in args.threads)
+    if args.cpu_affinity is not None:
+        args.cpu_affinity = [int(cpu) for cpu in args.cpu_affinity.split(",") if cpu]
+        assert len(args.cpu_affinity) >= max(args.threads)
     return args
 
 
-def run_once(binary, arguments, work_dir, name, threads):
+def run_once(binary, arguments, work_dir, name, threads, cpus=None):
     output = work_dir / "benchmark"
     command = [
         binary,
@@ -48,7 +58,7 @@ def run_once(binary, arguments, work_dir, name, threads):
         "--out", output,
         "--thread-num", threads,
     ]
-    return measure(command, work_dir, name, threads)
+    return measure(command, work_dir, name, threads, cpus)
 
 
 def compare_scenario(args, baseline, candidate, data, work, scenario):
@@ -62,25 +72,25 @@ def compare_scenario(args, baseline, candidate, data, work, scenario):
         candidate_work = scenario_work / "candidate" / f"threads_{threads}"
         baseline_work.mkdir(parents=True, exist_ok=True)
         candidate_work.mkdir(parents=True, exist_ok=True)
-        run_once(baseline, arguments, baseline_work, "warmup", threads)
-        run_once(candidate, arguments, candidate_work, "warmup", threads)
+        run_once(baseline, arguments, baseline_work, "warmup", threads, args.cpu_affinity)
+        run_once(candidate, arguments, candidate_work, "warmup", threads, args.cpu_affinity)
 
         baseline_runs = []
         candidate_runs = []
         for run in range(args.repeat):
             if run % 2 == 0:
                 baseline_runs.append(
-                    run_once(baseline, arguments, baseline_work, f"run_{run}", threads)
+                    run_once(baseline, arguments, baseline_work, f"run_{run}", threads, args.cpu_affinity)
                 )
                 candidate_runs.append(
-                    run_once(candidate, arguments, candidate_work, f"run_{run}", threads)
+                    run_once(candidate, arguments, candidate_work, f"run_{run}", threads, args.cpu_affinity)
                 )
             else:
                 candidate_runs.append(
-                    run_once(candidate, arguments, candidate_work, f"run_{run}", threads)
+                    run_once(candidate, arguments, candidate_work, f"run_{run}", threads, args.cpu_affinity)
                 )
                 baseline_runs.append(
-                    run_once(baseline, arguments, baseline_work, f"run_{run}", threads)
+                    run_once(baseline, arguments, baseline_work, f"run_{run}", threads, args.cpu_affinity)
                 )
 
         baseline_time = statistics.median(item["elapsed_seconds"] for item in baseline_runs)
@@ -154,6 +164,7 @@ def main():
         "max_slowdown": args.max_slowdown,
         "max_rss_increase": args.max_rss_increase,
         "min_wall_seconds": args.min_wall_seconds,
+        "cpu_affinity": args.cpu_affinity,
         "results": [],
     }
     for scenario in args.scenarios:
