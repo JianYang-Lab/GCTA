@@ -98,6 +98,7 @@ gcta_add_regression_test(error.legacy_invalid_option test_errors.py legacy_inval
 gcta_add_regression_test(legacy.grm_v1 test_legacy.py grm integration)
 gcta_add_regression_test(legacy.freq_v1 test_legacy.py frequency integration)
 gcta_add_regression_test(cli.threads_alias test_legacy.py threads_alias integration)
+gcta_add_regression_test(cli.dispatch test_dispatch.py dual_paths integration)
 gcta_add_regression_test(error.thread_conflict test_legacy.py thread_conflict integration)
 gcta_add_regression_test(error.ld_invalid_window test_errors.py ld_invalid_window integration)
 gcta_add_regression_test(analysis.ld test_ld.py matrix integration)
