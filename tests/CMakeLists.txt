@@ -41,6 +41,7 @@ gcta_add_regression_test(workflow.fastgwa_mlm test_workflows.py fastgwa_mlm inte
 gcta_add_regression_test(workflow.fastgwa_glmm test_workflows.py fastgwa_glmm integration)
 gcta_add_regression_test(workflow.mlma_loco test_workflows.py mlma_loco integration)
 gcta_add_regression_test(workflow.bivar_reml test_bivar.py reml integration)
+gcta_add_regression_test(workflow.hereg test_he.py output integration)
 gcta_add_regression_test(error.bivar_priors test_bivar.py bad_priors integration)
 gcta_add_regression_test(workflow.cojo_joint test_summary.py cojo_joint integration)
 gcta_add_regression_test(workflow.fastbat test_summary.py fastbat integration)
