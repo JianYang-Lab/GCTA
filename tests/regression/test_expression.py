@@ -81,8 +81,13 @@ def run_erm(gcta, work_dir, scenario, threads):
     write_expression(expression)
     algorithm = {"erm_std": 0, "erm_center": 1, "erm_individual": 2}[scenario]
     option = ["--make-erm"] if algorithm == 0 else ["--make-erm-alg", str(algorithm + 1)]
-    output = run_gcta(gcta, work_dir, "erm", ["--efile", expression, *option], threads=threads)
+    arguments = ["--efile", expression, *option]
+    output = run_gcta(gcta, work_dir, "erm", arguments, threads=threads)
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
+    legacy = run_gcta(gcta, work_dir, "erm_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
+    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     prefix = Path(f"{output}.E")
+    assert_grm_equal(prefix, Path(f"{legacy}.E"))
     expected, expected_denominators = expected_erm(algorithm)
     assert_floats_close(read_floats(Path(f"{prefix}.grm.bin")), expected, prefix)
     assert_floats_close(read_floats(Path(f"{prefix}.grm.N.bin")), expected_denominators, prefix)
@@ -94,8 +99,17 @@ def run_erm(gcta, work_dir, scenario, threads):
 def run_erm_gz(gcta, work_dir, threads):
     expression = Path(work_dir) / "input" / "expression.txt"
     write_expression(expression)
-    output = run_gcta(gcta, work_dir, "erm", ["--efile", expression, "--make-erm-gz"], threads=threads)
+    arguments = ["--efile", expression, "--make-erm-gz"]
+    output = run_gcta(gcta, work_dir, "erm", arguments, threads=threads)
+    assert "Accepted options:" not in Path(f"{output}.console").read_text(encoding="utf-8")
+    legacy = run_gcta(gcta, work_dir, "erm_legacy", [*arguments, "--reml-no-constrain"], threads=threads)
+    assert "Accepted options:" in Path(f"{legacy}.console").read_text(encoding="utf-8")
     result = Path(f"{output}.E.grm.gz")
+    with gzip.open(result, "rt", encoding="utf-8") as stream:
+        current_text = stream.read()
+    with gzip.open(f"{legacy}.E.grm.gz", "rt", encoding="utf-8") as stream:
+        legacy_text = stream.read()
+    assert current_text == legacy_text
     expected, expected_denominators = expected_erm(0)
     with gzip.open(result, "rt", encoding="utf-8") as stream:
         rows = [line.split() for line in stream.read().splitlines()]
