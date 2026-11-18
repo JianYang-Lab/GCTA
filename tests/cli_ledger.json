@@ -1,0 +1,4248 @@
+{
+  "schema_version": 1,
+  "m1": {
+    "v2_source": "src/main.cpp:supported_flagsV2",
+    "legacy_source": "legacy/option.cpp:option",
+    "expected_v2_unique_flags": 147,
+    "legacy_main_flags": [
+      "--HEreg",
+      "--HEreg-bivar",
+      "--blup-snp",
+      "--cojo-backward",
+      "--cojo-cond",
+      "--cojo-forward",
+      "--cojo-joint",
+      "--cojo-sblup",
+      "--cojo-slct",
+      "--cojo-stepwise",
+      "--cojo-top-SNPs",
+      "--fastBAT",
+      "--freq",
+      "--freq-v1",
+      "--fst",
+      "--grm-align",
+      "--gwas-adj-pc",
+      "--hapmap-genet-dst",
+      "--ibc",
+      "--ld",
+      "--ld-max-rsq",
+      "--ld-pruning",
+      "--ld-score",
+      "--ld-score-multi",
+      "--ld-score-region",
+      "--mBAT-combo",
+      "--make-bK",
+      "--make-bed",
+      "--make-grm",
+      "--make-grm-alg",
+      "--make-grm-bin",
+      "--make-grm-d-bin",
+      "--make-grm-d-gz",
+      "--make-grm-d-v1",
+      "--make-grm-f3",
+      "--make-grm-gz",
+      "--make-grm-inbred",
+      "--make-grm-inbred-bin",
+      "--make-grm-inbred-gz",
+      "--make-grm-v1",
+      "--make-grm-xchr",
+      "--make-grm-xchr-bin",
+      "--make-grm-xchr-gz",
+      "--mlma",
+      "--mlma-loco",
+      "--paa",
+      "--pc-loading",
+      "--pca",
+      "--project-loading",
+      "--raw-files",
+      "--recode",
+      "--recode-nomiss",
+      "--recode-std",
+      "--reml",
+      "--reml-bivar",
+      "--reml-no-constrain",
+      "--reml-wfam",
+      "--simu-cc",
+      "--simu-qt"
+    ]
+  },
+  "sources": [
+    "src/main.cpp supported_flagsV2",
+    "legacy/option.cpp option()"
+  ],
+  "notes": [
+    "All flags from both parsers are enumerated. M1 includes every v2 flag and every legacy terminal main-analysis trigger. Only legacy-only modifiers are deferred to M2.",
+    "Existing baselines are characterized evidence with source tests/baselines/manifest.json and sanity assertions; independent oracles are preferred where already available. New tests do not modify existing baselines."
+  ],
+  "flags": {
+    "--HEreg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.hereg"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--HEreg-bivar": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.hereg-bivar"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.hereg-bivar with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--acat": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.acat",
+        "error.acat_missing_input"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--autosome": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--autosome-num": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--bed": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.allowlisted_noops"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--bfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--bfile2": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--bgen": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.bgen_subset",
+        "format.make_bed",
+        "format.make_bed_dense",
+        "format.make_bed_bgen"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--bim": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.components"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--blup-snp": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.blup-snp"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.blup-snp with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--bpfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pgen_inputs"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--burden": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--c-inf": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--c-inf-no-filter": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--cg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--chr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--clump-kb": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--clump-p1": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--clump-r2": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--cojo-actual-geno": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-backward": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-select with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-collinear": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-cond": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-cond"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-cond with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-file": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-forward": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-select with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-gc": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-joint": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.cojo_joint"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-p": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-sblup": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-sblup"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-sblup with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-slct": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-select with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-stepwise": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-select with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-top-SNPs": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.cojo-select with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--cojo-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--covar": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--covar-maxlevel": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--cutoff-detail": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--cv-threshold": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--cvblup": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--dc": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Partitioned GRM/sex/dosage-compensation behavior asserted against full GRM and independent X oracle.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--diff-freq": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--dominance": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--dosage": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.multifile"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--dosage-beagle": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--dosage-call": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--dosage-mach": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--dosage-mach-gz": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--e-cor": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_std",
+        "workflow.erm_center",
+        "workflow.erm_individual",
+        "workflow.erm_gz",
+        "error.expression_duplicate_probe",
+        "workflow.ecojo_select",
+        "workflow.ecojo_blup",
+        "workflow.ecojo_no_signal",
+        "workflow.ecojo_collinear"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ecojo": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_std",
+        "workflow.erm_center",
+        "workflow.erm_individual",
+        "workflow.erm_gz",
+        "error.expression_duplicate_probe",
+        "workflow.ecojo_select",
+        "workflow.ecojo_blup",
+        "workflow.ecojo_no_signal",
+        "workflow.ecojo_collinear"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ecojo-blup": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.ecojo_blup"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ecojo-collinear": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.ecojo_collinear"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ecojo-p": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.ecojo"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ecojo-slct": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.ecojo_select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--effect-plot": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--efile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_std",
+        "workflow.erm_center",
+        "workflow.erm_individual",
+        "workflow.erm_gz",
+        "error.expression_duplicate_probe",
+        "workflow.ecojo_select",
+        "workflow.ecojo_blup",
+        "workflow.ecojo_no_signal",
+        "workflow.ecojo_collinear"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--envir": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--est-vg": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--exclude": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined",
+        "format.make_bed",
+        "format.make_bed_dense",
+        "format.make_bed_bgen"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--exclude-region-bp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--exclude-region-snp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--exclude-snp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--extract": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "grm.weighted",
+        "grm.missing",
+        "grm.threads",
+        "grm.sparse",
+        "grm.snp_merge",
+        "grm.partitions",
+        "workflow.cojo_joint",
+        "workflow.fastbat",
+        "workflow.mbat"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--extract-region-bp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--extract-region-snp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--extract-snp": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fam": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.components"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastBAT": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-set"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.fastbat-set with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-gene-list": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-ld-cutoff": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-seg": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-set-list": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastBAT-write-snpset": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--fastGWA": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.obsolete_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastGWA-gram": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.obsolete_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastGWA-lr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fastgwa_lr",
+        "model.lr_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastGWA-mlm": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fastgwa_mlm",
+        "model.mlm_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastGWA-mlm-binary": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fastgwa_glmm",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fastGWA-mlm-exact": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fastgwa_exact",
+        "model.exact_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--force-gwa": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--freq": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "geno.decoding",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--freq-v1": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "legacy.freq_v1",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--freqx": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "geno.freqx",
+        "geno.freqx_maf",
+        "geno.freqx_max_maf",
+        "geno.freq_x_filtered",
+        "geno.sum_x",
+        "error.freqx_no_x"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--fst": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fst"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ge": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gencall": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--gene-list": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.acat",
+        "error.acat_missing_input"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--geno": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.filters"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--grid-size": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--grm": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.hereg"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--grm-adj": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--grm-align": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.grm-align"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.grm-align with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--grm-bin": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--grm-cutoff": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--grm-cutoff-v1": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--grm-gz": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--grm-singleton": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--grm-sparse": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco",
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm",
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-alg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-direction": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-file": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-ld-fdr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-snp": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-snp-min": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr-so": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gsmr2-beta": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gwa-no-constrain": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--gwas-adj-pc": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.gwas-adj-pc"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.gwas-adj-pc with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--gwas-adj-pc-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--gwas-thresh": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--gxe": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--gxqe": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--h2-limit": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--hapmap-genet-dst": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.hapmap-genet-dst"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.hapmap-genet-dst with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--hard-call-thresh": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--heidi-snp": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.gsmr_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--heidi-thresh": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid",
+        "workflow.mtcojo",
+        "workflow.mtcojo_compressed_flip",
+        "workflow.mtcojo_internal_bxy",
+        "error.mtcojo_missing_ld"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ibc": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ibc"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.ibc with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ibc-all": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--imput-rsq": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--info": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.filters"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--inv-t1": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--joint-covar": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--keep": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.make_bed"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--ld": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.ld with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-file": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-i": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-matrix": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.ld"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ld-max-rsq": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld-max-rsq"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.ld-max-rsq with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-pruning": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "legacy.ld_pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-pruning-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-rsq-cutoff": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-score": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "legacy.ld_score"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-score-adj": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-score-multi": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld-score-multi"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.ld-score-multi with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-score-region": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld-score-region"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.ld-score-region with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-sig": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-step": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--ld-wind": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.ld",
+        "error.ld_invalid_window",
+        "legacy.ld_score",
+        "legacy.ld_pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--ldlt": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--llt": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--load-inv": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--load-model": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "model.lr_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--lscg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mBAT-combo": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.mbat-set with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-gene-list": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-print-all-p": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-set-list": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-svd-gamma": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mBAT-write-snpset": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--maf": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined",
+        "geno.freqx",
+        "geno.freqx_maf",
+        "geno.freqx_max_maf",
+        "geno.freq_x_filtered",
+        "geno.sum_x",
+        "error.freqx_no_x"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-bK": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pruning"
+      ],
+      "evidence": "independent_oracle",
+      "details": "v2 pruning/bK threshold behavior asserted; legacy dispatch differs and remains characterized by the v2 path and existing GRM tests.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-bK-sparse": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "grm.weighted",
+        "grm.missing",
+        "grm.threads",
+        "grm.sparse",
+        "grm.snp_merge",
+        "grm.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-bed": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.make_bed",
+        "cli.dispatch"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-erm": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_std",
+        "workflow.erm_center",
+        "workflow.erm_individual"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-erm-alg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_std",
+        "workflow.erm_center",
+        "workflow.erm_individual",
+        "workflow.erm_gz",
+        "error.expression_duplicate_probe",
+        "workflow.ecojo_select",
+        "workflow.ecojo_blup",
+        "workflow.ecojo_no_signal",
+        "workflow.ecojo_collinear"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-erm-gz": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.erm_gz"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-grm": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-grm-alg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "grm.weighted",
+        "legacy.grm_v1"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-grm-bin": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-d": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.xchr",
+        "grm.dominance"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-grm-d-bin": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-d-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-d-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-d-gz": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-d-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-d-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-d-part": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Partitioned GRM/sex/dosage-compensation behavior asserted against full GRM and independent X oracle.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-grm-d-v1": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-d-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-d-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-f3": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-gz": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-inbred": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-inbred-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-inbred-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-inbred-bin": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-inbred-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-inbred-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-inbred-gz": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-inbred-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-inbred-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-part": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--make-grm-v1": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "legacy.grm_v1",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-wt-wind": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-xchr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.xchr",
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "dual-path comparison; logs assert both v2 processMain and legacy Accepted options, with decoded outputs compared",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--make-grm-xchr-bin": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-xchr-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-xchr-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-xchr-gz": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.make-grm-xchr-formats"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.make-grm-xchr-formats with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--make-grm-xchr-part": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Partitioned GRM/sex/dosage-compensation behavior asserted against full GRM and independent X oracle.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--max-maf": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined",
+        "analysis.acat",
+        "error.acat_missing_input",
+        "geno.freqx",
+        "geno.freqx_maf",
+        "geno.freqx_max_maf",
+        "geno.freq_x_filtered",
+        "geno.sum_x",
+        "error.freqx_no_x"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--mbfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.multifile"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--mbgen": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--mbpfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pgen_inputs"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mgrm": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.snp_merge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--mgrm-bin": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mgrm-gz": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--min-mac": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.acat",
+        "error.acat_missing_input"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mlma": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.mlma"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mlma-loco": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.mlma_loco"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mlma-no-adj-covar": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mlma-no-preadj-covar": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--mlma-subtract-grm": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--model-only": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "model.lr_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mpfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.pgen_inputs"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mpheno": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco",
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm",
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--mtcojo-bxy": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.mtcojo",
+        "workflow.mtcojo_compressed_flip",
+        "workflow.mtcojo_internal_bxy",
+        "error.mtcojo_missing_ld"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--mtcojo-file": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.mtcojo",
+        "workflow.mtcojo_compressed_flip",
+        "workflow.mtcojo_internal_bxy"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--no-marker": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--noSandwich": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--noblas": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.allowlisted_noops"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--nofilter": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--num-vec": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.allowlisted_noops"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--optimal-rho": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--out": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--paa": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.paa"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.paa with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--pardiso": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--pc-loading": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.pc-loading"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.pc-loading with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--pca": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.pca"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--pfile": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.pgen_hardcall",
+        "format.pgen_dosage"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--pheno": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma",
+        "workflow.hereg"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--prevalence": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--project-loading": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.project-loading"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.project-loading with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--qcovar": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco",
+        "workflow.fastgwa_save_pheno",
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm",
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--r": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.ld"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--r2": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.ld"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--raw-files": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.raw_modern",
+        "format.raw_old",
+        "error.raw_snp_mismatch"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--raw-summary": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--rcovar": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--recode": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.recode"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.recode with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--recode-nomiss": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.recode"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.recode with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--recode-std": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.recode"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.recode with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--recodet": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "geno.decoding",
+        "format.pgen_hardcall",
+        "format.pgen_dosage"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ref-ld-chr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid",
+        "workflow.mtcojo",
+        "workflow.mtcojo_compressed_flip",
+        "workflow.mtcojo_internal_bxy",
+        "error.mtcojo_missing_ld"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--rel-only": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--reml": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-alg": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-allow-no-converge": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-amzvc": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bendV": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bending": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bivar": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.bivar_reml"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bivar-lrt-rg": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bivar-no-constrain": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bivar-nocove": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-bivar-prevalence": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-detail": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--reml-diag-mul": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-diag-one": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-diagV-adj": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-est-fix": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-est-fix-varcov": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-fixed-var": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-force-converge": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-inv-mtd": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-lrt": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-maxit": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-no-constrain": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.reml-variants"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.reml-variants with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-no-lrt": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-pred-rand": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-priors": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-priors-var": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-res-diag": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--reml-wfam": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.reml-variants"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Legacy terminal command asserted by cli.legacy_commands.reml-variants with decoded output/numeric checks.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--remove": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "filter.maf",
+        "filter.max_maf",
+        "filter.chr",
+        "filter.chr_range",
+        "filter.autosome",
+        "filter.autosome_num",
+        "filter.remove",
+        "filter.exclude",
+        "filter.combined"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--restrict-output-pC": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--rm-high-ld": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--sample": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "format.bgen_subset",
+        "format.make_bed",
+        "format.make_bed_dense",
+        "format.make_bed_bgen",
+        "format.mbfile",
+        "format.mbgen",
+        "format.mpfile"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--save-bin": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--save-fastGWA-mlm-residual": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--save-inv": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--save-pheno": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.fastgwa_save_pheno"
+      ],
+      "evidence": "characterization",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone. Characterized outputs use the pre-existing checked-in tests/baselines/manifest.json provenance plus convergence, dimensions, and finite-value sanity checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--save-ram": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--seed": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco",
+        "workflow.fastgwa_save_pheno",
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm",
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--set-list": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--simu-causal-loci": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-cc": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_cc"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-eff-mod": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-embayesb": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-hsq": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-k": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-ouput-causal": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-qt": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_qt"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "legacy option() terminal chain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-rep": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--simu-seed": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--snp-list": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "analysis.acat",
+        "error.acat_missing_input"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--sparse-cutoff": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "grm.standard",
+        "grm.weighted",
+        "grm.missing",
+        "grm.threads",
+        "grm.sparse",
+        "grm.snp_merge",
+        "grm.partitions",
+        "workflow.greml",
+        "workflow.pca",
+        "workflow.fastgwa_lr",
+        "workflow.fastgwa_lr_nofilter",
+        "workflow.mlma",
+        "workflow.fastgwa_exact",
+        "workflow.fastgwa_mlm",
+        "workflow.fastgwa_glmm",
+        "workflow.mlma_loco",
+        "binary.fastgwa_lr",
+        "binary.fastgwa_glmm",
+        "model.lr_roundtrip",
+        "model.lr_reordered_roundtrip",
+        "model.mlm_roundtrip",
+        "model.exact_roundtrip",
+        "model.glmm_roundtrip"
+      ],
+      "evidence": "format_decode",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--ssq": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--sub-popu": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--subtract-grm": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--sum-geno-x": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "geno.freqx",
+        "geno.freqx_maf",
+        "geno.freqx_max_maf",
+        "geno.freq_x_filtered",
+        "geno.sum_x",
+        "error.freqx_no_x"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--tao-start": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--tcg": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.inversion_errors"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--test-covar": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['allowlisted/helper']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['allowlisted/helper']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--thread-num": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.threads_alias",
+        "error.thread_conflict"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--threads": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.threads_alias",
+        "error.thread_conflict"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--trace-exact": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.allowlisted_noops"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--unify-grm": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--update-freq": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.components"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--update-imput-rsq": {
+      "scope": "M2",
+      "status": "deferred",
+      "tests": [],
+      "evidence": "deferred",
+      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "parsers": [
+        "legacy"
+      ]
+    },
+    "--update-ref-allele": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.components"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--update-sex": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.partitions"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Partitioned GRM/sex/dosage-compensation behavior asserted against full GRM and independent X oracle.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2",
+        "legacy"
+      ]
+    },
+    "--verbose": {
+      "scope": "M1",
+      "status": "excluded",
+      "tests": [],
+      "evidence": "excluded",
+      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ],
+      "exclusion": {
+        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+      }
+    },
+    "--w-ld-chr": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "workflow.gsmr",
+        "workflow.gsmr_compressed_flip",
+        "workflow.gsmr_multi_trait",
+        "workflow.gsmr_correlated",
+        "workflow.gsmr_heidi",
+        "workflow.gsmr_overlap_ldsc",
+        "workflow.gsmr_overlap_correlation",
+        "error.gsmr_overlap_invalid",
+        "workflow.mtcojo",
+        "workflow.mtcojo_compressed_flip",
+        "workflow.mtcojo_internal_bxy",
+        "error.mtcojo_missing_ld"
+      ],
+      "evidence": "error_path",
+      "details": "Asserts command-specific decoded output, numerical content, and/or exact diagnostic; not exit status alone.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    },
+    "--wind": {
+      "scope": "M1",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.acat_wind"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
+      "dispatch": "v2 module processMain",
+      "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
+      "parsers": [
+        "v2"
+      ]
+    }
+  }
+}

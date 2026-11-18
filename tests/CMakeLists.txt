@@ -21,7 +21,20 @@ function(gcta_add_regression_test test_name script scenario label)
         TIMEOUT 120
         ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
     )
+    set_property(GLOBAL APPEND PROPERTY GCTA_LEDGER_TESTS ${test_name})
 endfunction()
+
+add_test(
+    NAME cli.ledger.audit
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/audit_cli_ledger.py"
+        --source "${CMAKE_SOURCE_DIR}"
+        --build "${CMAKE_BINARY_DIR}"
+)
+set_tests_properties(cli.ledger.audit PROPERTIES
+    LABELS "audit"
+    TIMEOUT 30
+    ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+)
 
 gcta_add_regression_test(grm.standard test_grm.py standard unit)
 gcta_add_regression_test(grm.weighted test_grm.py weighted unit)
@@ -99,6 +112,12 @@ gcta_add_regression_test(legacy.grm_v1 test_legacy.py grm integration)
 gcta_add_regression_test(legacy.freq_v1 test_legacy.py frequency integration)
 gcta_add_regression_test(cli.threads_alias test_legacy.py threads_alias integration)
 gcta_add_regression_test(cli.dispatch test_dispatch.py dual_paths integration)
+foreach(scenario IN ITEMS components filters pruning partitions multifile pgen_inputs ld inversion_errors obsolete_errors gsmr gsmr_errors ecojo acat_wind allowlisted_noops)
+    gcta_add_regression_test(cli.v2_flags.${scenario} test_v2_flags.py ${scenario} integration)
+endforeach()
+foreach(scenario IN ITEMS raw-files hapmap-genet-dst paa ibc make-grm-formats make-grm-d-formats make-grm-xchr-formats make-grm-inbred-formats recode ld ld-score-multi ld-score-region ld-max-rsq blup-snp cojo-select cojo-cond cojo-sblup fastbat-set fastbat-seg mbat-set gwas-adj-pc pc-loading project-loading hereg-bivar reml-variants grm-align)
+    gcta_add_regression_test(cli.legacy_commands.${scenario} test_legacy_commands.py ${scenario} integration)
+endforeach()
 gcta_add_regression_test(error.thread_conflict test_legacy.py thread_conflict integration)
 gcta_add_regression_test(error.ld_invalid_window test_errors.py ld_invalid_window integration)
 gcta_add_regression_test(analysis.ld test_ld.py matrix integration)
@@ -164,3 +183,18 @@ if(LINUX)
     )
     set_tests_properties(install.runtime PROPERTIES LABELS "integration" TIMEOUT 120)
 endif()
+
+get_property(GCTA_LEDGER_DEPENDENCIES GLOBAL PROPERTY GCTA_LEDGER_TESTS)
+add_test(
+    NAME cli.ledger.coverage
+    COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/audit_cli_ledger.py"
+        --source "${CMAKE_SOURCE_DIR}"
+        --build "${CMAKE_BINARY_DIR}"
+        --run
+)
+set_tests_properties(cli.ledger.coverage PROPERTIES
+    LABELS "audit"
+    TIMEOUT 120
+    DEPENDS "${GCTA_LEDGER_DEPENDENCIES}"
+    ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1"
+)
