@@ -54,6 +54,8 @@ gcta_add_regression_test(error.mtcojo_missing_ld test_mtcojo.py missing_ld integ
 gcta_add_regression_test(workflow.erm_std test_expression.py erm_std integration)
 gcta_add_regression_test(workflow.erm_center test_expression.py erm_center integration)
 gcta_add_regression_test(workflow.erm_individual test_expression.py erm_individual integration)
+gcta_add_regression_test(workflow.ecojo_select test_expression.py ecojo_select integration)
+gcta_add_regression_test(workflow.ecojo_blup test_expression.py ecojo_blup integration)
 gcta_add_regression_test(workflow.simu_qt test_simu.py qt integration)
 gcta_add_regression_test(workflow.simu_cc test_simu.py cc integration)
 gcta_add_regression_test(error.simu_seed test_simu.py bad_seed integration)
