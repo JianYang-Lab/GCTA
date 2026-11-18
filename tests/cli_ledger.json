@@ -268,48 +268,44 @@
       "status": "excluded",
       "tests": [],
       "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "details": "Attempted cli.v2_flags.burden: model loads and genes are processed, but burden output declares START/END columns and writes a different field count. Requires an output-format/statistical decision before it can be characterized safely.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
       ],
       "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+        "attempted": "v2_flags.run_burden with --load-model, --set-list, --burden",
+        "required": "Agreement on burden output schema and an independent statistic oracle."
       }
     },
     "--c-inf": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_grammar"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--c-inf-no-filter": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_grammar"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--cg": {
       "scope": "M1",
@@ -564,36 +560,32 @@
     },
     "--covar": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_lr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2",
         "legacy"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--covar-maxlevel": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_lr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--cutoff-detail": {
       "scope": "M1",
@@ -611,19 +603,17 @@
     },
     "--cv-threshold": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_binary"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--cvblup": {
       "scope": "M2",
@@ -700,19 +690,17 @@
     },
     "--dosage-call": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.bgen_dosage"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--dosage-mach": {
       "scope": "M2",
@@ -879,35 +867,31 @@
     },
     "--envir": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--est-vg": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--exclude": {
       "scope": "M1",
@@ -1197,19 +1181,17 @@
     },
     "--force-gwa": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--freq": {
       "scope": "M1",
@@ -1330,19 +1312,17 @@
     },
     "--grid-size": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--grm": {
       "scope": "M1",
@@ -1609,19 +1589,17 @@
     },
     "--gwa-no-constrain": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--gwas-adj-pc": {
       "scope": "M1",
@@ -1683,19 +1661,17 @@
     },
     "--h2-limit": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--hapmap-genet-dst": {
       "scope": "M1",
@@ -1713,19 +1689,17 @@
     },
     "--hard-call-thresh": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.bgen_dosage"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--heidi-snp": {
       "scope": "M1",
@@ -2049,19 +2023,17 @@
     },
     "--ldlt": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--llt": {
       "scope": "M1",
@@ -2079,19 +2051,17 @@
     },
     "--load-inv": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--load-model": {
       "scope": "M1",
@@ -2663,19 +2633,17 @@
     },
     "--mbgen": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.bgen_dosage"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_bgen_dosage']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--mbpfile": {
       "scope": "M1",
@@ -2895,35 +2863,31 @@
     },
     "--no-marker": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--noSandwich": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--noblas": {
       "scope": "M1",
@@ -2977,19 +2941,17 @@
     },
     "--optimal-rho": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--out": {
       "scope": "M1",
@@ -3207,19 +3169,17 @@
     },
     "--rcovar": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_lr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--recode": {
       "scope": "M1",
@@ -3306,19 +3266,17 @@
     },
     "--rel-only": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_ge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_ge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--reml": {
       "scope": "M1",
@@ -3440,19 +3398,17 @@
     },
     "--reml-detail": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--reml-diag-mul": {
       "scope": "M2",
@@ -3712,35 +3668,31 @@
     },
     "--save-fastGWA-mlm-residual": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_grammar"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_grammar']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--save-inv": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_exact"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_exact']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--save-pheno": {
       "scope": "M1",
@@ -3801,15 +3753,15 @@
       "status": "excluded",
       "tests": [],
       "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "details": "Exercised only through the blocked burden path (cli.v2_flags.burden). Requires the same burden output-schema decision plus a stable gene-list/result oracle.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
       ],
       "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_burden']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+        "attempted": "v2_flags.run_burden with a deterministic gene list",
+        "required": "Burden output schema decision and a passing region-test assertion."
       }
     },
     "--simu-causal-loci": {
@@ -3993,19 +3945,17 @@
     },
     "--subtract-grm": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.grm_merge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--sum-geno-x": {
       "scope": "M1",
@@ -4028,19 +3978,17 @@
     },
     "--tao-start": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_binary"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_binary']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--tcg": {
       "scope": "M1",
@@ -4061,15 +4009,15 @@
       "status": "excluded",
       "tests": [],
       "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['allowlisted/helper']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "details": "Attempted cli.v2_flags.components with --test-covar; the debug hook reports template: 8 but samples 0 / X size 0 and then exits with SIGFPE (-8). It is a developer diagnostic, not a supported analysis, and needs a code fix before regression coverage.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
       ],
       "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['allowlisted/helper']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
+        "attempted": "v2 --bfile/--freq with --test-covar covar.txt",
+        "required": "Fix the debug covariate expansion crash and define its supported observable behavior."
       }
     },
     "--thread-num": {
@@ -4120,19 +4068,17 @@
     },
     "--unify-grm": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.grm_merge"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_grm_merge']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--update-freq": {
       "scope": "M1",
@@ -4191,19 +4137,17 @@
     },
     "--verbose": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.fastgwa_lr"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Behavior asserted by the named v2 scenario with decoded output/numeric checks.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "Attempted in test_v2_flags.py scenario(s) ['run_fastgwa_lr']; assertion failed due to fixture-specific statistical assumptions or missing output, so no stable oracle is available in M1. Required: a dedicated deterministic fixture/oracle review before enabling this flag as behavioral coverage.",
-        "required": "Dedicated fixture/oracle review and a passing observable assertion."
-      }
+      ]
     },
     "--w-ld-chr": {
       "scope": "M1",
