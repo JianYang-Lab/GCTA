@@ -812,6 +812,8 @@ void Geno::readGeno_pgen(const vector<uint32_t> &extractIndex){
             }
             int lag_index = rawIndex - base_index;
             int al_idx = marker->isEffecRevRaw(rawIndex) ? 0 : 1;
+            // Hard-call variants leave the trailing dosage-count word unset.
+            g_buf[pgenGenoBuf1PtrSize - 1] = 0;
             reader.ReadDosage(g_buf, lag_index, al_idx);
             g_buf += pgenGenoBuf1PtrSize;
         }
