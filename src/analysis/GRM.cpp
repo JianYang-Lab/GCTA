@@ -991,15 +991,8 @@ void GRM::calculate_GRM_blas(uintptr_t *buf, const vector<uint32_t> &markerIndex
     if(!no_missing && !hasMissing){
         hasMissing = true;
         allocate_N();
-        if(numValidMarkers != 0){
-            add_N_constant(numValidMarkers);
-        }
     }
-    if(no_missing){
-        if(hasMissing && curNumValidMarkers != 0){
-            add_N_constant(curNumValidMarkers);
-        }
-    }else{
+    if(!no_missing){
         const int markerPerN = sizeof(uintptr_t) * CHAR_BIT;
         int numNblock = (curNumValidMarkers + markerPerN - 1) / markerPerN;
         static int numNSampleBlock = (n + markerPerN - 1) / markerPerN;
@@ -1554,18 +1547,6 @@ void GRM::allocate_N(){
         LOGGER.e(0, "can't allocate enough memory to store (parted) N: " + to_string(N_entries * sizeof(uint32_t) / 1024.0/1024/1024) + "GB required.");
     }
     memset(N, 0, N_entries * sizeof(uint32_t));
-}
-
-void GRM::add_N_constant(uint32_t count){
-    for(auto &index_pair : index_grm_pairs){
-        uint64_t startPos = ((uint64_t)index_pair.first + 1 + part_keep_indices.first) * (index_pair.first - part_keep_indices.first) / 2;
-        uint32_t *po_N = N + startPos;
-        for(int pair1 = index_pair.first; pair1 != index_pair.second + 1; pair1++){
-            for(int pair2 = 0; pair2 != pair1 + 1; pair2++){
-                *po_N++ += count;
-            }
-        }
-    }
 }
 
 void GRM::N_thread(int grm_index_from, int grm_index_to, const uintptr_t* cur_cmask){
