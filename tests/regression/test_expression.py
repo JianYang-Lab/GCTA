@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
+import gzip
 import math
 from pathlib import Path
 
 from gcta_runner import assert_floats_close, assert_grm_equal, assert_tables_close, read_floats, read_table, run_gcta
+from test_errors import expect_error
 
 PROBE_DATA = [
     [1.0, 2.0, None, 4.0],
@@ -87,6 +89,37 @@ def run_erm(gcta, work_dir, scenario, threads):
     ids = Path(f"{prefix}.grm.id").read_text(encoding="utf-8").splitlines()
     assert ids == [f"F{index}\tI{index}" for index in range(len(PROBE_DATA))]
     return prefix
+
+
+def run_erm_gz(gcta, work_dir, threads):
+    expression = Path(work_dir) / "input" / "expression.txt"
+    write_expression(expression)
+    output = run_gcta(gcta, work_dir, "erm", ["--efile", expression, "--make-erm-gz"], threads=threads)
+    result = Path(f"{output}.E.grm.gz")
+    expected, expected_denominators = expected_erm(0)
+    with gzip.open(result, "rt", encoding="utf-8") as stream:
+        rows = [line.split() for line in stream.read().splitlines()]
+    assert len(rows) == len(expected)
+    index = 0
+    for row in range(len(PROBE_DATA)):
+        for column in range(row + 1):
+            assert rows[index][:2] == [str(row + 1), str(column + 1)]
+            assert math.isclose(float(rows[index][2]), expected_denominators[index], rel_tol=2e-5, abs_tol=1e-6)
+            assert math.isclose(float(rows[index][3]), expected[index], rel_tol=2e-5, abs_tol=1e-6)
+            index += 1
+    ids = Path(f"{output}.E.grm.id").read_text(encoding="utf-8").splitlines()
+    assert ids == [f"F{index}\tI{index}" for index in range(len(PROBE_DATA))]
+    return result
+
+
+def expect_duplicate_probe(gcta, work_dir):
+    expression = Path(work_dir) / "input" / "duplicate.txt"
+    expression.parent.mkdir(parents=True, exist_ok=True)
+    expression.write_text("FID IID P0 P0\nF0 I0 1 2\n", encoding="utf-8")
+    output = Path(work_dir) / "duplicate"
+    expect_error(gcta, Path(work_dir), "duplicate", ["--efile", expression, "--make-erm", "--out", output])
+    console = (Path(work_dir) / "duplicate.console").read_text(encoding="utf-8")
+    assert "duplicated probe names found" in console
 
 
 ECOJO_DATA = [
@@ -220,6 +253,21 @@ def run_ecojo_blup(gcta, work_dir, threads):
     return outputs[0]
 
 
+def run_ecojo_no_signal(gcta, work_dir, threads):
+    expression, summary, _ = write_ecojo_fixture(work_dir)
+    summary.write_text("Probe z N\nP0 0 100\nP1 0 100\n", encoding="utf-8")
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "no_signal",
+        ["--efile", expression, "--ecojo", summary, "--ecojo-slct"],
+        threads=threads,
+    )
+    assert not Path(f"{output}.slct.ecojo").exists()
+    console = Path(f"{output}.console").read_text(encoding="utf-8")
+    assert "No probe has been selected." in console
+
+
 def main():
     parser = argparse.ArgumentParser(description="GCTA expression workflow regression tests")
     parser.add_argument("--gcta", required=True)
@@ -228,13 +276,35 @@ def main():
     parser.add_argument(
         "--scenario",
         required=True,
-        choices=("erm_std", "erm_center", "erm_individual", "ecojo_select", "ecojo_blup"),
+        choices=(
+            "erm_std",
+            "erm_center",
+            "erm_individual",
+            "erm_gz",
+            "duplicate_probe",
+            "ecojo_select",
+            "ecojo_blup",
+            "ecojo_no_signal",
+        ),
     )
     args = parser.parse_args()
-    if args.scenario.startswith("erm_"):
+    if args.scenario == "duplicate_probe":
+        expect_duplicate_probe(args.gcta, args.work)
+    elif args.scenario == "erm_gz":
+        single = run_erm_gz(args.gcta, Path(args.work) / "single", 1)
+        multi = run_erm_gz(args.gcta, Path(args.work) / "multi", 4)
+        with gzip.open(single, "rt", encoding="utf-8") as stream:
+            single_text = stream.read()
+        with gzip.open(multi, "rt", encoding="utf-8") as stream:
+            multi_text = stream.read()
+        assert single_text == multi_text
+    elif args.scenario.startswith("erm_"):
         single = run_erm(args.gcta, Path(args.work) / "single", args.scenario, 1)
         multi = run_erm(args.gcta, Path(args.work) / "multi", args.scenario, 4)
         assert_grm_equal(single, multi)
+    elif args.scenario == "ecojo_no_signal":
+        run_ecojo_no_signal(args.gcta, Path(args.work) / "single", 1)
+        run_ecojo_no_signal(args.gcta, Path(args.work) / "multi", 4)
     else:
         runner = run_ecojo_select if args.scenario == "ecojo_select" else run_ecojo_blup
         single = runner(args.gcta, Path(args.work) / "single", 1)
