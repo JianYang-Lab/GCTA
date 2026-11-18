@@ -303,9 +303,9 @@ vector<uint32_t> Marker::getNextWindowIndex(uint32_t cur_marker_index, uint32_t 
 }
 
 uint32_t Marker::getNextSize(const vector<uint32_t> &rawRef, uint32_t curExtractIndex, uint32_t num, int &fileIndex, bool &chr_ends, uint8_t &isSexXY){
-    static bool success;
-    static uint8_t Xchr = mapCHR("X", success);
-    static uint8_t Ychr = mapCHR("Y", success);
+    bool success;
+    const uint8_t Xchr = mapCHR("X", success);
+    const uint8_t Ychr = mapCHR("Y", success);
     if(curExtractIndex >= rawRef.size()){
         chr_ends = true;
         return 0;

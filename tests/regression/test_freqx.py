@@ -87,6 +87,36 @@ def check_output(
     return output.with_suffix(".frq")
 
 
+def check_sum_output(gcta, work_dir, threads):
+    prefix = make_fixture(work_dir)
+    output = run_gcta(
+        gcta,
+        work_dir,
+        "sum",
+        ["--bfile", prefix, "--sum-geno-x"],
+        threads=threads,
+    )
+    rows = read_table(output.with_suffix(".sum"))
+    assert rows[0] == [
+        "CHR", "SNP", "POS", "A1", "A2",
+        "AAm", "ABm", "BBm", "Mm", "AAf", "ABf", "BBf", "Mf",
+    ]
+    assert len(rows) == len(MARKERS) + 1
+    for fields, (index, marker) in zip(rows[1:], enumerate(MARKERS)):
+        counts = []
+        for sex in (1, 2):
+            values = [value for value, sample_sex in zip(marker, SEXES) if sample_sex == sex]
+            counts.extend([
+                values.count(2),
+                values.count(1),
+                values.count(0),
+                values.count(None),
+            ])
+        assert fields[:5] == ["23", f"rs{index}", str(1000 + index), "A", "G"]
+        assert fields[5:] == [str(value) for value in counts]
+    return output.with_suffix(".sum")
+
+
 def main():
     parser = argparse.ArgumentParser(description="GCTA X-chromosome frequency regression tests")
     parser.add_argument("--gcta", required=True)
@@ -95,7 +125,7 @@ def main():
     parser.add_argument(
         "--scenario",
         required=True,
-        choices=("output", "maf", "max_maf", "frequency_max_maf", "no_x"),
+        choices=("output", "maf", "max_maf", "frequency_max_maf", "sum_geno", "no_x"),
     )
     args = parser.parse_args()
     work = Path(args.work)
@@ -111,7 +141,11 @@ def main():
             "maximum_maf": 0.45,
         },
     }
-    if args.scenario != "no_x":
+    if args.scenario == "sum_geno":
+        single = check_sum_output(args.gcta, work / "single", 1)
+        multi = check_sum_output(args.gcta, work / "multi", 4)
+        assert single.read_bytes() == multi.read_bytes()
+    elif args.scenario != "no_x":
         single = check_output(args.gcta, work / "single", 1, **configurations[args.scenario])
         multi = check_output(args.gcta, work / "multi", 4, **configurations[args.scenario])
         assert single.read_bytes() == multi.read_bytes()

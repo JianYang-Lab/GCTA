@@ -125,6 +125,7 @@ gcta_add_regression_test(geno.freqx test_freqx.py output integration)
 gcta_add_regression_test(geno.freqx_maf test_freqx.py maf integration)
 gcta_add_regression_test(geno.freqx_max_maf test_freqx.py max_maf integration)
 gcta_add_regression_test(geno.freq_x_filtered test_freqx.py frequency_max_maf integration)
+gcta_add_regression_test(geno.sum_x test_freqx.py sum_geno integration)
 gcta_add_regression_test(error.freqx_no_x test_freqx.py no_x integration)
 
 add_executable(async_buffer_test async_buffer_test.cpp)
@@ -137,6 +138,14 @@ target_include_directories(thread_pool_test PRIVATE "${CMAKE_SOURCE_DIR}/include
 target_link_libraries(thread_pool_test threadpool Threads::Threads)
 add_test(NAME thread.pool COMMAND thread_pool_test)
 set_tests_properties(thread.pool PROPERTIES LABELS "unit" TIMEOUT 120)
+add_executable(geno_lifecycle_test geno_lifecycle_test.cpp)
+target_include_directories(geno_lifecycle_test PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(geno_lifecycle_test
+    geno Pgenlib sqlite3 libzstd Threads::Threads zlib OpenMP::OpenMP_CXX ${CMAKE_DL_LIBS})
+add_test(
+    NAME geno.lifecycle
+    COMMAND geno_lifecycle_test "${GCTA_TEST_DATA}/gcta_legacy/toy")
+set_tests_properties(geno.lifecycle PROPERTIES LABELS "unit" TIMEOUT 120)
 gcta_add_regression_test(linkage.numeric_symbols test_linkage.py numeric_symbols integration)
 set_tests_properties(linkage.numeric_symbols PROPERTIES SKIP_REGULAR_EXPRESSION "SKIP:")
 gcta_add_regression_test(backend.grm test_backends.py grm integration)

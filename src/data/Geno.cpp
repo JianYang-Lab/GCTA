@@ -272,6 +272,7 @@ Geno::Geno(Pheno* pheno, Marker* marker) {
 }
 
 Geno::~Geno(){
+    closeGFiles();
     if(asyncBuffer)delete asyncBuffer;
     if(keep_mask)delete[] keep_mask;
     if(keep_male_mask) delete[] keep_male_mask;
@@ -295,7 +296,9 @@ void Geno::init_keep(){
         num_male_keep_sample = pheno->count_male();
         total_markers -= pheno->count_male();
         keep_male_mask = new uint64_t[(num_keep_sample + 63)/64]();
-        pheno->getMaskBitMale(keep_male_mask);
+        for(auto male_index : pheno->getMaleExtractIndex()){
+            keep_male_mask[male_index / 64] |= 1ULL << (male_index % 64);
+        }
     }
 }
 
@@ -2233,8 +2236,10 @@ void Geno::preProcess_bed(GenoBuf *gbuf){
     keepMask64 = new uint64_t[(rawCountSamples[0] + 63)/64](); 
     pheno->getMaskBit(keepMask64); 
     //if(gbuf->bSex){
-    maleMask64 = new uint64_t[(sampleKeepIndex.size() + 63) / 64](); 
-    pheno->getMaskBitMale(maleMask64); 
+    maleMask64 = new uint64_t[(sampleKeepIndex.size() + 63) / 64]();
+    for(auto male_index : pheno->getMaleExtractIndex()){
+        maleMask64[male_index / 64] |= 1ULL << (male_index % 64);
+    }
     countMale = pheno->count_male();
 
     if(asyncMode){
@@ -2720,20 +2725,17 @@ void Geno::freq2(uint8_t *buf, int num_marker) {
 */
 
 void Geno::sum_geno_x(uint64_t *buf, int num_marker) {
-    static bool inited = false;
-    static std::ofstream out;
-    if(!inited){
-        inited = true;
-        out.open((options["out"] + ".sum").c_str());
-        if (!out) { LOGGER.e(0, "failed to open the file [" + options["out"] + ".sum" + "] to write"); }
-        out << "CHR\tSNP\tPOS\tA1\tA2\tAAm\tABm\tBBm\tMm\tAAf\tABf\tBBf\tMf" << std::endl;
+    if(!osOut.is_open()){
+        osOut.open((options["out"] + ".sum").c_str());
+        if (!osOut) { LOGGER.e(0, "failed to open the file [" + options["out"] + ".sum" + "] to write"); }
+        osOut << "CHR\tSNP\tPOS\tA1\tA2\tAAm\tABm\tBBm\tMm\tAAf\tABf\tBBf\tMf" << std::endl;
     }
 
     const static uint64_t MASK = 6148914691236517205UL; 
     if(num_marker_freq >= marker->count_extract()) return;
 
     int cur_num_marker_read = num_marker;
-    uint32_t *gender_mask = (uint32_t *)keep_male_mask;
+    uint64_t *gender_mask = keep_male_mask;
 
     vector<string> out_contents;
     out_contents.resize(cur_num_marker_read);
@@ -2781,7 +2783,7 @@ void Geno::sum_geno_x(uint64_t *buf, int num_marker) {
  
     }
 
-    std::copy(out_contents.begin(), out_contents.end(), std::ostream_iterator<string>(out, "\n"));
+    std::copy(out_contents.begin(), out_contents.end(), std::ostream_iterator<string>(osOut, "\n"));
  
     num_marker_freq += num_marker;
 
@@ -2793,7 +2795,7 @@ void Geno::freq64_x(uint64_t *buf, int num_marker) {
     if(num_marker_freq >= marker->count_extract()) return;
 
     int cur_num_marker_read = num_marker;
-    uint32_t *gender_mask = (uint32_t *)keep_male_mask;
+    uint64_t *gender_mask = keep_male_mask;
     
     #pragma omp parallel for schedule(dynamic) 
     for(int cur_marker_index = 0; cur_marker_index < cur_num_marker_read; ++cur_marker_index){
@@ -3055,9 +3057,8 @@ void Geno::bgen2bed(const vector<uint32_t> &raw_marker_index){
 
 
 void Geno::save_bed(uint64_t *buf, int num_marker){
-    static string err_string = "can't write to [" + options["out"] + ".bed].";
-    static bool inited = false;
-    if(!inited){
+    const string err_string = "can't write to [" + options["out"] + ".bed].";
+    if(hOut == NULL){
         hOut = fopen((options["out"] + ".bed").c_str(), "wb");
         if(hOut == NULL){
             LOGGER.e(0, err_string);
@@ -3069,7 +3070,6 @@ void Geno::save_bed(uint64_t *buf, int num_marker){
         if(3 != fwrite(buffer, sizeof(uint8_t), 3, hOut)){
             LOGGER.e(0, err_string);
         }
-        inited = true;
         delete[] buffer;
     }
 
@@ -3085,7 +3085,10 @@ void Geno::save_bed(uint64_t *buf, int num_marker){
 }
 
 void Geno::closeOut(){
-    fclose(hOut);
+    if(hOut != NULL){
+        fclose(hOut);
+        hOut = NULL;
+    }
 }
 
 void Geno::resetFreq(){
@@ -3305,13 +3308,9 @@ void Geno::move_geno(uint8_t *buf, uint64_t *keep_list, uint32_t num_raw_sample,
     }
     */
 
-    static uint32_t num_byte_keep_geno = (num_keep_sample + 3) / 4;
-    static uint32_t num_byte_per_marker = (num_raw_sample + 3) / 4;
-    static uint32_t num_qword_per_marker = (num_byte_keep_geno + 7) / 8;
-
-    static int remain_bit = (num_byte_per_marker % 8) * 8;
-    static int move_bit = 64 - remain_bit;
-    static uint64_t MASK = (UINT64_MAX << move_bit) >> move_bit;
+    const uint32_t num_byte_keep_geno = (num_keep_sample + 3) / 4;
+    const uint32_t num_byte_per_marker = (num_raw_sample + 3) / 4;
+    const uint32_t num_qword_per_marker = (num_byte_keep_geno + 7) / 8;
 
     const int move_markers = 4;
 
@@ -3430,11 +3429,11 @@ void Geno::loop_64block(const vector<uint32_t> &raw_marker_index, vector<functio
 
 
 void Geno::makeMarkerX(uint64_t *buf, int cur_marker, double *w_buf, bool center, bool std, uint32_t num_sample){
-    static uint32_t n_actual_sample = (num_sample == 0) ? num_keep_sample : num_sample;
-    uint32_t num_item_n_sample = (n_actual_sample + 31) / 32;
-    static uint32_t last_sample = (n_actual_sample % 32 == 0) ? 32 : (n_actual_sample % 32);
-    static uint32_t last_8block = last_sample / 4;
-    static uint32_t last_2block = last_sample % 4; 
+    const uint32_t n_actual_sample = (num_sample == 0) ? num_keep_sample : num_sample;
+    const uint32_t num_item_n_sample = (n_actual_sample + 31) / 32;
+    const uint32_t last_sample = (n_actual_sample % 32 == 0) ? 32 : (n_actual_sample % 32);
+    const uint32_t last_8block = last_sample / 4;
+    const uint32_t last_2block = last_sample % 4;
 
     uint32_t cur_raw_marker = num_finished_markers + cur_marker;
     uint64_t *cur_buf = buf + cur_marker * num_item_1geno;
