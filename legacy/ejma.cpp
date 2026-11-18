@@ -244,7 +244,7 @@ bool gcta::ecojo_slct_entry(vector<int> &slct, vector<int> &remain, eigenVector 
     vector<double> pC_buf;
     eigenVector2Vector(pC, pC_buf);
 
-    while (true) {
+    while (!pC_buf.empty()) {
         m = min_element(pC_buf.begin(), pC_buf.end()) - pC_buf.begin();
         if (pC_buf[m] >= _ecojo_p_cutoff){
 
@@ -286,6 +286,7 @@ bool gcta::ecojo_slct_entry(vector<int> &slct, vector<int> &remain, eigenVector 
         // debug
         //LOGGER<<"remain = "<<remain.size()<<endl;
     }
+    return false;
 }
 
 void gcta::ecojo_slct_stay(vector<int> &slct, eigenVector &bJ, eigenVector &bJ_se, eigenVector &pJ)

@@ -198,23 +198,20 @@ def check_ecojo_blup(result, expected_b, expected_se, expected_blup):
         assert math.isclose(float(row[5]), expected_blup[index], rel_tol=2e-5, abs_tol=1e-6)
 
 
-def run_ecojo_select(gcta, work_dir, threads):
+def run_ecojo_select(gcta, work_dir, threads, collinear=None):
     expression, summary, _ = write_ecojo_fixture(work_dir)
-    output = run_gcta(
-        gcta,
-        work_dir,
-        "select",
-        ["--efile", expression, "--ecojo", summary, "--ecojo-slct"],
-        threads=threads,
-    )
+    arguments = ["--efile", expression, "--ecojo", summary, "--ecojo-slct"]
+    if collinear is not None:
+        arguments.extend(("--ecojo-collinear", collinear))
+    output = run_gcta(gcta, work_dir, "select", arguments, threads=threads)
     result = Path(f"{output}.slct.ecojo")
     rows = read_table(result)
-    assert len(rows) == 3
+    assert len(rows) == (2 if collinear is not None else 3)
     b, se = ecojo_marginals()
     r_value = ecojo_correlation()
     correlation = [[1.0, r_value], [r_value, 1.0]]
-    expected_bj = solve_2x2(correlation, b)
-    inverse_diagonal = 1.0 / (1.0 - r_value * r_value)
+    expected_bj = [b[0]] if collinear is not None else solve_2x2(correlation, b)
+    inverse_diagonal = 1.0 if collinear is not None else 1.0 / (1.0 - r_value * r_value)
     for index, row in enumerate(rows[1:]):
         assert row[0] == f"P{index}"
         assert math.isclose(float(row[1]), b[index], rel_tol=2e-5, abs_tol=1e-6)
@@ -285,6 +282,7 @@ def main():
             "ecojo_select",
             "ecojo_blup",
             "ecojo_no_signal",
+            "ecojo_collinear",
         ),
     )
     args = parser.parse_args()
@@ -306,7 +304,12 @@ def main():
         run_ecojo_no_signal(args.gcta, Path(args.work) / "single", 1)
         run_ecojo_no_signal(args.gcta, Path(args.work) / "multi", 4)
     else:
-        runner = run_ecojo_select if args.scenario == "ecojo_select" else run_ecojo_blup
+        if args.scenario == "ecojo_select":
+            runner = run_ecojo_select
+        elif args.scenario == "ecojo_collinear":
+            runner = lambda *args: run_ecojo_select(*args, collinear=0.1)
+        else:
+            runner = run_ecojo_blup
         single = runner(args.gcta, Path(args.work) / "single", 1)
         multi = runner(args.gcta, Path(args.work) / "multi", 4)
         assert_tables_close(single, multi)

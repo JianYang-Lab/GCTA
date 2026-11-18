@@ -62,6 +62,7 @@ gcta_add_regression_test(error.expression_duplicate_probe test_expression.py dup
 gcta_add_regression_test(workflow.ecojo_select test_expression.py ecojo_select integration)
 gcta_add_regression_test(workflow.ecojo_blup test_expression.py ecojo_blup integration)
 gcta_add_regression_test(workflow.ecojo_no_signal test_expression.py ecojo_no_signal integration)
+gcta_add_regression_test(workflow.ecojo_collinear test_expression.py ecojo_collinear integration)
 gcta_add_regression_test(format.raw_modern test_raw.py modern integration)
 gcta_add_regression_test(format.raw_old test_raw.py old integration)
 gcta_add_regression_test(error.raw_snp_mismatch test_raw.py mismatch integration)
