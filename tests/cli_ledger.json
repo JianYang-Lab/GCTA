@@ -196,13 +196,17 @@
     },
     "--bfile2": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.misc_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "not numerical"
     },
     "--bgen": {
       "scope": "M1",
@@ -388,13 +392,17 @@
     },
     "--cojo-actual-geno": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--cojo-backward": {
       "scope": "M1",
@@ -412,13 +420,17 @@
     },
     "--cojo-collinear": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--cojo-cond": {
       "scope": "M1",
@@ -436,13 +448,17 @@
     },
     "--cojo-file": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--cojo-forward": {
       "scope": "M1",
@@ -460,13 +476,17 @@
     },
     "--cojo-gc": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "characterization",
+      "details": "M2 COJO scenario enables genomic control and asserts decoded selection output plus 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--cojo-joint": {
       "scope": "M1",
@@ -484,13 +504,17 @@
     },
     "--cojo-p": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--cojo-sblup": {
       "scope": "M1",
@@ -550,13 +574,17 @@
     },
     "--cojo-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--covar": {
       "scope": "M1",
@@ -617,13 +645,17 @@
     },
     "--cvblup": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_inputs"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--dc": {
       "scope": "M1",
@@ -656,13 +688,17 @@
     },
     "--dominance": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--dosage": {
       "scope": "M1",
@@ -680,13 +716,17 @@
     },
     "--dosage-beagle": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "format.beagle_dosage"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--dosage-call": {
       "scope": "M1",
@@ -704,23 +744,31 @@
     },
     "--dosage-mach": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "format.mach_dosage"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--dosage-mach-gz": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.dosage_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--e-cor": {
       "scope": "M1",
@@ -921,33 +969,45 @@
     },
     "--exclude-region-bp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--exclude-region-snp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--exclude-snp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--extract": {
       "scope": "M1",
@@ -975,33 +1035,45 @@
     },
     "--extract-region-bp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--extract-region-snp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--extract-snp": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.filters"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fam": {
       "scope": "M1",
@@ -1033,63 +1105,87 @@
     },
     "--fastBAT-gene-list": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.fastbat"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastBAT-ld-cutoff": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-set"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastBAT-seg": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-seg"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastBAT-set-list": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-set"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastBAT-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-set"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastBAT-write-snpset": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.fastbat-seg"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--fastGWA": {
       "scope": "M1",
@@ -1273,13 +1369,17 @@
     },
     "--gencall": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.raw-files"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--gene-list": {
       "scope": "M1",
@@ -1341,13 +1441,17 @@
     },
     "--grm-adj": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--grm-align": {
       "scope": "M1",
@@ -1365,13 +1469,17 @@
     },
     "--grm-bin": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--grm-cutoff": {
       "scope": "M1",
@@ -1390,23 +1498,31 @@
     },
     "--grm-cutoff-v1": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--grm-gz": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--grm-singleton": {
       "scope": "M1",
@@ -1617,13 +1733,17 @@
     },
     "--gwas-adj-pc-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.gwas-adj-pc"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--gwas-thresh": {
       "scope": "M1",
@@ -1641,23 +1761,31 @@
     },
     "--gxe": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_inputs"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--gxqe": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_inputs"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--h2-limit": {
       "scope": "M1",
@@ -1756,23 +1884,31 @@
     },
     "--ibc-all": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ibc"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--imput-rsq": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.dosage_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--info": {
       "scope": "M1",
@@ -1851,23 +1987,31 @@
     },
     "--ld-file": {
       "scope": "M2",
-      "status": "deferred",
+      "status": "excluded",
       "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "evidence": "excluded",
+      "details": "Attempted standalone --ld-file --ld-score-region with generated 4- and 40-SNP score files; both SIGSEGV in gcta::ld_seg after input is read. Requires a boundary fix and region-breakpoint oracle.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "exclusion": {
+        "attempted": "standalone --ld-file score.ld --ld-score-region 10/100",
+        "required": "Fix gcta::ld_seg crash and add boundary coverage."
+      }
     },
     "--ld-i": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.ld_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-matrix": {
       "scope": "M1",
@@ -1913,23 +2057,31 @@
     },
     "--ld-pruning-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.ld_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-rsq-cutoff": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.ld_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-score": {
       "scope": "M1",
@@ -1947,13 +2099,17 @@
     },
     "--ld-score-adj": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.ld_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-score-multi": {
       "scope": "M1",
@@ -1985,23 +2141,31 @@
     },
     "--ld-sig": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.ld"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-step": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.ld_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--ld-wind": {
       "scope": "M1",
@@ -2110,63 +2274,87 @@
     },
     "--mBAT-gene-list": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.mbat"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mBAT-print-all-p": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mBAT-set-list": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mBAT-svd-gamma": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mBAT-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mBAT-write-snpset": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.mbat-set"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--maf": {
       "scope": "M1",
@@ -2519,13 +2707,17 @@
     },
     "--make-grm-wt-wind": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--make-grm-xchr": {
       "scope": "M1",
@@ -2676,23 +2868,31 @@
     },
     "--mgrm-bin": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mgrm-gz": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--min-mac": {
       "scope": "M1",
@@ -2739,33 +2939,45 @@
     },
     "--mlma-no-adj-covar": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.mlma_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mlma-no-preadj-covar": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.mlma_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--mlma-subtract-grm": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.mlma_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--model-only": {
       "scope": "M1",
@@ -3060,13 +3272,17 @@
     },
     "--prevalence": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_inputs"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--project-loading": {
       "scope": "M1",
@@ -3159,13 +3375,17 @@
     },
     "--raw-summary": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.raw-files"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--rcovar": {
       "scope": "M1",
@@ -3294,53 +3514,73 @@
     },
     "--reml-alg": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "error.legacy_invalid_option"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-allow-no-converge": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-amzvc": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bendV": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bending": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bivar": {
       "scope": "M1",
@@ -3358,43 +3598,59 @@
     },
     "--reml-bivar-lrt-rg": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.bivar_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bivar-no-constrain": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.bivar_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bivar-nocove": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.bivar_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-bivar-prevalence": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.bivar_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-detail": {
       "scope": "M1",
@@ -3412,103 +3668,143 @@
     },
     "--reml-diag-mul": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-diag-one": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-diagV-adj": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-est-fix": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.greml"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-est-fix-varcov": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-fixed-var": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-force-converge": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-inv-mtd": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-lrt": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-maxit": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.greml"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-no-constrain": {
       "scope": "M1",
@@ -3526,53 +3822,73 @@
     },
     "--reml-no-lrt": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.greml"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-pred-rand": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-priors": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.greml"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-priors-var": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-res-diag": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.reml_inputs"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--reml-wfam": {
       "scope": "M1",
@@ -3613,23 +3929,31 @@
     },
     "--restrict-output-pC": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_commands.cojo-select"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--rm-high-ld": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.grm_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--sample": {
       "scope": "M1",
@@ -3710,13 +4034,17 @@
     },
     "--save-ram": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.dispatch"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--seed": {
       "scope": "M1",
@@ -3766,13 +4094,17 @@
     },
     "--simu-causal-loci": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_qt"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-cc": {
       "scope": "M1",
@@ -3790,53 +4122,73 @@
     },
     "--simu-eff-mod": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.simu_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-embayesb": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.simu_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-hsq": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_qt"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-k": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_cc"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-ouput-causal": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.simu_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-qt": {
       "scope": "M1",
@@ -3854,23 +4206,31 @@
     },
     "--simu-rep": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_qt"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--simu-seed": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.simu_qt"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--snp-list": {
       "scope": "M1",
@@ -3925,23 +4285,31 @@
     },
     "--ssq": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.misc_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--sub-popu": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "workflow.fst"
+      ],
+      "evidence": "independent_oracle",
+      "details": "Mapped existing behavioral scenario asserts this modifier through decoded numerical output and 1/4-thread agreement.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--subtract-grm": {
       "scope": "M1",
@@ -4097,13 +4465,17 @@
     },
     "--update-imput-rsq": {
       "scope": "M2",
-      "status": "deferred",
-      "tests": [],
-      "evidence": "deferred",
-      "details": "Legacy-only modifier/input flag; deferred to M2 as allowed by M1.",
+      "status": "covered",
+      "tests": [
+        "cli.legacy_modifiers.dosage_controls"
+      ],
+      "evidence": "characterization",
+      "details": "M2 modifier scenario runs legacy dispatch, compares 1/4-thread output, and asserts the modifier-specific decoded output or exact diagnostic.",
       "parsers": [
         "legacy"
-      ]
+      ],
+      "dispatch": "legacy option() terminal chain; mapped scenario asserts \"Accepted options:\" so v2 fallback cannot mask the modifier.",
+      "threads": "Mapped scenario compares decoded output at 1 and 4 threads."
     },
     "--update-ref-allele": {
       "scope": "M1",

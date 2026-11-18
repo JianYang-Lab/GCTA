@@ -822,7 +822,7 @@ def scenario_cojo_select(gcta, work):
                 gcta,
                 Path(work) / name / f"threads_{threads}",
                 "cojo",
-                ["--bfile", prefix, "--cojo-file", meta] + options,
+                ["--bfile", prefix, "--cojo-file", meta, "--cojo-collinear", 0.9, "--cojo-wind", 100, "--restrict-output-pC", 1, "--cojo-actual-geno", "--cojo-gc", 1] + options,
                 threads,
                 terminal_log,
             )
@@ -900,7 +900,7 @@ def scenario_fastbat_set(gcta, work):
             gcta,
             Path(work) / f"threads_{threads}",
             "fastbat",
-            ["--bfile", prefix, "--fastBAT", meta, "--fastBAT-set-list", sets, "--fastBAT-write-snpset"],
+            ["--bfile", prefix, "--fastBAT", meta, "--fastBAT-set-list", sets, "--fastBAT-write-snpset", "--fastBAT-ld-cutoff", 0.9, "--fastBAT-wind", 50],
             threads,
             "Running fastBAT analysis",
         )
@@ -954,7 +954,7 @@ def scenario_mbat_set(gcta, work):
             gcta,
             Path(work) / f"threads_{threads}",
             "mbat",
-            ["--bfile", prefix, "--mBAT-combo", meta, "--mBAT-set-list", sets, "--mBAT-write-snpset"],
+            ["--bfile", prefix, "--mBAT-combo", meta, "--mBAT-set-list", sets, "--mBAT-write-snpset", "--mBAT-svd-gamma", 0.9, "--mBAT-wind", 50, "--mBAT-print-all-p"],
             threads,
             "Running mBAT-combo analysis",
         )
@@ -1010,7 +1010,7 @@ def scenario_gwas_adj_pc(gcta, work):
             gcta,
             Path(work) / f"threads_{threads}",
             "pcadj",
-            ["--bfile", prefix, "--gwas-adj-pc", file_list, "--pc-loading", pcs],
+            ["--bfile", prefix, "--gwas-adj-pc", file_list, "--gwas-adj-pc-wind", 10000, "--pc-loading", pcs],
             threads,
             "PC1, bxy =",
         )

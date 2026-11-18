@@ -65,8 +65,8 @@ def audit(source, build):
         status = entry["status"]
         if m1 and status not in ("covered", "excluded"):
             errors.append(f"{flag}: M1 status is {status}")
-        if not m1 and status not in ("deferred", "covered", "excluded"):
-            errors.append(f"{flag}: invalid M2 status {status}")
+        if not m1 and status not in ("covered", "excluded"):
+            errors.append(f"{flag}: M2 is incomplete; status is {status}")
         if status == "covered":
             if not entry.get("tests"):
                 errors.append(f"{flag}: covered without a ctest mapping")
