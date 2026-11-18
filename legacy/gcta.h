@@ -143,7 +143,6 @@ public:
     void genet_dst(string bfile, string hapmap_genet_map);
 
     void GWAS_simu(string bfile, int simu_num, string qtl_file, int case_num, int control_num, double hsq, double K, int seed, bool output_causal, bool simu_emb_flag, int eff_mod=0);
-    //void simu_geno_unlinked(int N, int M, double maf);
 
     void set_diff_freq(double freq_diff);
     void run_massoc_slct(string metafile, int wind_size, double p_cutoff, double collinear, int64_t top_SNPs, bool joint_only, bool GC, double GC_val, bool actual_geno, int mld_slct_alg);
@@ -326,12 +325,9 @@ private:
     bool calcu_Vi_bivar(eigenMatrix &Vi, eigenVector &prev_varcmp, double &logdet, int &iter);
 
     // GWAS simulation
-    void kosambi();
     int read_QTL_file(string qtl_file, vector<string> &qtl_name, vector<int> &qtl_pos, vector<double> &qtl_eff, vector<int> &have_eff);
     void output_simu_par(vector<string> &qtl_name, vector<int> &qtl_pos, vector<double> &qtl_eff, double Vp);
     void save_phenfile(vector< vector<double> > &y);
-    // not usefully any more
-    void GenerCases(string bfile, string qtl_file, int case_num, int control_num, double hsq, double K, bool curr_popu = false, double gnrt = 100);
 
     // LD
     void EstLD(vector<int> &smpl, double wind_size, vector< vector<string> > &snp, vector< vector<double> > &r, vector<double> &r2, vector<double> &md_r2, vector<double> &max_r2, vector<string> &max_r2_snp, vector<double> &dL, vector<double> &dR, vector<int> &K, vector<string> &L_SNP, vector<string> &R_SNP, double alpha, bool IncldQ);

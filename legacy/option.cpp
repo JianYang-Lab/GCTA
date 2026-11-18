@@ -95,13 +95,9 @@ void option(int option_num, char* option_str[])
     // initialize paramters for simulation based on real genotype data
     bool simu_qt_flag = false, simu_cc = false, simu_emb_flag = false, simu_output_causal = false;
     int simu_rep = 1, simu_case_num = 0, simu_control_num = 0, simu_eff_mod = 0;
-    double simu_h2 = 0.1, simu_K = 0.1, simu_gener = 100, simu_seed = -CommFunc::rand_seed();
+    double simu_h2 = 0.1, simu_K = 0.1, simu_seed = -CommFunc::rand_seed();
     string simu_causal = "";
 
-    // simulate unlinked SNPs
-    bool simu_unlinked_flag = false;
-    int simu_unlinked_n = 1, simu_unlinked_m = 1;
-    double simu_unlinked_maf = 0.0;
 
     // estimate genetic distance based on hapmap_data
     bool hapmap_genet_dst = false;
@@ -1333,7 +1329,6 @@ void option(int option_num, char* option_str[])
     pter_gcta->set_reml_diag_mul(reml_diag_mul);
     pter_gcta->set_diff_freq(freq_thresh); 
     if (grm_bin_flag || m_grm_bin_flag) pter_gcta->enable_grm_bin_flag();
-    //if(simu_unlinked_flag) pter_gcta->simu_geno_unlinked(simu_unlinked_n, simu_unlinked_m, simu_unlinked_maf);
     if (!RG_fname_file.empty()) {
         if (RG_summary_file.empty()) LOGGER.e(0, "please input the summary information for the raw data files by the option --raw-summary.");
         pter_gcta->read_IRG_fnames(RG_summary_file, RG_fname_file, GC_cutoff);
