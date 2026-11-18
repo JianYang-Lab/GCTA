@@ -35,59 +35,64 @@ If you have any bug reports or questions please send an email to Jian Yang at <j
 
 #### Requirements
 
-1. Currently only x86\_64-based operating systems are supported.
-2. [Intel MKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html) 2017 or above (only needed when building on x86\-64 machines)
-3. OpenBLAS (only needed when building on AArch64 machines)
-4. Eigen == 3.3.7 (there are bugs in the new version of Eigen)
-5. CMake >= 3.1
-6. BOOST >= 1.4
-7. zlib >= 1.2.11 (old zlib may cause an error of bgen file decompression)
-8. sqlite3 >= 3.31.1
-9. zstd >= 1.4.4
-10. [Spectra](https://spectralib.org/) >= 0.8.1
-11. gsl (GNU scientific library)
-
-Most of the dependencies above will be downloaded by CMake automatically. You only need to install the `gsl` and `Intel MKL` manually.
-
-#### Linux
-
-1. Kernel version >= 2.6.28 (otherwise the Intel MKL library doesn't work).
-2. GCC version >= 6.1 with C++ 11 support.
-
-#### Before compilation 
-
-Update [plink_ng](https://github.com/chrchang/plink-ng) submodule first.
+The build requires CMake >= 3.16 and a C++17 compiler. Install the plink-ng submodule before configuring:
 
 ```sh
 git submodule update --init
 ```
 
-On Windows, apply the patch under the `third_party` directory to the `plink-ng`.
+Most dependencies are fetched by CPM. The current source configuration uses Eigen 3.4.0, Boost 1.86.0, Spectra 1.1.0, zlib 1.3.1, zstd 1.5.6, and the SQLite 3.46.0 amalgamation. GSL and Intel MKL must be installed separately when required by the target platform. OpenBLAS is used on AArch64; the runtime backend can also be selected with `GCTA_NUMERIC_BACKEND`.
 
-#### Build
+The build files cover Linux, macOS, and Windows. The regression suite in this checkout is validated on Linux x86-64; other platforms require separate validation.
 
-##### CMake Configuration
+#### Configure and build
 
-On MacOS and Linux, use following command to generate the build system:
+On Linux:
 
 ```sh
-# e.g MKL_DIR can be "/opt/intel/oneapi/mkl/latest/lib/cmake/mkl"
+# Example: /opt/intel/oneapi/mkl/latest/lib/cmake/mkl
 cmake -DCMAKE_BUILD_TYPE=Release -DMKL_DIR="<your_mkl_cmake_path>" -G Ninja -B build/Release -S .
-```
-
-On Windows, you should apply a patch for `plink` under `third_party/`, and then use the toolchain file in `cmake/win-toolchain.cmake`:
-
-``` sh
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="cmake/win-toolchain.cmake" -DLLVM_ROOT="<your_llvm_path>" -DMKL_DIR="<your_mkl_cmake_path>" -G Ninja -B build/Release -S .
-```
-
-##### Compile
-
-```sh
 cmake --build build/Release
 ```
 
-The executable binary will be generated under `build/Release`. 
+On Windows, use the provided toolchain file and apply the plink-ng patch in `third_party/` when required:
+
+```sh
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="cmake/win-toolchain.cmake" -DLLVM_ROOT="<your_llvm_path>" -DMKL_DIR="<your_mkl_cmake_path>" -G Ninja -B build/Release -S .
+cmake --build build/Release
+```
+
+The executable is generated as `build/Release/gcta64`.
+
+#### Test
+
+Regression tests are enabled by default with `GCTA_BUILD_TESTING=ON` and require Python 3:
+
+```sh
+ctest --test-dir build/Release --output-on-failure -j 4
+```
+
+Tests include independent numerical oracles, format and error paths, and 1/4-thread comparisons. New statistical code should be covered before its legacy implementation is removed.
+
+#### Install
+
+Set `CMAKE_INSTALL_PREFIX` at configure time when a non-default installation location is needed:
+
+```sh
+cmake --install build/Release
+```
+
+For a staged installation without writing to the configured prefix:
+
+```sh
+DESTDIR=/tmp/gcta-install cmake --install build/Release
+```
+
+On Linux, the installed executable locates bundled libraries through `$ORIGIN/../lib` and external libraries, including MKL, through their configured link paths. A separate MKL installation is still required; the installation is not a fully self-contained package.
+
+## Development overview
+
+The v2 implementation is organized under `src/{data,analysis,infrastructure}` with mirrored headers in `include/`. Modules expose `registerOption` and `processMain`; unsupported options fall back to `legacy/`. See `docs/development/dev.md` for the module boundaries and migration checklist.
 
 ## MCP Server
 
