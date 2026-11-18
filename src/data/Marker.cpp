@@ -849,6 +849,7 @@ void Marker::read_bgen_index(string bgen_file){
         LOGGER.e(0, "bad index file, the first 1000 bytes aren't consistent."
                 "\nTry to regenerate the index by " + prompt_index + ".");
     }
+    delete[] geno_first1000bytes;
 
     fseek(h_bgen, 0L, SEEK_END);
     if(file_size != ftell(h_bgen)){
@@ -856,7 +857,7 @@ void Marker::read_bgen_index(string bgen_file){
                 "\nTry to regenerate the index by " + prompt_index + ".");
     }
     rewind(h_bgen);
-    rc = sqlite3_reset(stmt);
+    rc = sqlite3_finalize(stmt);
 
     // check variants;
     const char * sql_allvar = "SELECT count(*) FROM Variant";
@@ -872,7 +873,7 @@ void Marker::read_bgen_index(string bgen_file){
     if(rc == SQLITE_ROW){
         n_variants_total_index = sqlite3_column_int(stmt, 0);
     }
-    rc = sqlite3_reset(stmt);
+    rc = sqlite3_finalize(stmt);
 
     string outputs;
     MarkerParam markerParam = getBgenMarkerParam(h_bgen, outputs);
@@ -901,9 +902,11 @@ void Marker::read_bgen_index(string bgen_file){
        LOGGER.e(0, "bad index file: " + string(sqlite3_errmsg(db)) +
                 "\nTry to regenerate the index by " + prompt_index + ".");
     }
-    rc = sqlite3_reset(stmt);
+    rc = sqlite3_finalize(stmt);
     if(n_variants == 0){
         LOGGER.w(0, "No biallelic variants.");
+        sqlite3_close(db);
+        fclose(h_bgen);
         return;
     }
     int cur_total_num_variants = chr.size() + n_variants;
