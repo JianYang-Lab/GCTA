@@ -813,11 +813,7 @@ GRM::GRM(Pheno* pheno, Marker* marker) {
     }
     memset(grm, 0, fill_grm * sizeof(double));
 
-    int ret_N = posix_memalign((void **)&N, 32, fill_N * sizeof(uint32_t));
-    if(ret_N){
-        LOGGER.e(0, "can't allocate enough memory to store (parted) N: " + to_string(fill_grm*sizeof(uint32_t) / 1024.0/1024/1024) + "GB required.");
-    }
-    memset(N, 0, fill_N * sizeof(uint32_t));
+    N_entries = fill_N;
 
     sub_miss = new uint32_t[index_keep.size() + 64]();
 
@@ -985,41 +981,59 @@ void GRM::calculate_GRM_blas(uintptr_t *buf, const vector<uint32_t> &markerIndex
     //memset(this->cmask_buf, 0, num_byte_cmask);
 
     //LOGGER << "count N" << std::endl;
-    const int markerPerN = sizeof(uintptr_t) * CHAR_BIT;
-    int numNblock = (curNumValidMarkers + markerPerN - 1) / markerPerN;
-    static int numNSampleBlock = (n + markerPerN - 1) / markerPerN;
-    //LOGGER << "marker block: " << numNblock << ", sample block:" << numNSampleBlock << ", MarkerPerN: " << markerPerN << std::endl;
-    //LOGGER << ", n: " << n << std::endl;
-    uintptr_t *sample_miss = new uintptr_t[numNSampleBlock * markerPerN]; // don't need to set to 0
-    for(int i = 0; i < numNblock; i++){
-        int lastIndex = markerPerN * (i + 1);
-        int lastValidIndex = lastIndex > curNumValidMarkers ? curNumValidMarkers : lastIndex;
-
-        int baseMarkerIndex = markerPerN * i;
-        #pragma omp parallel for
-        for(int j = 0; j < numNSampleBlock; j++){
-            int baseMissIndex = j * markerPerN;
-            for(int k = baseMarkerIndex; k < lastValidIndex; k++){
-                int curMarkerIndex = validIndex[k];
-                sample_miss[baseMissIndex + k - baseMarkerIndex] = revbits(gbufitems[curMarkerIndex].missing[j]);
-            }
-            for(int k = lastValidIndex; k < lastIndex; k++){
-                sample_miss[baseMissIndex + k - baseMarkerIndex] = 0UL;
-            }
-            
-            flip64(&sample_miss[baseMissIndex]);
-
-            for(int k = baseMissIndex; k < baseMissIndex + markerPerN; k++){
-                sub_miss[k] += popcounts(sample_miss[k]); // give sub_miss a little more avoid overflow
-            }
-        }
-        #pragma omp parallel for
-        for(int index = 0; index < index_grm_pairs.size(); index++){
-            auto index_pair = index_grm_pairs[index];
-            N_thread(index_pair.first, index_pair.second, sample_miss);
+    bool no_missing = true;
+    for(int i = 0; i < curNumValidMarkers; i++){
+        if(gbufitems[validIndex[i]].nValidN != n){
+            no_missing = false;
+            break;
         }
     }
-    delete[] sample_miss;
+    if(!no_missing && !hasMissing){
+        hasMissing = true;
+        allocate_N();
+        if(numValidMarkers != 0){
+            add_N_constant(numValidMarkers);
+        }
+    }
+    if(no_missing){
+        if(hasMissing && curNumValidMarkers != 0){
+            add_N_constant(curNumValidMarkers);
+        }
+    }else{
+        const int markerPerN = sizeof(uintptr_t) * CHAR_BIT;
+        int numNblock = (curNumValidMarkers + markerPerN - 1) / markerPerN;
+        static int numNSampleBlock = (n + markerPerN - 1) / markerPerN;
+        uintptr_t *sample_miss = new uintptr_t[numNSampleBlock * markerPerN];
+        for(int i = 0; i < numNblock; i++){
+            int lastIndex = markerPerN * (i + 1);
+            int lastValidIndex = lastIndex > curNumValidMarkers ? curNumValidMarkers : lastIndex;
+
+            int baseMarkerIndex = markerPerN * i;
+            #pragma omp parallel for
+            for(int j = 0; j < numNSampleBlock; j++){
+                int baseMissIndex = j * markerPerN;
+                for(int k = baseMarkerIndex; k < lastValidIndex; k++){
+                    int curMarkerIndex = validIndex[k];
+                    sample_miss[baseMissIndex + k - baseMarkerIndex] = revbits(gbufitems[curMarkerIndex].missing[j]);
+                }
+                for(int k = lastValidIndex; k < lastIndex; k++){
+                    sample_miss[baseMissIndex + k - baseMarkerIndex] = 0UL;
+                }
+
+                flip64(&sample_miss[baseMissIndex]);
+
+                for(int k = baseMissIndex; k < baseMissIndex + markerPerN; k++){
+                    sub_miss[k] += popcounts(sample_miss[k]);
+                }
+            }
+            #pragma omp parallel for
+            for(int index = 0; index < index_grm_pairs.size(); index++){
+                auto index_pair = index_grm_pairs[index];
+                N_thread(index_pair.first, index_pair.second, sample_miss);
+            }
+        }
+        delete[] sample_miss;
+    }
 
     finished_marker += num_marker;
 
@@ -1431,25 +1445,37 @@ void GRM::deduce_GRM(){
     */
     
     if(bBLAS){
-        for(int pair1 = part_keep_indices.first; pair1 != part_keep_indices.second + 1; pair1++){
-            uint32_t sub_miss1 = numValidMarkers - sub_miss[pair1];
-            for(int pair2 = 0; pair2 != pair1 + 1; pair2++){
-                uint32_t sub_N = *(po_N + pair2) + sub_miss1 - sub_miss[pair2];
-                w_N[pair2] = (float)sub_N;
-
-                if(sub_N){
-                    w_grm[pair2] = (float)((*(po_grm + (uint64_t)pair2 * m))/sub_N) * mtd_weight;
-                }else{
-                    w_grm[pair2] = 0.0;
+        if(!hasMissing){
+            for(int pair1 = part_keep_indices.first; pair1 != part_keep_indices.second + 1; pair1++){
+                uint32_t sub_N = numValidMarkers;
+                for(int pair2 = 0; pair2 != pair1 + 1; pair2++){
+                    w_N[pair2] = (float)sub_N;
+                    if(sub_N){
+                        w_grm[pair2] = (float)((*(po_grm + (uint64_t)pair2 * m))/sub_N) * mtd_weight;
+                    }else{
+                        w_grm[pair2] = 0.0;
+                    }
                 }
-                //po_N++;
-                //po_grm++;
+                write_GRM(w_grm, w_N, grm_out, N_out, pair1, thresh);
+                po_grm = po_grm + 1;
             }
-            //fwrite(w_grm, sizeof(float), pair1 + 1, grm_out);
-            //fwrite(w_N, sizeof(float), pair1 + 1, N_out);
-            write_GRM(w_grm, w_N, grm_out, N_out, pair1, thresh);
-            po_N = po_N + pair1 + 1;
-            po_grm = po_grm + 1;
+        }else{
+            for(int pair1 = part_keep_indices.first; pair1 != part_keep_indices.second + 1; pair1++){
+                uint32_t sub_miss1 = numValidMarkers - sub_miss[pair1];
+                for(int pair2 = 0; pair2 != pair1 + 1; pair2++){
+                    uint32_t sub_N = *(po_N + pair2) + sub_miss1 - sub_miss[pair2];
+                    w_N[pair2] = (float)sub_N;
+
+                    if(sub_N){
+                        w_grm[pair2] = (float)((*(po_grm + (uint64_t)pair2 * m))/sub_N) * mtd_weight;
+                    }else{
+                        w_grm[pair2] = 0.0;
+                    }
+                }
+                write_GRM(w_grm, w_N, grm_out, N_out, pair1, thresh);
+                po_N = po_N + pair1 + 1;
+                po_grm = po_grm + 1;
+            }
         }
     }
     /* // don't need special case
@@ -1518,6 +1544,29 @@ void GRM::deduce_GRM(){
 
 }
 
+
+void GRM::allocate_N(){
+    if(N){
+        return;
+    }
+    int ret = posix_memalign((void **)&N, 32, N_entries * sizeof(uint32_t));
+    if(ret){
+        LOGGER.e(0, "can't allocate enough memory to store (parted) N: " + to_string(N_entries * sizeof(uint32_t) / 1024.0/1024/1024) + "GB required.");
+    }
+    memset(N, 0, N_entries * sizeof(uint32_t));
+}
+
+void GRM::add_N_constant(uint32_t count){
+    for(auto &index_pair : index_grm_pairs){
+        uint64_t startPos = ((uint64_t)index_pair.first + 1 + part_keep_indices.first) * (index_pair.first - part_keep_indices.first) / 2;
+        uint32_t *po_N = N + startPos;
+        for(int pair1 = index_pair.first; pair1 != index_pair.second + 1; pair1++){
+            for(int pair2 = 0; pair2 != pair1 + 1; pair2++){
+                *po_N++ += count;
+            }
+        }
+    }
+}
 
 void GRM::N_thread(int grm_index_from, int grm_index_to, const uintptr_t* cur_cmask){
     uint64_t startPos = ((uint64_t)grm_index_from + 1 + part_keep_indices.first) * (grm_index_from - part_keep_indices.first) / 2;

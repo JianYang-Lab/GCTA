@@ -53,6 +53,8 @@ public:
     
     void grm_thread(int grm_index_from, int grm_index_to);
     void N_thread(int grm_index_from, int grm_index_to, const uintptr_t* cmask);
+    void allocate_N();
+    void add_N_constant(uint32_t count);
     void deduce_GRM();
     vector<uint32_t> divide_parts(uint32_t from, uint32_t to, uint32_t num_parts);
     vector<uint32_t> divide_parts_mem(uint32_t n_sample, uint32_t num_parts);
@@ -83,6 +85,8 @@ private:
 
     double *grm = NULL;
     uint32_t *N = NULL;
+    uint64_t N_entries = 0;
+    bool hasMissing = false;
     uint32_t *sub_miss = NULL; // sample miss in all markers
 
     //========
