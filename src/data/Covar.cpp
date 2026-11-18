@@ -830,7 +830,10 @@ int Covar::registerOption(map<string, vector<string>>& options_in){
         Covar covar;
         vector<double> X;
         vector<uint32_t> sample_index;
-        covar.getCovarXRaw(samples, X, sample_index);
+        if(!covar.getCovarXRaw(samples, X, sample_index) || sample_index.empty()){
+            LOGGER.w(0, "no covariate data is available for --test-covar.");
+            return 0;
+        }
         LOGGER<< "samples " << sample_index.size() << std::endl;
         LOGGER << "X size: " << X.size() << std::endl;
 
@@ -841,7 +844,10 @@ int Covar::registerOption(map<string, vector<string>>& options_in){
             LOGGER << std::endl;
         }
 
-        covar.getCovarX(samples, X, sample_index);
+        if(!covar.getCovarX(samples, X, sample_index) || sample_index.empty()){
+            LOGGER.w(0, "no covariate data is available for --test-covar.");
+            return 0;
+        }
         LOGGER<< "samples " << sample_index.size() << std::endl;
         LOGGER << "X size: " << X.size() << std::endl;
 

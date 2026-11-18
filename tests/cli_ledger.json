@@ -4380,19 +4380,17 @@
     },
     "--test-covar": {
       "scope": "M1",
-      "status": "excluded",
-      "tests": [],
-      "evidence": "excluded",
-      "details": "Attempted cli.v2_flags.components with --test-covar; the debug hook reports template: 8 but samples 0 / X size 0 and then exits with SIGFPE (-8). It is a developer diagnostic, not a supported analysis, and needs a code fix before regression coverage.",
+      "status": "covered",
+      "tests": [
+        "cli.v2_flags.components"
+      ],
+      "evidence": "error_path",
+      "details": "Runs --freq with --test-covar and a covariate file; asserts v2 dispatch, the empty-covariate diagnostic, and exit 0 instead of SIGFPE. The flag remains a developer diagnostic with no supported analysis semantics.",
       "dispatch": "v2 module processMain",
       "threads": "Numeric scenarios run and compare 1 and 4 threads; error/format-only scenarios are not numerical and record deterministic decoding instead.",
       "parsers": [
         "v2"
-      ],
-      "exclusion": {
-        "attempted": "v2 --bfile/--freq with --test-covar covar.txt",
-        "required": "Fix the debug covariate expansion crash and define its supported observable behavior."
-      }
+      ]
     },
     "--thread-num": {
       "scope": "M1",

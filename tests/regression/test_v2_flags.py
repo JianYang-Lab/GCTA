@@ -183,6 +183,16 @@ def run_components(gcta, work, threads):
     rows = read_table(supplied_output.with_suffix(".frq"))
     for row, expected_frequency in zip(rows[1:], supplied):
         assert math.isclose(float(row[5]), expected_frequency, rel_tol=2e-5, abs_tol=1e-6)
+
+    test_covar = run_gcta(
+        gcta,
+        work,
+        "test_covar",
+        ["--bfile", prefix, "--freq", "--test-covar", covariates],
+        threads=threads,
+    )
+    assert_v2(test_covar, "Computing allele frequencies")
+    assert "no covariate data is available for --test-covar" in console_text(test_covar)
     return grm, updated.with_suffix(".frq"), supplied_output.with_suffix(".frq")
 
 
