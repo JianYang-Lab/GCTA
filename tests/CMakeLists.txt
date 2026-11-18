@@ -114,3 +114,16 @@ gcta_add_regression_test(linkage.numeric_symbols test_linkage.py numeric_symbols
 set_tests_properties(linkage.numeric_symbols PROPERTIES SKIP_REGULAR_EXPRESSION "SKIP:")
 gcta_add_regression_test(backend.grm test_backends.py grm integration)
 set_tests_properties(backend.grm PROPERTIES SKIP_REGULAR_EXPRESSION "SKIP:")
+
+if(LINUX)
+    add_test(
+        NAME install.runtime
+        COMMAND ${CMAKE_COMMAND}
+            -DGCTA_INSTALL_TEST_BINARY_DIR=${CMAKE_BINARY_DIR}
+            -DGCTA_INSTALL_TEST_PREFIX=${CMAKE_INSTALL_PREFIX}
+            -DGCTA_INSTALL_TEST_WORK=${CMAKE_CURRENT_BINARY_DIR}/output/install.runtime
+            -DGCTA_INSTALL_TEST_DATA=${GCTA_TEST_DATA}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/install_smoke.cmake
+    )
+    set_tests_properties(install.runtime PROPERTIES LABELS "integration" TIMEOUT 120)
+endif()

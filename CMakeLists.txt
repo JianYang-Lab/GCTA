@@ -253,9 +253,9 @@ endforeach()
 
 # Installation
 if(LINUX)
-    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH OFF)
+    set_target_properties(gcta64 PROPERTIES
+        INSTALL_RPATH "$ORIGIN/../lib"
+        INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     # Targets
     install(TARGETS gcta64 mainV1 dcdflib ${GCTA_LIBS}
