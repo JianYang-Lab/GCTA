@@ -25,6 +25,8 @@ gcta::gcta(int autosome_num, double rm_ld_cutoff, string out)
     _autosome_num = autosome_num;
     _rm_ld_cutoff = rm_ld_cutoff;
     _out = out;
+    _grm_mkl = NULL;
+    _geno_mkl = NULL;
     _dosage_flag = false;
     _grm_bin_flag = false;
     _reml_mtd = 0;
@@ -57,6 +59,8 @@ gcta::gcta(int autosome_num, double rm_ld_cutoff, string out)
 }
 
 gcta::gcta() {
+    _grm_mkl = NULL;
+    _geno_mkl = NULL;
     _dosage_flag = false;
     _grm_bin_flag = false;
     _reml_mtd = 0;
