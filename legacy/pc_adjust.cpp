@@ -249,7 +249,12 @@ void restrict_snp_effect(map<string,int> meta_snp_name_map, vector<string> snp_n
 }
 
 void init_ld_snp_index(int snp_start, int &snp_end, vector<int> snp_remain, vector<int> snp_chr, vector<int> snp_bp, int wind_size) {
-    int snp_index = snp_start, snp_test_start = snp_remain[snp_start], snp_test_end = 0, m = snp_remain.size();
+    int m = snp_remain.size();
+    if(snp_start < 0 || snp_start >= m) {
+        snp_end = m - 1;
+        return;
+    }
+    int snp_index = snp_start, snp_test_start = snp_remain[snp_start], snp_test_end = 0;
 
     while(1) {
         snp_index++;
