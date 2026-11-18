@@ -66,13 +66,18 @@
       "--simu-qt"
     ]
   },
+  "m2": {
+    "status": "complete",
+    "deferred_flags": 0
+  },
   "sources": [
     "src/main.cpp supported_flagsV2",
     "legacy/option.cpp option()"
   ],
   "notes": [
-    "All flags from both parsers are enumerated. M1 includes every v2 flag and every legacy terminal main-analysis trigger. Only legacy-only modifiers are deferred to M2.",
-    "Existing baselines are characterized evidence with source tests/baselines/manifest.json and sanity assertions; independent oracles are preferred where already available. New tests do not modify existing baselines."
+    "All flags from both parsers are enumerated. M1 covers every v2 flag and every legacy terminal main-analysis trigger.",
+    "M2 covers every legacy-only modifier; no deferred entries remain. Covered entries map to a passing ctest with observable output, format/error evidence, and 1/4-thread checks where numerical.",
+    "Existing baselines are characterized evidence with source tests/baselines/manifest.json and sanity assertions; new M2 tests do not modify existing baselines."
   ],
   "flags": {
     "--HEreg": {
