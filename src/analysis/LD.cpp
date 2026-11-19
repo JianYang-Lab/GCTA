@@ -65,7 +65,6 @@ void LD::calcLD(){
     int nc1 = cur_buffer_offset[cacl_index_buffer] / nr;
     double alpha = 1.0 / (nr - 1);
     double *ptr1 = geno_buffer[cacl_index_buffer].get();
-    double *res1 = new double[nc1 * nc1];
 
     // GWAS LD is a band: only markers within the physical window are written.
     vector<uint32_t> band_sizes(nc1);
@@ -73,19 +72,33 @@ void LD::calcLD(){
         band_sizes[i] = geno->marker->getNextWindowSize(cur_process_marker_index + i, ld_window);
     }
 
-#if GCTA_CPU_x86
-    dsyrk(&uplo, &trans, &nc1, &nr, &alpha, ptr1, &nr, &zero, res1, &nc1);
-#else
-    dsyrk_(&uplo, &trans, &nc1, &nr, &alpha, ptr1, &nr, &zero, res1, &nc1);
-#endif
-
     double *ptr2 = geno_buffer[!cacl_index_buffer].get();
     const int nc2 = ptr2 ? cur_buffer_offset[!cacl_index_buffer] / nr : 0;
     const int row_block = 64;
+    vector<double> within(static_cast<size_t>(std::min(row_block, nc1)) * nc1);
     vector<double> cross;
     vector<float> row;
+    auto multiply = [&](int rows, int cols, const double *left, const double *right,
+                        double *result, int stride){
+#if GCTA_CPU_x86
+        dgemm(&trans, &notrans, &rows, &cols, &nr, &alpha, left, &nr, right, &nr, &zero, result, &stride);
+#else
+        dgemm_(&trans, &notrans, &rows, &cols, &nr, &alpha, left, &nr, right, &nr, &zero, result, &stride);
+#endif
+    };
     for(int r0 = 0; r0 < nc1; r0 += row_block){
         const int br = std::min(row_block, nc1 - r0);
+        const int stride = nc1 - r0;
+        const double *strip_geno = ptr1 + static_cast<size_t>(r0) * nr;
+#if GCTA_CPU_x86
+        dsyrk(&uplo, &trans, &br, &nr, &alpha, strip_geno, &nr, &zero, within.data(), &stride);
+#else
+        dsyrk_(&uplo, &trans, &br, &nr, &alpha, strip_geno, &nr, &zero, within.data(), &stride);
+#endif
+        if(stride > br){
+            multiply(stride - br, br, strip_geno + static_cast<size_t>(br) * nr,
+                     strip_geno, within.data() + br, stride);
+        }
         int need = 0;
         if(ptr2){
             for(int i = r0; i < r0 + br; i++){
@@ -97,11 +110,7 @@ void LD::calcLD(){
         }
         if(need){
             cross.resize(static_cast<size_t>(need) * br);
-#if GCTA_CPU_x86
-            dgemm(&trans, &notrans, &need, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, cross.data(), &need);
-#else
-            dgemm_(&trans, &notrans, &need, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, cross.data(), &need);
-#endif
+            multiply(need, br, ptr2, strip_geno, cross.data(), need);
         }
         for(int j = 0; j < br; j++){
             const int i = r0 + j;
@@ -111,11 +120,11 @@ void LD::calcLD(){
                 LOGGER.e(0, "inconsistent LD window boundaries.");
             }
             row.resize(cur_size);
-            const double *within = res1 + static_cast<size_t>(i) * nc1 + i;
-            std::transform(within, within + inside, row.data(), static_cast_func<float>());
+            const double *in = within.data() + static_cast<size_t>(j) * stride + j;
+            std::transform(in, in + inside, row.data(), static_cast_func<float>());
             if(cur_size > inside){
                 const double *outside = cross.data() + static_cast<size_t>(j) * need;
-                std::transform(outside, outside + cur_size - inside, row.data() + inside, static_cast_func<float>());
+                std::transform(outside, outside + (cur_size - inside), row.data() + inside, static_cast_func<float>());
             }
             if(fwrite(&cur_size, sizeof(uint32_t), 1, h_ld) != 1 ||
                fwrite(row.data(), sizeof(float), cur_size, h_ld) != cur_size){
@@ -124,7 +133,6 @@ void LD::calcLD(){
         }
     }
     cur_process_marker_index += nc1;
-    delete[] res1;
     geno_buffer[cacl_index_buffer].reset(nullptr);
     fflush(h_ld);
 }
