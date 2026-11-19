@@ -79,71 +79,52 @@ void LD::calcLD(){
     dsyrk_(&uplo, &trans, &nc1, &nr, &alpha, ptr1, &nr, &zero, res1, &nc1);
 #endif
 
-    double *res2 = nullptr;
-    // is previous buffer active?
-    int nc2 = 0;
-    if(geno_buffer[!cacl_index_buffer]){
-        nc2 = cur_buffer_offset[!cacl_index_buffer] / nr;
-        double *ptr2 = geno_buffer[!cacl_index_buffer].get();
-        res2 = new double[nc2 * nc1];
-        // Only the rows whose window extends into the next buffer, and only
-        // the columns each row needs, contribute to the banded output.
-        const int row_block = 64;
-        for(int r0 = 0; r0 < nc1; r0 += row_block){
-            const int br = std::min(row_block, nc1 - r0);
-            const int last = r0 + br - 1;
-            const uint32_t inside = nc1 - last;
-            uint32_t need = band_sizes[last] > inside ? band_sizes[last] - inside : 0;
-            need = std::min<uint32_t>(need, nc2);
-            if(need == 0){
-                continue;
+    double *ptr2 = geno_buffer[!cacl_index_buffer].get();
+    const int nc2 = ptr2 ? cur_buffer_offset[!cacl_index_buffer] / nr : 0;
+    const int row_block = 64;
+    vector<double> cross;
+    vector<float> row;
+    for(int r0 = 0; r0 < nc1; r0 += row_block){
+        const int br = std::min(row_block, nc1 - r0);
+        int need = 0;
+        if(ptr2){
+            for(int i = r0; i < r0 + br; i++){
+                const uint32_t inside = nc1 - i;
+                if(band_sizes[i] > inside){
+                    need = std::max(need, static_cast<int>(std::min<uint32_t>(band_sizes[i] - inside, nc2)));
+                }
             }
-            const int need_size = need;
-            // res2 is stored as next-buffer markers by current-buffer markers,
-            // so the block of rows [r0, r0 + br) starts at r0 * nc2.
+        }
+        if(need){
+            cross.resize(static_cast<size_t>(need) * br);
 #if GCTA_CPU_x86
-            dgemm(&trans, &notrans, &need_size, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, res2 + (int64_t)r0 * nc2, &nc2);
+            dgemm(&trans, &notrans, &need, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, cross.data(), &need);
 #else
-            dgemm_(&trans, &notrans, &need_size, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, res2 + (int64_t)r0 * nc2, &nc2);
+            dgemm_(&trans, &notrans, &need, &br, &nr, &alpha, ptr2, &nr, ptr1 + (int64_t)r0 * nr, &nr, &zero, cross.data(), &need);
 #endif
         }
-    }
-    
-    for(int i = 0; i < nc1; i++){
-        uint32_t cur_size;
-        float *buffer;
-        if(res2){ 
-            cur_size = band_sizes[i];
-            buffer = new float[cur_size];
-            uint32_t cur_size1 = nc1 - i;
-            uint32_t cur_size2 = cur_size - cur_size1;
-            double* temp_ptr = res1 + i + i*nc1;
-            double* temp_ptr2 = res2 + i * nc2;
-            std::transform(temp_ptr, temp_ptr + cur_size1, buffer, static_cast_func<float>());
-            std::transform(temp_ptr2, temp_ptr2 + cur_size2, buffer + cur_size1, static_cast_func<float>());
-        }else{
-            cur_size = nc1 - i;
-            buffer = new float[cur_size];
-            double* temp_ptr = res1 + i + i * nc1;
-            std::transform(temp_ptr, temp_ptr + cur_size, buffer, static_cast_func<float>());
+        for(int j = 0; j < br; j++){
+            const int i = r0 + j;
+            const uint32_t inside = nc1 - i;
+            const uint32_t cur_size = ptr2 ? band_sizes[i] : inside;
+            if(cur_size < inside || cur_size - inside > static_cast<uint32_t>(need)){
+                LOGGER.e(0, "inconsistent LD window boundaries.");
+            }
+            row.resize(cur_size);
+            const double *within = res1 + static_cast<size_t>(i) * nc1 + i;
+            std::transform(within, within + inside, row.data(), static_cast_func<float>());
+            if(cur_size > inside){
+                const double *outside = cross.data() + static_cast<size_t>(j) * need;
+                std::transform(outside, outside + cur_size - inside, row.data() + inside, static_cast_func<float>());
+            }
+            if(fwrite(&cur_size, sizeof(uint32_t), 1, h_ld) != 1 ||
+               fwrite(row.data(), sizeof(float), cur_size, h_ld) != cur_size){
+                LOGGER.e(0, "can't write to " + options["out"] + ".");
+            }
         }
-        // write to file
-        if(fwrite(&cur_size, sizeof(uint32_t), 1, h_ld) != 1){
-            LOGGER.e(0, "can't write to " + options["out"] + ".");
-        }
-        if(fwrite(buffer, sizeof(float), cur_size, h_ld) != cur_size){
-            LOGGER.e(0, "can't write to " + options["out"] + ".");
-        }
-        delete[] buffer;
-        cur_process_marker_index++;
     }
-    //clean 
-    if(res1){
-        delete[] res1;
-    }
-    if(res2){
-        delete[] res2;
-    }
+    cur_process_marker_index += nc1;
+    delete[] res1;
     geno_buffer[cacl_index_buffer].reset(nullptr);
     fflush(h_ld);
 }
@@ -258,4 +239,3 @@ void LD::processMain(){
         }
     }
 }
-
