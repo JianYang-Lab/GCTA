@@ -171,17 +171,17 @@ def prepare_fastgwa_family(gcta, work, option, envir, sample_count=1024, marker_
     return arguments, sample_count, marker_count * repeats
 
 
-def prepare_ld_matrix(work, sample_count=1024, marker_count=8193):
+def prepare_ld_matrix(work, sample_count=1024, marker_count=8193, spacing=1000, window=1000):
     prefix = work / "input" / "synthetic"
     write_synthetic_plink(prefix, sample_count=sample_count, marker_count=marker_count)
     lines = prefix.with_suffix(".bim").read_text(encoding="utf-8").splitlines()
     spaced = []
     for index, line in enumerate(lines):
         fields = line.split()
-        fields[3] = str(1000 + index * 1000)
+        fields[3] = str(1000 + index * spacing)
         spaced.append(" ".join(fields))
     prefix.with_suffix(".bim").write_text("\n".join(spaced) + "\n", encoding="utf-8")
-    return ["--bfile", prefix, "--ld-matrix", "--ld-wind", "1000"], sample_count, marker_count
+    return ["--bfile", prefix, "--ld-matrix", "--ld-wind", str(window)], sample_count, marker_count
 
 
 def prepare_greml(gcta, data, work):
@@ -273,6 +273,10 @@ def prepare_scenario(gcta, data, work, scenario):
         )
     if scenario == "ld_matrix":
         return prepare_ld_matrix(work)
+    if scenario == "ld_matrix_dense":
+        return prepare_ld_matrix(work, sample_count=256, spacing=250)
+    if scenario == "ld_matrix_narrow":
+        return prepare_ld_matrix(work, window=50)
     return prepare_fastgwa(gcta, work, scenario)
 
 
@@ -404,6 +408,8 @@ def main():
             "fastgwa_2df_mixed_nosandwich",
             "fastgwa_glmm_large",
             "ld_matrix",
+            "ld_matrix_dense",
+            "ld_matrix_narrow",
         ),
     )
     parser.add_argument("--threads", nargs="+", type=int, default=(1, 2, 4))
